@@ -11,7 +11,43 @@ ul {
 }
 .synopsis {
     font-size: 90%;
-}
+    font-size: var(--font-size-smaller);
+    opacity: var(--medium-em);
+    }
+
+/* surface/ink */
+#themeMood {
+    align-items: stretch;
+    align-self: stretch;
+    display: inline-flex;
+    justify-content: stretch;
+    user-select: none;
+    }
+#themeMood > span {
+    border: 1px solid var(--ink-1);
+    color: var(--ink-1);
+    display: inline-flex;
+    background-color: var(--surface-1);
+    display: inline-block;
+    padding: 0 0.5em;
+    text-align: center;
+    user-select: none;
+    }
+
+/* primary color */
+#themePrimary {
+    align-items: stretch;
+    align-self: stretch;
+    display: inline-flex;
+    justify-content: stretch;
+    position: relative;
+    }
+#themePrimary > span {
+    background-color: rgb(var(--primary-50));
+    display: inline-flex;
+    width: 2em;
+    }
+
 [href="advanced-settings.html"] {
     display: none;
 }
@@ -21,6 +57,7 @@ body[dir="rtl"] ul {
 }
 
 #userSettings {
+  position: relative;
   padding-left: 0;
   margin: 50px;
   margin-top: 20px;
@@ -121,14 +158,14 @@ input[type=range] {
   background-color: transparent;
   height: 10px;
   width: 95%;
-  border-color: #0076FF;
+  border-color: var(--adn-blue);
   padding:0;
   margin:0;
 }
 input[type=range]::-webkit-slider-thumb{
     -webkit-appearance: none;
     -moz-apperance: none;
-    box-shadow: -320px 0 0 315px #0076FF;
+    box-shadow: -320px 0 0 315px var(--adn-blue);
     width: 2em;
     height: 8px;
     background-color: #004ca5;
@@ -155,9 +192,9 @@ p:disabled{
   color: #777;
 }
 input[type=range]::-moz-range-progress {
-  background-color: #0076FF;
+  background-color: var(--adn-blue);
   height: 10px;
-  border-color: #0076FF;
+  border-color: var(--adn-blue);
   margin-right: 5px;
   padding:0px;
   border-radius: 2px;
@@ -200,7 +237,7 @@ input[type=range]:disabled::-moz-range-progress {
     content: "×";
 }
 #export-dialog h5{
-  background:#0076FF;
+  background:var(--adn-blue);
   margin:-10px -20px 20px -20px;
   font-size:22px;
   font-family: bebas_neue, sans-serif;
@@ -241,14 +278,14 @@ input[type=range]:disabled::-moz-range-progress {
   height: 16px;
   width: 16px;
   background-color: black;
-  border-color:#0076FF;
+  border-color:var(--adn-blue);
   border-style: solid;
   border-width: 2px;
   border-radius: 50%;
 }
 /* When the radio button is checked, add a blue background */
 .radioContainer input:checked ~ .radiobtn {
-  background-color: #0076FF;
+  background-color: var(--adn-blue);
 }
 
 /* Create the indicator (the dot/circle - hidden when not checked) */
@@ -271,6 +308,39 @@ input[type=range]:disabled::-moz-range-progress {
   height: 6px;
   border-radius: 50%;
   background: black;
+}
+
+/* Click exceptions expandable */
+.clickExceptions-expander {
+    cursor: pointer;
+}
+.clickExceptions-expander .listExpander {
+    display: inline-block;
+    font-size: 14px;
+    color: var(--adn-blue);
+    fill: var(--adn-blue);
+    min-width: 16px;
+}
+.clickExceptions-expander .listExpander svg {
+    transform: rotate(90deg);
+    transform-origin: 50%;
+    width: 10px;
+    height: 10px;
+    transition: transform 0.2s;
+}
+.clickExceptions-expander.expanded .listExpander svg {
+    transform: rotate(180deg);
+}
+.clickExceptions-expander #clickingExceptions {
+    display: none;
+    width: 95%;
+    min-height: 80px;
+    margin-top: 6px;
+    font-size: var(--font-size-smaller);
+    resize: vertical;
+}
+.clickExceptions-expander.expanded #clickingExceptions {
+    display: block;
 }
 
 /* Mobile devices */

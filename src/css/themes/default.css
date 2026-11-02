@@ -35,6 +35,7 @@
     --green-40: 84 255 189;
     --green-50: 63 225 176;
     --green-60: 42 195 162;
+    --green-65: 21 165 149;
     --green-70: 0 135 135;
     --green-80: 0 94 94;
     --ink-10: 57 52 115;
@@ -127,8 +128,8 @@
  * */
 :root {
     --font-size: 14px;
-    --font-size-smaller: 13px;
-    --font-size-xsmall: 11px;
+    --font-size-smaller: calc(var(--font-size) - 1px);
+    --font-size-xsmall: calc(var(--font-size) - 3px);
     --font-size-larger: 15px;
     --font-family: Inter, sans-serif;
     --monospace-size: 12px;
@@ -239,6 +240,8 @@
     --dashboard-tab-focus-surface-rgb: var(--primary-90);
     --dashboard-highlight-surface-rgb: var(--primary-90);
 
+    --dashboard-happy-green: rgb(var(--green-65));
+
     /* popup panel */
     --popup-cell-cname-ink: #0054d7; /* h260 S:100 Luv:40 */;
     --popup-cell-label-mixed-surface: #c29100; /* TODO: fix */
@@ -260,14 +263,13 @@
     --cm-cursor: var(--ink-0);
     --cm-foldmarker-ink: rgb(var(--blue-40));
     --cm-gutter-border: var(--surface-1);
-    --cm-gutter-surface: var(--dark-gray-70); /* Adn */
-    --cm-gutter-ink: #fff; /* Adn */
+    --cm-gutter-ink: var(--ink-3);
+    --cm-gutter-surface: var(--surface-2);
     --cm-matchingbracket: rgb(var(--green-30));
     --cm-merge-copy-ink: rgb(var(--blue-50));
     --cm-merge-chunk-border: rgb(var(--surface-0-rgb) / 40%);
     --cm-merge-chunk-surface: rgb(var(--surface-0-rgb) / 40%);
     --cm-negative: #e32f00; /* h:15 S:100 Luv:50 */
-    --cm-red: #c400ff; /* h:0 S:100 Luv:50 ---- Adn StrictBlock */
     --cm-positive: #008a21; /* h:130 S:100 Luv:50 */
     --cm-selection-surface: rgb(var(--gray-80));
     --cm-selection-focused-surface: rgb(var(--primary-80));
@@ -276,8 +278,8 @@
     --cm-search-match-surface: rgb(var(--yellow-40) / 50%);
 
     /* syntax highlight: static filtering */
-    --sf-comment-ink: var(--light-gray-90);
-    --sf-def-ink: #007eff; /* Adn */
+    --sf-comment-ink: var(--ink-3);
+    --sf-def-ink: #3c3aff; /* h:266 S:100 Luv:40 */
     --sf-directive-ink: var(--ink-1);
     --sf-error-ink: #ff8981; /* h15 S:100 Luv:70 */
     --sf-error-surface: #ff898133; /* h15 S:100 Luv:70 @ 20% */
@@ -285,24 +287,89 @@
     --sf-notice-ink: var(--ink-4);
     --sf-readonly-ink: var(--ink-3);
     --sf-tag-ink: #006e2e /* h:135 S:100 Luv:40 */;
-    --sf-value-ink: var(--orange-60); /* Adn */
-    --sf-variable-ink: var(--violet-40); /* Adn */
-    --sf-warning-ink: #e49d00; /* h:50 S:100 Luv:70 */
+    --sf-unicode-ink: var(--ink-1);
+    --sf-value-ink: #974900 /* h:30 S:100 Luv:40 */;
+    --sf-variable-ink: var(--ink-1);
+    --sf-warning-ink: #ffbb03; /* h:50 S:100 Luv:70 */
     --sf-warning-surface: #e49d0033; /* h:50 S:100 Luv:70 @ 20% */
 
     /* syntax highlight: dynamic filtering */
     --df-allow-ink: var(--cm-positive);
     --df-block-ink: var(--cm-negative);
     --df-noop-ink: rgb(var(--dark-gray-10));
-    --df-strictBlock-ink: var(--cm-red);
+    --df-strictBlock-ink: var(--cm-red); /* Adn specific */
 
     /* logger */
-    --logger-blocked-surface: #c0000059;
-    --logger-modified-surface: #5b00c06b;
-    --logger-allowed-surface: #00a0004a;
-    --logger-blocked-em-surface: #c0000036;
+    --logger-blocked-surface: #c0000059; /* Adn */
+    --logger-modified-surface: #5b00c06b; /* Adn */
+    --logger-allowed-surface: #00a0004a; /* Adn */
+    --logger-blocked-em-surface: #c0000036; /* Adn */
     --logger-modified-em-surface: #0000c028;
-}
+    --logger-redirected-surface: rgb(var(--yellow-5) / 50%);
+    --logger-scriptlet-surface: rgb(var(--yellow-30) / 50%);
+
+    /* AdNauseam colors */
+    --adn-white: #FFFFFF;
+    --adn-black: #000000;
+    --adn-blue: #0076FF;
+    --adn-purple: #BD10E0;
+    --adn-red: #D8000C;
+    --adn-ligher-gray: #dadada;
+    --adn-light-gray: #999;
+    --adn-medium-dark-gray: #4C4D4C;
+    --adn-dark-gray: #444;
+    --adn-transparent-gray: #8d8d8d82;
+    --adn-transparent-drak-gray: #44444482;
+    --adn-money-green: #85bb65;
+    
+    /* adn text */
+    --adn-text: var(--adn-light-gray);
+    --adn-disabled-button: var(--adn-transparent-gray);
+    
+    /* adn menu */
+    --adn-menu-text: var(--adn-medium-dark-gray);
+    --adn-menu-highlight-text: var(--adn-light-gray);
+    --adn-menu-header-text: var(--adn-ligher-gray);
+    --adn-ad-cost: var(--adn-money-green);
+    --adn-menu-border: var(--adn-dark-gray);
+    
+    /* adn input */
+    --adn-text-input-bg: var(--adn-transparent-drak-gray);
+    --adn-text-input: var(--adn-transparent-drak-gray);
+    --adn-text-contrast: var(--adn-white);
+    
+    /* adn buttons */
+    --adn-button-disabled: var(--adn-transparent-gray);
+    --adn-button-active: var(--adn-black);
+    
+    /* adn tabButton */
+    --adn-tab-button-bg: var(--adn-dark-gray);
+    
+    /* adn notification error */ 
+    --adn-notification-error: var(--adn-red);
+    --adn-notification-error-bg: #ffbaba;
+    
+    /* adn notification warning */
+    --adn-notification-warning: #9F6000;
+    --adn-notification-warning-bg: #FEEFB3;
+    
+    /* adn notification info */
+    --adn-notification-info: #00529B;
+    --adn-notification-info-bg: #BDE5F8;
+    
+    /* adn notification dnt */
+    --adn-notification-dnt: #4F8A10;
+    --adn-notification-dnt-bg: #DFF2BF;
+    
+    /* adn logger */
+    --adn-logger-dnt: rgba(150,185,107,0.5);
+    --adn-logger-adnallow: rgba(0,118,255,0.35);
+    
+    /* adn vault */
+    --adn-vault-text: var(--adn-medium-dark-gray);
+    --adn-vault-highlight-text: var(--adn-light-gray);
+    /* end AdNauseam colors */ 
+}   
 
 /**
     Use slightly darker inks on lower pixel-density devices to improve
@@ -310,7 +377,6 @@
 */
 :root:not(.hidpi) {
     --default-ink: var(--ink-90);
-    --button-ink: #0076FF;  /* AdNauseam */
     --fieldset-header-ink: var(--ink-50);
     --link-ink: var(--violet-80);
 }
@@ -323,7 +389,7 @@
     --elevation-up1-opacity: 12%;
     --elevation-up2-opacity: 24%;
 
-    --ink-rgb: var(--gray-95);
+    --ink-rgb: var(--gray-90);
     --ink-0: white;
     --ink-100: black;
 
@@ -387,12 +453,11 @@
     /* logger */
     --logger-modified-surface: #663efd60;
     --logger-redirected-surface: rgb(var(--yellow-5) / 40%);
+    --logger-scriptlet-surface: rgb(var(--yellow-30) / 40%);
 }
 
-:root.dark input,
-:root.dark select,
-:root.dark textarea {
-    color-scheme: dark;
+:root.dark {
+    color-scheme: dark light;
 }
 
 /*
@@ -418,8 +483,11 @@
     --fieldset-header-surface: transparent;
     --fieldset-header-ink: var(--ink-2);
 
-    --button-ink: #0076FF;
+    --native-control-opacity: 0;
+
+    --button-ink: var(--ink-1);
     --button-surface: rgb(var(--button-surface-rgb));
+    --button-border-size: 0;
     --button-border-radius: 5px;
     --button-preferred-ink: var(--accent-ink-1);
     --button-preferred-surface: var(--accent-surface-1);
@@ -430,6 +498,7 @@
     --checkbox-ink: var(--ink-3);
     --checkbox-checked-ink: var(--accent-surface-1);
     --checkbox-disabled-filter: opacity(50%);
+    --checkbox-margin-end: calc(var(--font-size) * 0.75);
 
     --notice-ink: var(--accent-ink-1);
     --notice-surface: var(--accent-surface-1);
@@ -462,11 +531,18 @@
     --popup-cell-block-surface: rgb(var(--popup-cell-block-surface-rgb));
     --popup-power-ink: rgb(var(--popup-power-ink-rgb));
     --popup-toolbar-surface: rgb(var(--primary-80) / 15%);
-    --popup-toolbar-surface-hover: rgb(var(--primary-80) / 20%);
+    --popup-toolbar-surface-hover: rgb(var(--primary-80) / 30%);
     --popup-ruleset-tool-ink: var(--ink-1);
     --popup-ruleset-tool-surface: rgb(var(--primary-80) / 15%);
     --popup-ruleset-tool-surface-hover: rgb(var(--primary-80) / 20%);
     --popup-ruleset-tool-shadow: transparent;
+}
+
+@media (prefers-contrast: more) {
+    :root {
+        --native-control-opacity: 1;
+        --button-border-size: 1px;
+    }
 }
 
 /*
@@ -531,3 +607,200 @@
     --ink-rgb: 251 251 254;
 }
 */
+
+/* AdNauseam colorBlind color scheme */
+
+:root.colorBlind {
+    --adn-text: var(--adn-dark-gray);
+    --adn-text-contrast: var(--adn-black);
+    --adn-button-active: var(--adn-white);
+    --adn-menu-text: var(--adn-medium-dark-gray);
+    --adn-menu-highlight-text: var(--adn-dark-gray);
+    --adn-menu-header-text: var(--adn-medium-dark-gray);
+}
+
+/* backgrounds */
+:root.colorBlind body,
+:root.colorBlind #ad-list,
+:root.colorBlind #settings,
+:root.colorBlind .disabled #paused-menu {
+    background-image: none;
+    background-color: white;
+}
+
+:root.colorBlind header, :root.colorBlind footer {
+    background-color: white;
+}
+
+/* toggle buttons */
+:root.colorBlind input.cmn-toggle-round-flat:checked + label:before {
+    background-color: var(--adn-blue);
+}
+
+:root.colorBlind input.cmn-toggle-round-flat + label:before {
+    background-color: var(--adn-button-disabled);
+}
+
+:root.colorBlind input.cmn-toggle-round-flat + label:after {
+    background-color: white;
+}
+
+/* checkboxes */
+
+:root.colorBlind label:hover .checkbox:not([disabled]) svg {
+    background-color: gray;
+}
+
+/* nav bar */
+
+:root.colorBlind #dashboard-nav-widgets {
+    background-color: white;
+    border-color: var(--adn-blue);
+}
+
+:root.colorBlind #dashboard-nav-widgets span {
+    color: var(--adn-blue);
+}
+
+:root.colorBlind .tabButton {
+    border-color: var(--adn-blue);
+    color: var(--adn-blue);
+    background: transparent;
+}
+
+:root.colorBlind .tabButton.selected {
+    background-color: var(--adn-blue);
+    color: white;
+}
+
+/* popup menu */
+
+:root.colorBlind #vault-count {
+    /*background: #000000;*/
+    color: white;
+}
+
+
+:root.colorBlind #btn-settings svg path {
+    fill: white;
+}
+
+:root.colorBlind #btn-settings:hover svg path {
+    stroke: var(--adn-blue);
+    fill: var(--adn-blue);
+}
+
+#btn-ublock .colorBlind {
+    display: none;
+    position: absolute;
+}
+
+:root.colorBlind #btn-ublock:hover svg.colorBlind {
+    display: block;
+    fill: var(--adn-blue);
+}
+
+:root.colorBlind #btn-ublock:hover svg:not(.colorBlind) {
+    display: none;
+}
+
+:root.colorBlind .alert img {
+    box-shadow: none;
+    filter: invert(1);
+}
+:root.colorBlind .alert p {
+    text-shadow: none;
+    color: black;
+}
+
+:root.colorBlind #btn-ublock svg mask path {
+    fill: inherit;
+    stroke: inherit;
+}
+
+/* menu disable popup */
+
+:root.colorBlind .inner-popup {
+    border: 1px solid #000000;
+    background: white;
+}
+
+/*
+:root.colorBlind .btn_radio:hover + .btn_radio_label {
+    color: gray;
+}
+*/
+
+/* popup-fenix */
+
+:root.colorBlind .toolRibbon .tool {
+    fill: black;
+}
+
+:root.colorBlind #firewall > div > span:first-of-type,
+:root.colorBlind #firewall > div > span,
+:root.colorBlind #actionSelector > #dynaCounts {
+    background-color: white;
+}
+
+:root.colorBlind #firewall {
+    background: gray;
+}
+
+/* logger */
+
+:root.colorBlind #vwRenderer .logEntry {
+    color: black;
+}
+
+:root.colorBlind .netFilteringDialog > .headers > .header {
+    color: black;
+}
+
+:root.colorBlind .netFilteringDialog[data-pane="details"] > .headers > [data-pane="details"], 
+:root.colorBlind .netFilteringDialog[data-pane="dynamic"] > .headers > [data-pane="dynamic"], 
+:root.colorBlind .netFilteringDialog[data-pane="static"] > .headers > [data-pane="static"] {
+    color: white;
+}
+
+:root.colorBlind .netFilteringDialog > div.panes > .dynamic .entry {
+    background-color: white;
+}
+
+/* notifications */
+
+:root.colorBlind .notification.warning,
+:root.colorBlind .notification.warning button,
+:root.colorBlind button.warning,
+:root.colorBlind .notification.error,
+:root.colorBlind .notification.error button,
+:root.colorBlind button.error,
+:root.colorBlind .notification.info,
+:root.colorBlind .notification.info button,
+:root.colorBlind button.info {
+    background-color: white;
+    box-shadow: none;
+}
+
+:root.colorBlind a.help-mark,
+:root.colorBlind button:hover:enabled {
+    color: white !important;
+}
+
+:rott.colorBlind .notification.error,
+:rott.colorBlind.notification.error button,
+:rott.colorBlind button.error {
+    background-blend-mode: difference;
+}
+
+:root.colorBlind .notification.warning button:hover:enabled,
+:rott.colorBlind .notification.warning a.help-mark,
+:rott.colorBlind button.warning:hover:enabled {
+    background-color: black;
+}
+
+/* export dialog */
+:rott.colorBlind #export-dialog {
+    background: white;
+    border-color: var(--adn-blue);
+}

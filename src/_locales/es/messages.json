@@ -220,7 +220,7 @@
     "description": "Tooltip when hovering the top-most cell of the global-rules column."
   },
   "popupTipLocalRules": {
-    "message": "Reglas locales: las reglas en esta columna se aplican solo al sitio actual.\nLas reglas locales anulan las reglas globales.",
+    "message": "Reglas locales: las reglas en esta columna se aplican solo al sitio actual.",
     "description": "Tooltip when hovering the top-most cell of the local-rules column."
   },
   "popupTipSaveRules": {
@@ -275,13 +275,13 @@
     "message": "Versión",
     "description": "Example of use: Version 1.26.4"
   },
-  "popup3pScriptFilterTip": {
-    "message": "↑: resaltar filas que tienen scripts de terceros",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party scripts' cell"
+  "popup3pScriptFilter": {
+    "message": "script",
+    "description": "Appears as an option to filter out firewall rows"
   },
-  "popup3pFrameFilterTip": {
-    "message": "↑: resaltar filas que tienen frames de terceros",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party frames' cell"
+  "popup3pFrameFilter": {
+    "message": "frame",
+    "description": "Appears as an option to filter out firewall rows"
   },
   "pickerCreate": {
     "message": "Crear",
@@ -469,35 +469,43 @@
   },
   "3pGroupDefault": {
     "message": "Incluidos",
-    "description": "Header for the uBlock filters section in 'Filter lists pane'"
+    "description": "Filter lists section name"
   },
   "3pGroupAds": {
     "message": "Anuncios",
-    "description": "English: Ads"
+    "description": "Filter lists section name"
   },
   "3pGroupPrivacy": {
     "message": "Privacidad",
-    "description": "English: Privacy"
+    "description": "Filter lists section name"
   },
   "3pGroupMalware": {
-    "message": "Dominios de malware",
-    "description": "English: Malware domains"
+    "message": "Protección de malware, seguridad",
+    "description": "Filter lists section name"
+  },
+  "3pGroupSocial": {
+    "message": "Widgets sociales",
+    "description": "Filter lists section name"
+  },
+  "3pGroupCookies": {
+    "message": "Avisos de cookies",
+    "description": "Filter lists section name"
   },
   "3pGroupAnnoyances": {
     "message": "Elementos molestos",
-    "description": "The header identifying the filter lists in the category 'annoyances'"
+    "description": "Filter lists section name"
   },
   "3pGroupMultipurpose": {
     "message": "Multiusos",
-    "description": "English: Multipurpose"
+    "description": "Filter lists section name"
   },
   "3pGroupRegions": {
     "message": "Regiones, idiomas",
-    "description": "English: Regions, languages"
+    "description": "Filter lists section name"
   },
   "3pGroupCustom": {
     "message": "Personalizado",
-    "description": "English: Custom"
+    "description": "Filter lists section name"
   },
   "3pImport": {
     "message": "Importar…",
@@ -527,17 +535,25 @@
     "message": "Un error de red impide que se actualicen los recursos.",
     "description": "used as a tooltip for error icon beside a list"
   },
-  "1pFormatHint": {
-    "message": "Un filtro por línea. El filtro puede ser un nombre de dominio, o un filtro compatible con EasyList. Las líneas que comiencen con <code>!</code> serán ignoradas.",
-    "description": "Short information about how to create custom filters"
+  "1pTrustWarning": {
+    "message": "No añadas filtros de fuentes no confiables.",
+    "description": "Warning against copy-pasting filters from random sources"
+  },
+  "1pEnableMyFiltersLabel": {
+    "message": "Habilitar mis filtros personalizados",
+    "description": "Label for the checkbox use to enable/disable 'My filters' list"
+  },
+  "1pTrustMyFiltersLabel": {
+    "message": "Permitir filtros personalizados que requieran confianza",
+    "description": "Label for the checkbox use to trust the content of 'My filters' list"
   },
   "1pImport": {
-    "message": "Importar y anexar",
-    "description": "English: Import and append"
+    "message": "Importar y anexar…",
+    "description": "Button in the 'My filters' pane"
   },
   "1pExport": {
-    "message": "Exportar",
-    "description": "English: Export"
+    "message": "Exportar…",
+    "description": "Button in the 'My filters' pane"
   },
   "1pExportFilename": {
     "message": "ublock-mis-filtros-estaticos_{{datetime}}.txt",
@@ -581,7 +597,7 @@
   },
   "rulesExport": {
     "message": "Exportar a archivo…",
-    "description": ""
+    "description": "Button in the 'My rules' pane"
   },
   "rulesDefaultFileName": {
     "message": "ublock-mis-reglas-dinamicas_{{datetime}}.txt",
@@ -616,12 +632,12 @@
     "description": "A concise description of the 'Trusted sites' pane."
   },
   "whitelistImport": {
-    "message": "Importar y anexar",
-    "description": "English: Import and append"
+    "message": "Importar y anexar…",
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExport": {
-    "message": "Exportar",
-    "description": "English: Export"
+    "message": "Exportar…",
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExportFilename": {
     "message": "ublock-mis-sitios-de-confianza_{{datetime}}.txt",
@@ -881,14 +897,14 @@
   },
   "supportOpenButton": {
     "message": "Abrir",
-    "description": "Text for button which open an external webpage in Support pane"
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportReportSpecificButton": {
-    "message": "Crear nuevo reporte",
-    "description": "Text for button which open an external webpage in Support pane"
+    "message": "Crear nuevo reporte en GitHub",
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportFindSpecificButton": {
-    "message": "Encontrar reportes similares",
+    "message": "Encontrar reportes similares en GitHub",
     "description": "A clickable link in the filter issue reporter section"
   },
   "supportS1H": {
@@ -939,16 +955,20 @@
     "message": "A continuación encontrarás información técnica que puede ser útil cuando los voluntarios intenten ayudarte a resolver un problema.",
     "description": "First paragraph of 'Troubleshooting Information' section in Support pane"
   },
-  "supportS5P2": {
-    "message": "<b>Importante:</b> la información potencialmente privada o sensible se redacta de forma predeterminada. La información redactada puede dificultar la resolución de un problema.",
-    "description": "Second paragraph of 'Troubleshooting Information' section in Support pane"
-  },
   "supportS6H": {
     "message": "Reportar un problema de filtro",
     "description": "Header of 'Report a filter issue' section in Support pane"
   },
   "supportS6P1S1": {
-    "message": "Para evitar sobrecargar a voluntarios con reportes duplicados, verifica que el problema no haya sido reportado.",
+    "message": "Para evitar sobrecargar a voluntarios con reportes duplicados, verifica que el problema no haya sido reportado. <b>Nota:</b> al hacer clic en el botón, hará que el origen de la página se envíe a GitHub.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S1": {
+    "message": "Las listas de filtros se actualizan diariamente. Asegúrate de que tu problema no haya sido abordado en las listas de filtros más recientes.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S2": {
+    "message": "Verifica que el problema aún exista después de recargar la página web problemática.",
     "description": "A paragraph in the filter issue reporter section"
   },
   "supportS6URL": {
@@ -980,24 +1000,20 @@
     "description": "An entry in the widget used to select the type of issue"
   },
   "supportS6Select1Option5": {
-    "message": "Se rompe cuando uBlock Origin está habilitado",
+    "message": "Funciona mal cuando uBlock Origin está habilitado",
     "description": "An entry in the widget used to select the type of issue"
   },
   "supportS6Select1Option6": {
     "message": "Abre pestañas o ventanas no deseadas",
     "description": "An entry in the widget used to select the type of issue"
   },
+  "supportS6Select1Option7": {
+    "message": "Conduce a malware y phishing",
+    "description": "An entry in the widget used to select the type of issue"
+  },
   "supportS6Checkbox1": {
     "message": "Etiquetar la página web como “NSFW” (<a href=\"https://es.wikipedia.org/wiki/NSFW\">“no es seguro/apropiado para el trabajo”</a>)",
     "description": "A checkbox to use for NSFW sites"
-  },
-  "supportRedact": {
-    "message": "Redactar",
-    "description": "Text for 'Redact' button"
-  },
-  "supportUnredact": {
-    "message": "Sin redactar",
-    "description": "Text for 'Unredact' button"
   },
   "aboutPrivacyPolicy": {
     "message": "Política de privacidad",
@@ -1036,7 +1052,7 @@
     "description": "Shown in the About pane"
   },
   "aboutCDNsInfo": {
-    "message": "Se utilizará una CDN elegida al azar cuando sea necesario actualizar una lista de filtros",
+    "message": "Se utilizará una CDN elegida al azar cuando sea necesario actualizar una lista de filtros.",
     "description": "Shown in the About pane"
   },
   "aboutBackupDataButton": {
@@ -1070,10 +1086,6 @@
   "errorCantConnectTo": {
     "message": "Error de red: {{msg}}",
     "description": "English: Network error: {{msg}}"
-  },
-  "subscriberConfirm": {
-    "message": "¿Deseas añadir la siguiente URL a tus listas de filtros personalizados?\n\nTítulo: \"{{title}}\"\nURL: {{url}}",
-    "description": "No longer used"
   },
   "subscribeButton": {
     "message": "Suscribirse",
@@ -1163,6 +1175,26 @@
     "message": "Continuar",
     "description": "Button text to navigate to the blocked page"
   },
+  "docblockedRedirectPrompt": {
+    "message": "La página bloqueada quiere redirigir a otro sitio. Si eliges continuar, navegarás directamente a: {{url}}",
+    "description": "Text warning about an incoming redirect"
+  },
+  "docblockedReasonLabel": {
+    "message": "Razón:",
+    "description": "The label which prepend the actual reason why a page was blocked"
+  },
+  "docblockedReasonMalicious": {
+    "message": "Malicioso",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonTracker": {
+    "message": "Rastreador",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonDisreputable": {
+    "message": "Mala reputación",
+    "description": "An actual reason why a page was blocked"
+  },
   "cloudPush": {
     "message": "Exportar datos a la nube",
     "description": "tooltip"
@@ -1215,6 +1247,10 @@
     "message": "Permitir temporalmente elementos multimedia grandes",
     "description": "A context menu entry, present when large media elements have been blocked on the current site"
   },
+  "contextMenuViewSource": {
+    "message": "Ver código fuente…",
+    "description": "A context menu entry, to view the source code of the target resource"
+  },
   "shortcutCapturePlaceholder": {
     "message": "Escribe un atajo",
     "description": "Placeholder string for input field used to capture a keyboard shortcut"
@@ -1234,6 +1270,10 @@
   "toggleCosmeticFiltering": {
     "message": "Alternar filtrado cosmético",
     "description": "Label for keyboard shortcut used to toggle cosmetic filtering"
+  },
+  "toggleJavascript": {
+    "message": "Alternar JavaScript",
+    "description": "Label for keyboard shortcut used to toggle no-scripting switch"
   },
   "relaxBlockingMode": {
     "message": "Modo de bloqueo relajado",
@@ -1258,6 +1298,14 @@
   "clickToLoad": {
     "message": "Clic para cargar",
     "description": "Message used in frame placeholders"
+  },
+  "linterMainReport": {
+    "message": "Errores: {{count}}",
+    "description": "Summary of number of errors as reported by the linter "
+  },
+  "unprocessedRequestTooltip": {
+    "message": "No se puede filtrar correctamente al iniciar el navegador. Recarga la página para garantizar el filtrado correcto.",
+    "description": "A warning which will appear in the popup panel if needed"
   },
   "dummy": {
     "message": "Esta entrada debe ser la última",

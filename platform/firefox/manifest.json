@@ -9,9 +9,11 @@
   },
   "browser_action": {
     "browser_style": false,
+    "default_area": "navbar",
     "default_icon": {
       "16": "img/icon_16.png",
-      "32": "img/icon-32.png"
+      "32": "img/icon_32.png",
+      "64": "img/icon_64.png"
     },
     "default_title": "AdNauseam",
     "default_popup": "menu.html"
@@ -19,7 +21,13 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "adnauseam@rednoise.org",
-      "strict_min_version": "68.0"
+      "strict_min_version": "115.0",
+      "data_collection_permissions": {
+        "required": [ "none" ]
+      }
+    },
+    "gecko_android": {
+      "strict_min_version": "115.0"
     }
   },
   "commands": {
@@ -41,6 +49,9 @@
     },
     "toggle-cosmetic-filtering": {
       "description": "__MSG_toggleCosmeticFiltering__"
+    },
+    "toggle-javascript": {
+      "description": "__MSG_toggleJavascript__"
     }
   },
   "content_scripts": [
@@ -68,11 +79,22 @@
         "https://filterlists.com/*",
         "https://forums.lanik.us/*",
         "https://github.com/*",
-        "https://*.github.io/*",
-        "https://*.letsblock.it/*"
+        "https://*.github.io/*"
       ],
       "js": [
         "/js/scriptlets/subscriber.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "https://github.com/uBlockOrigin/*",
+        "https://ublockorigin.github.io/*",
+        "https://*.reddit.com/r/uBlockOrigin/*"
+      ],
+      "js": [
+        "/js/scriptlets/updater.js"
       ],
       "run_at": "document_idle",
       "all_frames": false
@@ -81,8 +103,8 @@
   "default_locale": "en",
   "description": "__MSG_extShortDesc__",
   "icons": {
-    "48": "img/icon-48.png",
-    "96": "img/icon-96.png"
+    "48": "img/icon_48.png",
+    "96": "img/icon_96.png"
   },
   "manifest_version": 2,
   "name": "AdNauseam",
@@ -91,6 +113,7 @@
     "open_in_tab": true
   },
   "permissions": [
+    "alarms",
     "dns",
     "menus",
     "privacy",

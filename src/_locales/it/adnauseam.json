@@ -36,15 +36,15 @@
     "description": "Message asking user to confirm reset"
   },
   "adnFirstRunHideAllAdsDescription": {
-    "message": "Nascondi le pubblicità presenti nelle <span>liste selezionate</span>",
+    "message": "Nascondi le pubblicità presenti nelle <span>liste selezionate<\/span>",
     "description": "English: Firstrun.html -> Hide Ads in your selected filter lists"
   },
   "adnFirstRunClickingAdsDescription": {
-    "message": "Registro delle visite delle pubblicità trovate attraverso i tuoi <span>elenchi filtri</span>",
+    "message": "Registro delle visite delle pubblicità trovate attraverso i tuoi <span>elenchi filtri<\/span>",
     "description": "English: Firstrun.html -> Register visits on Ads found via your filter lists"
   },
   "adnFirstRunBlockingMalwareDescription": {
-    "message": "Blocca tracker e altri malware (<span>personalizza</span>)",
+    "message": "Blocca tracker e altri malware (<span>personalizza<\/span>)",
     "description": "English: Firstrun.html -> Block trackers and other malware (customize)"
   },
   "adnNotificationReactivate": {
@@ -96,24 +96,28 @@
     "description": "English: Notifications -> You have allowed adnauseam to have access to your online activities while private browsing."
   },
   "adnNotificationDNTAllowed": {
-    "message": "Questa pagina rispetta l'intestazione <b>Do Not Track</b>, le pubblicità sono permesse.",
+    "message": "Questa pagina rispetta l'intestazione <b>Do Not Track<\/b>, le pubblicità sono permesse.",
     "description": "English: Notifications -> This page respects Do Not Track, Ads are allowed."
   },
   "adnNotificationDNTHidingNotClicking": {
-    "message": "Questa pagina rispetta l'intestazione <b>Do Not Track</b>, le pubblicità verranno nascoste ma non cliccate.",
+    "message": "Questa pagina rispetta l'intestazione <b>Do Not Track<\/b>, le pubblicità verranno nascoste ma non cliccate.",
     "description": "English: Notifications -> This page respects Do Not Track, hiding not clicking."
   },
   "adnNotificationDNTClickingNotHiding": {
-    "message": "Questa pagina rispetta l'intestazione <b>Do Not Track</b>, le pubblicità verranno cliccate ma non nascoste",
+    "message": "Questa pagina rispetta l'intestazione <b>Do Not Track<\/b>, le pubblicità verranno cliccate ma non nascoste",
     "description": "English: Notifications -> This page respects Do Not Track, clicking not hiding."
   },
   "adnNotificationDNTJustSoYouKnow": {
-    "message": "Giusto perchè tu lo sappia, questa pagina rispetta l'intestazione <b>Do Not Track</b>.",
+    "message": "Giusto perchè tu lo sappia, questa pagina rispetta l'intestazione <b>Do Not Track<\/b>.",
     "description": "English: Notifications -> This page respects Do Not Track, just so you know."
   },
   "adnNotificationShowAdsDebug": {
-    "message": "The Advanced Setting \"Show Ads Debug\" is turned on",
+    "message": "L'impostazione avanzata \"Mostra debug annunci\" è attivata",
     "description": "English: Notifications -> The Advanced Setting \"Show Ads Debug\" is turned on"
+  },
+  "adnNewerVersionAvailableNotification": {
+    "message": "È disponibile una nuova versione di AdNauseam",
+    "description": "English: Notifications -> A newer version of AdNauseam is available"
   },
   "adnTarget": {
     "message": "TARGET",
@@ -153,7 +157,7 @@
   },
   "adnPausedOnPage": {
     "message": "AdNauseam è disattivato su questa pagina",
-    "description": "English: Menu->display when paused on page/site"
+    "description": "English: Menu->display when paused on page\/site"
   },
   "adnNotHiding": {
     "message": "Al momento AdNauseam non sta nascondendo le pubblicità",
@@ -168,35 +172,35 @@
     "description": "appears in ADN vault, above ad slider"
   },
   "topAdnetworks": {
-    "message": "Top Ad Networks",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "Principali reti pubblicitarie",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "topSites": {
     "message": "Siti migliori",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypes": {
     "message": "Tipologia Annuncio",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesImageAds": {
     "message": "Annunci Immagine",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesTextAds": {
     "message": "Annunci Testo",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adnShowingRecentAds": {
     "message": "Nessuna pubblicità raccolta in questa pagina (recenti)",
     "description": "shown in menu when only 'recent' Ads are shown"
   },
   "adnThisPageStrictBlocked": {
-    "message": "{{domain}} is currently strict-blocked.",
+    "message": "{{domain}} è attualmente bloccato in modo rigoroso.",
     "description": "shown in menu when the current page is strict-blocked"
   },
   "adnStrictBlockListDescription": {
-    "message": "The strict-block list serves to help the users to strict-block specific domains or pages more easily.",
+    "message": "L'elenco rigoroso serve per aiutare gli utenti a bloccare domini specifici o pagine più facilmente.",
     "description": "Description on the strict-block list tab, which is found on the dashboard"
   },
   "adnExportedAdsFilename": {
@@ -216,7 +220,7 @@
     "description": "appears in ADN settings"
   },
   "adnPurgeConfirm": {
-    "message": "This action will permanently remove all ads with load image error. Make sure your internet is connected, otherwise all your ads will be deleted.",
+    "message": "Questa azione rimuoverà permanentemente tutti gli annunci per i quali l'immagine non può essere caricata. Prima di eseguirla è una buona idea eseguire il backup della cassaforte e assicurarsi di avere una connessione internet attiva.",
     "description": "appears in ADN settings"
   },
   "adnAdClickingStatusPending": {
@@ -268,23 +272,23 @@
     "description": "appears in ADN popup menu three state button"
   },
   "adnMenuDisable": {
-    "message": "Disable",
+    "message": "Disattiva",
     "description": "Disabled Adnauseam -> appears in ADN popup menu three state button"
   },
   "adnMenuActive": {
-    "message": "Active",
+    "message": "Attiva",
     "description": "Make Adnauseam Active -> appears in ADN popup menu three state button"
   },
   "adnMenuStrict": {
-    "message": "Strict",
+    "message": "Rigorosa",
     "description": "Activate Strict-Block -> appears in ADN popup menu three state button"
   },
   "adnMenuDisableScopeDomain": {
-    "message": "on {{domain}}",
+    "message": "su {{domain}}",
     "description": "Disable AdNaueam Block On this Domain -> Popup option that appears inside ADN menu"
   },
   "adnMenuDisableScopePage": {
-    "message": "on this page",
+    "message": "su questa pagina",
     "description": "Disable AdNaueam Block On This Page -> Popup option that appears inside ADN menu"
   },
   "adnMenuSettings": {
@@ -356,8 +360,20 @@
     "description": "appears on vault page"
   },
   "adnPurgeDeadAds": {
-    "message": "Purge Dead Ads",
+    "message": "Eliminare gli annunci vecchi",
     "description": "appears on vault page"
+  },
+  "adnShowDeadAds": {
+    "message": "Mostra Annunci Morti",
+    "description": "appears on vault page"
+  },
+  "adnHideDeadAds": {
+    "message": "Nascondi Annunci Morti",
+    "description": "appears on vault page"
+  },
+  "adnCaptureVault": {
+    "message": "Cattura",
+    "description": "appears on vault page in dev mode"
   },
   "adnVaultFound": {
     "message": "{{total}} annunci raccolti",
@@ -475,24 +491,36 @@
     "message": "Aggiorna",
     "description": "English: update"
   },
+  "adnUpdateButton": {
+    "message": "Aggiorna",
+    "description": "English: update"
+  },
   "whitelistPageName": {
     "message": "Whitelist",
     "description": "appears as tab name in dashboard"
   },
   "strictBlockListPageName": {
-    "message": "Strict-Block List",
+    "message": "Lista Strict-Block",
     "description": "appears as tab name in dashboard"
   },
   "eventLoggingPrompt": {
-    "message": "Attiva debug",
+    "message": "Modalità di Debug",
     "description": "prompt for toggle"
   },
   "disableWarnings": {
     "message": "Disabilita avvisi",
     "description": "English:Disable warnings"
   },
+  "blurCollectedAds": {
+    "message": "Sfoca gli annunci collezionati",
+    "description": "English: Blur Collected ads"
+  },
+  "hideDeadAds": {
+    "message": "Nascondi Annunci Morti",
+    "description": "English: Hide Dead ads"
+  },
   "showAdsDebugPrompt": {
-    "message": "Show ads for ad-collection debugging",
+    "message": "Mostra pubblicità per il debug della collezione pubblicitaria",
     "description": "English: Show ads for ad-collection debugging"
   },
   "removeAdsInPrivate": {
@@ -500,7 +528,27 @@
     "description": "English:Remove ads collected in private mode - settings page"
   },
   "settingsStrictBlockingMode": {
-    "message": "Activate Strict-Blocking Mode",
+    "message": "Attiva Modalità Strict-Blocking",
     "description": "English: Activate Strict-Blocking Mode"
+  },
+  "adnRefreshButton": {
+    "message": "Aggiorna",
+    "description": "English: refresh page from menu notification button"
+  },
+  "adnRefreshNotification": {
+    "message": "Applica le modifiche alla pagina corrente",
+    "description": "English: refresh page from menu notification"
+  },
+  "supportS6P3S1": {
+    "message": "Assicurati che questo problema sia <b>specifico-AdNauseam<\/b>.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P3S2": {
+    "message": "Ho testato la stessa pagina web su <a url='https:\/\/github.com\/gorhill\/uBlock'>#uBO#<\/a> e confermo che questo problema è <b>specifico-AdNauseam<\/b>.",
+    "description": "A checkbox in the filter issue reporter section"
+  },
+  "supportS6Select1Option7": {
+    "message": "Annunci non raccolti",
+    "description": "Ads are present on page but none are collected"
   }
 }

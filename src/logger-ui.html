@@ -3,13 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=560, initial-scale=1">
+<meta name="color-scheme" content="light dark" />
 <link rel="stylesheet" href="css/fonts/stylesheet.css">
 <link rel="stylesheet" href="css/themes/default.css">
 <link rel="stylesheet" href="css/common.css">
 <link rel="stylesheet" href="css/fa-icons.css">
 <link rel="stylesheet" href="css/logger-ui.css">
 <link rel="stylesheet" href="css/logger-ui-inspector.css">
-<link rel="shortcut icon" type="image/png" href="img/icon-64.png">
+<link rel="icon" type="image/png" href="img/icon_64.png">
 <title data-i18n="statsPageName"></title>
 <style id="vwRendererRuntimeStyles"></style>
 </head>
@@ -21,7 +22,7 @@
             <option value="0" data-i18n="logAll">
             <option value="-1" data-i18n="logBehindTheScene">
             <option value="_" data-i18n="loggerCurrentTab">
-        </select>
+        </select>&ensp;
         <button id="refresh" class="iconified notext disabled needdom" data-i18n-title="loggerReloadTip" type="button"><span class="fa-icon">refresh</span><span class="hover"></span></button>
         <button id="showdom" class="iconified notext disabled needdom" data-i18n-title="loggerDomInspectorTip" type="button"><span class="fa-icon">code</span><span class="hover"></span></button>
         <button id="showpopup" class="iconified notext disabled needdom" data-i18n-title="loggerPopupPanelTip" type="button"><span class="fa-icon"><svg><use href="/img/ublock-defs.svg#ubo-solid"></use></svg></span><span class="hover"></span></button>
@@ -35,9 +36,9 @@
     <div id="domInspector" class="inspector hCompact">
         <div class="permatoolbar">
             <div>
+                <button class="iconified notext vExpandToggler"><span class="fa-icon">double-angle-up</span><span class="hover"></span></button>
                 <button class="iconified notext vCompactToggler"><span class="fa-icon">double-angle-up</span><span class="hover"></span></button>
                 <button class="iconified notext hCompactToggler"><span class="fa-icon">double-angle-left</span><span class="hover"></span></button>
-                <!-- <span class="button fa highlightMode" style="display: none">&#xf042;</span> -->
                 <button class="iconified notext revert disabled"><span class="fa-icon">eraser</span><span class="hover"></span></button>
                 <button class="iconified notext commit disabled"><span class="fa-icon">floppy-o</span><span class="hover"></span></button>
             </div>
@@ -52,31 +53,45 @@
                 <button class="iconified notext vCompactToggler"><span class="fa-icon">double-angle-up</span><span class="hover"></span></button>
                 <button id="clean" class="iconified notext disabled"><span class="fa-icon">times</span><span class="hover"></span></button>
                 <button id="clear" class="iconified notext disabled" data-i18n-title="loggerClearTip"><span class="fa-icon">eraser</span><span class="hover"></span></button>
-                <button id="pause" class="iconified notext"><span class="fa-icon" data-i18n-title="loggerPauseTip">pause-circle-o</span><span class="fa-icon" data-i18n-title="loggerUnpauseTip">play-circle-o</span><span class="hover"></span></button>
+                <button id="pause" class="iconified notext"><span class="fa-icon" data-i18n-title="loggerPauseTip">pause-circle-o</span><span class="fa-icon" data-i18n-title="loggerUnpauseTip">play-circle-o</span><span class="hover"></span></button>&ensp;
                 <span id="filterExprGroup">
                     <button id="filterButton" class="iconified notext" data-i18n-title="loggerRowFiltererButtonTip"><span class="fa-icon">filter</span><span class="hover"></span></button>
                     <span id="filterInput">
-                        <input type="search" placeholder="logFilterPrompt">
+                        <input type="search" placeholder="logFilterPrompt" spellcheck="false">
                         <span id="filterExprButton" class="button fa-icon expanded" data-i18n-title="loggerRowFiltererBuiltinTip">angle-up</span>
                         <div id="filterExprPicker">
                             <div>
-                                <span data-filtex="!" data-i18n="loggerRowFiltererBuiltinNot"></span>
-                                <span data-filtex="\t--\t|\t<<\t|\t##" data-i18n="loggerRowFiltererBuiltinBlocked"></span>
-                                <span data-filtex="\t\+\+\t|\t\*\*\t|\t#@#" data-i18n="loggerRowFiltererBuiltinAllowed"></span>
-                                <span data-filtex="\t~~">adn-<span style="pointer-events: none;" data-i18n="loggerRowFiltererBuiltinAllowed"></span></span> <!-- adnauseam allowed requests -->
-                                <span data-filtex="[$,](?:csp|removeparam|redirect-rule)=|\t\<\<\t" data-i18n="loggerRowFiltererBuiltinModified"></span>
+															<span data-filtex="!" data-i18n="loggerRowFiltererBuiltinNot"></span>
+															<span data-filtex="\x1F--\x1F|\x1F<<\x1F|\x1F##" data-i18n="loggerRowFiltererBuiltinBlocked"></span>
+															<span data-filtex="\x1F\+\+\x1F|\x1F\*\*\x1F|\x1F#@#" data-i18n="loggerRowFiltererBuiltinAllowed"></span>
+															<span data-filtex="[$,](?:csp|permissions|removeparam|redirect-rule|replace|urlskip|ur[il]transform)=|\x1F\<\<\x1F" data-i18n="loggerRowFiltererBuiltinModified"></span>
+                              <span data-filtex="~~">adn-<span style="pointer-events: none;" data-i18n="loggerRowFiltererBuiltinAllowed"></span> <!-- adnauseam allowed requests -->
                             </div>
                             <div><span data-filtex="!" data-i18n="loggerRowFiltererBuiltinNot"></span>
                                 <span style="flex-direction: column;">
-                                    <div style="margin-bottom: 1px;"><span data-filtex="\t(?:css|(?:inline-)?font)\t">css/font</span><span data-filtex="\timage\t">image</span><span data-filtex="\tmedia\t">media</span><span data-filtex="\t(?:inline-)?script(?:ing)?\t">script</span></div>
-                                    <div><span data-filtex="\t(?:websocket|xhr)\t">xhr</span><span data-filtex="\tframe\t">frame</span><span data-filtex="\t(?:dom|g(?:eneric)?hide|s(?:pecific)?hide)\t">dom</span><span data-filtex="\t(?:beacon|csp_report|doc|ping|popup|popunder|other)\t">other</span></div>
+                                    <div><span data-filtex="\x1F(?:css|(?:inline-)?font)\x1F">css/font</span><span data-filtex="\x1Fimage\x1F">image</span><span data-filtex="\x1Fmedia\x1F">media</span><span data-filtex="\x1F(?:inline-)?script(?:ing)?\x1F">script</span></div>
+                                    <div><span data-filtex="\x1F(?:websocket|xhr)\x1F">xhr</span><span data-filtex="\x1F(?:frame|object)\x1F">frame</span><span data-filtex="\x1F(?:dom|g(?:eneric)?hide|s(?:pecific)?hide)\x1F">dom</span><span data-filtex="\x1F(?:scriptlet)\x1F">scriptlet</span><span data-filtex="\x1F(?:beacon|csp_report|doc|ping|popup|popunder|other)\x1F">other</span></div>
                                 </span>
                             </div>
-                            <div><span data-filtex="!" data-i18n="loggerRowFiltererBuiltinNot"></span><span data-filtex="\t(?:0,)?1\t" data-i18n="loggerRowFiltererBuiltin1p"></span><span data-filtex="\t(?:3(?:,\d)?|0,3)\t" data-i18n="loggerRowFiltererBuiltin3p"></span></div>
-                            <div id="filterExprCnameOf" style="display:none"><span data-filtex="!" data-i18n="loggerRowFiltererBuiltinNot"></span><span data-filtex="\taliasURL=.">CNAME</span></div>
+                            <div><span data-filtex="!" data-i18n="loggerRowFiltererBuiltinNot"></span><span data-filtex="\x1F(?:0,)?1\x1F" data-i18n="loggerRowFiltererBuiltin1p"></span><span data-filtex="\x1F(?:3(?:,\d)?|0,3)\x1F" data-i18n="loggerRowFiltererBuiltin3p"></span><span data-filtex="\x1F0,\d\x1F">tabless</span></div>
+                            <div><span data-filtex="!" data-i18n="loggerRowFiltererBuiltinNot"></span><span data-filtex="\x1Fget\x1F">get</span><span data-filtex="\x1Fhead\x1F">head</span><span data-filtex="\x1Fpost\x1F">post</span></div>
+                            <div><span data-filtex="!" data-i18n="loggerRowFiltererBuiltinNot" class="on"></span>
+                                <span style="flex-direction: column;">
+                                    <span data-filtex="\bcsp=[^\x1F]+\x1F(?:--|\+\+)\x1F">csp</span><span data-filtex="\bpermissions=[^\x1F]+\x1F(?:--|\+\+)\x1F" class="on">permissions</span><span data-filtex="\bredirect-rule=[^\x1F]+\x1F(?:--|\+\+)\x1F">redirect</span><span data-filtex="\bremoveparam=[^\x1F]+\x1F(?:--|\+\+)\x1F">removeparam</span><span data-filtex="\breplace=[^\x1F]+\x1F(?:--|\+\+)\x1F">replace</span><span data-filtex="\burlskip=[^\x1F]+\x1F(?:--|\+\+)\x1F">urlskip</span>
+                                </span>
+                            </div>
+                            <div id="filterExprCnameOf" style="display:none"><span data-filtex="!" data-i18n="loggerRowFiltererBuiltinNot"></span><span data-filtex="\x1FaliasURL=.">CNAME</span></div>
+                            <div><span data-filtex="!" data-i18n="loggerRowFiltererBuiltinNot"></span>
+                                <span style="flex-direction: column;">
+                                    <div><span data-filtex="\x1Finfo\x1F">info</span><span data-filtex="\x1Ferror\x1F">error</span></div>
+                                </span>
+                            </div>
                         </div>
                     </span>
                 </span>
+            </div>
+            <div>
+                <button id="logLevel" class="iconified notext" title="Toggle verbose mode" type="button"><span class="fa-icon">volume-up</span><span class="hover"></span></button>
             </div>
             <div>
                 <button id="loggerColorKey" class="iconified notext"><span class="fa-icon">color-pallete</span><span class="hover"></span></button>
@@ -93,9 +108,21 @@
                     </div>
                 </div>
                 <div id="vwLineSizer">
-                    <div class="logEntry oneLine"><div><span>00:00:00</span><span>&nbsp;</span><span>**</span><span>&nbsp;</span><span>3,3</span><span>inline-script</span><span>&nbsp;</span></div></div>
+                    <div class="logEntry oneLine"><div class="fields"><span>00:00:00</span><span>&nbsp;</span><span>**</span><span>&nbsp;</span><span>3,3</span><span>options</span><span>inline-script</span><span>&nbsp;</span></div></div>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="entryTools inspector"></div>
+    <div id="infoInspector" class="inspector">
+        <div class="permatoolbar">
+            <div>
+                <button id="clearConsole" class="iconified notext"><span class="fa-icon">eraser</span><span class="hover"></span></button>
+                <button id="logLevel" class="iconified notext" title="Toggle verbose mode" type="button"><span class="fa-icon">volume-up</span><span class="hover"></span></button>&ensp;
+                <input type="search" placeholder="Filter output" spellcheck="false">
+            </div>
+        </div>
+        <div class="vscrollable">
         </div>
     </div>
     <iframe id="popupContainer"></iframe>
@@ -103,22 +130,24 @@
 
 <div id="modalOverlay">
     <div>
+        <div class="closeButton"><svg viewBox="0 0 64 64"><path d="M 16 16 L 48 48 M 16 48 L 48 16" /></svg></div>
         <div id="modalOverlayContainer"></div>
-        <div id="modalOverlayClose"><svg viewBox="0 0 64 64"><path d="M 16 16 L 48 48 M 16 48 L 48 16" /></svg></div>
     </div>
 </div>
 
 <div id="templates" style="display: none;">
-    <div id="logEntryTemplate"><div><span></span>&#8203;<span></span>&#8203;<span></span>&#8203;<span></span>&#8203;<span></span>&#8203;<span></span>&#8203;<span></span></div></div>
+    <div id="logEntryTemplate"><div class="fields"><span></span>&#8203;<span></span>&#8203;<span></span>&#8203;<span></span>&#8203;<span></span>&#8203;<span></span>&#8203;<span></span>&#8203;<span></span></div></div>
 
-    <div id="netFilteringDialog" data-pane="details">
+    <div class="netFilteringDialog" data-pane="details">
         <div class="hide preview"><span>click to preview</span></div>
         <div class="headers">
-            &ensp;
-            <span class="header details" data-pane="details" data-i18n="loggerEntryDetailsHeader"></span>
-            <span class="header dynamic" data-pane="dynamic" data-i18n="loggerURLFilteringHeader"></span>
-            <span class="header static" data-pane="static" data-i18n="loggerStaticFilteringHeader"></span>
-            <span class="tools"><span class="fa-icon reload">refresh</span>&ensp;<span class="fa-icon picker">eye-dropper</span></span>
+            <span>
+                <span class="header details" data-pane="details" data-i18n="loggerEntryDetailsHeader"></span>
+                <span class="header dynamic" data-pane="dynamic" data-i18n="loggerURLFilteringHeader"></span>
+                <span class="header static" data-pane="static" data-i18n="loggerStaticFilteringHeader"></span>
+            </span>
+            <span class="tools"><span class="fa-icon picker">eye-dropper</span><span class="fa-icon reload">refresh</span></span>
+            <span class="closeButton"><svg viewBox="0 0 64 64"><path d="M 16 16 L 48 48 M 16 48 L 48 16" /></span>
         </div>
         <div class="panes">
             <div class="pane details" data-pane="details">
@@ -228,12 +257,11 @@
 
 <script src="lib/hsluv/hsluv-0.1.0.min.js"></script>
 
-<script src="js/fa-icons.js"></script>
+<script src="js/fa-icons.js" type="module"></script>
 <script src="js/vapi.js"></script>
 <script src="js/vapi-common.js"></script>
 <script src="js/vapi-client.js"></script>
-<script src="js/vapi-client-extra.js"></script>
-<script src="js/udom.js"></script>
+<script src="js/theme.js" type="module"></script>
 <script src="js/i18n.js" type="module"></script>
 <script src="js/logger-ui.js" type="module"></script>
 <script src="js/logger-ui-inspector.js" type="module"></script>

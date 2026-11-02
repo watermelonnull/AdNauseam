@@ -70,32 +70,6 @@ cp $SRC/vi/adnauseam.json    $DES/vi/adnauseam.json
 cp $SRC/zh-CN/adnauseam.json $DES/zh_CN/adnauseam.json
 cp $SRC/zh-TW/adnauseam.json $DES/zh_TW/adnauseam.json
 
-# Changes for ubo-lite translations, check later
-# 
-# DESMV3=./platform/mv3/extension/_locales
-# 
-# for dir in $SRC/*/; do
-#   srclang=$(basename $dir)
-#   deslang=${srclang/-/_}
-#   deslang=${deslang%_AM}
-#   deslang=${deslang%_ES}
-#   deslang=${deslang%_IE}
-#   deslang=${deslang%_IN}
-#   deslang=${deslang%_LK}
-#   deslang=${deslang%_NL}
-#   deslang=${deslang%_PK}
-#   deslang=${deslang%_SE}
-#   if [[ $deslang == 'en' ]]; then
-#     continue
-#   fi
-#   # ubo
-#   mkdir -p "$DES/$deslang/" && cp "$SRC/$srclang/messages.json" "$DES/$deslang/"
-#   # ubo lite
-#   mkdir -p "$DESMV3/$deslang/" && cp "$SRC/$srclang/uBO-Lite/messages.json" "$DESMV3/$deslang/"
-#   # descriptions
-#   #cp "$SRC/$srclang/description.txt" "./dist/description/description-${deslang}.txt"
-# done
-
 # Output files with possible misuse of `$`, as this can lead to severe
 # consequences, such as not being able to run the extension at all.
 # uBO does not use `$`, so any instance of `$` must be investigated.

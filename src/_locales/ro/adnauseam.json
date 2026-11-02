@@ -36,15 +36,15 @@
     "description": "Message asking user to confirm reset"
   },
   "adnFirstRunHideAllAdsDescription": {
-    "message": "Ascunde reclamele în <span>listele tale de filtrare</span>",
+    "message": "Ascunde reclamele în <span>listele tale de filtrare<\/span>",
     "description": "English: Firstrun.html -> Hide Ads in your selected filter lists"
   },
   "adnFirstRunClickingAdsDescription": {
-    "message": "Înregistrează vizite pe reclamele găsite prin intermediul <span>listelelor tale de filtrare</span>",
+    "message": "Înregistrează vizite pe reclamele găsite prin intermediul <span>listelelor tale de filtrare<\/span>",
     "description": "English: Firstrun.html -> Register visits on Ads found via your filter lists"
   },
   "adnFirstRunBlockingMalwareDescription": {
-    "message": "Blochează trackere şi alte site-uri periculoase (<span>personalizează</span>)",
+    "message": "Blochează trackere şi alte site-uri periculoase (<span>personalizează<\/span>)",
     "description": "English: Firstrun.html -> Block trackers and other malware (customize)"
   },
   "adnNotificationReactivate": {
@@ -96,24 +96,28 @@
     "description": "English: Notifications -> You have allowed adnauseam to have access to your online activities while private browsing."
   },
   "adnNotificationDNTAllowed": {
-    "message": "Această pagină respectă <b>Nu urmări</b>, reclamele sunt permise.",
+    "message": "Această pagină respectă <b>Nu urmări<\/b>, reclamele sunt permise.",
     "description": "English: Notifications -> This page respects Do Not Track, Ads are allowed."
   },
   "adnNotificationDNTHidingNotClicking": {
-    "message": "This page respects <b>Do Not Track</b>, hiding not clicking.",
+    "message": "This page respects <b>Do Not Track<\/b>, hiding not clicking.",
     "description": "English: Notifications -> This page respects Do Not Track, hiding not clicking."
   },
   "adnNotificationDNTClickingNotHiding": {
-    "message": "This page respects <b>Do Not Track</b>, clicking not hiding",
+    "message": "This page respects <b>Do Not Track<\/b>, clicking not hiding",
     "description": "English: Notifications -> This page respects Do Not Track, clicking not hiding."
   },
   "adnNotificationDNTJustSoYouKnow": {
-    "message": "This page respects <b>Do Not Track</b>, just so you know.",
+    "message": "This page respects <b>Do Not Track<\/b>, just so you know.",
     "description": "English: Notifications -> This page respects Do Not Track, just so you know."
   },
   "adnNotificationShowAdsDebug": {
     "message": "The Advanced Setting \"Show Ads Debug\" is turned on",
     "description": "English: Notifications -> The Advanced Setting \"Show Ads Debug\" is turned on"
+  },
+  "adnNewerVersionAvailableNotification": {
+    "message": "A newer version of AdNauseam is available",
+    "description": "English: Notifications -> A newer version of AdNauseam is available"
   },
   "adnTarget": {
     "message": "TARGET",
@@ -136,27 +140,27 @@
     "description": "English: Firstrun.html -> Switch me on"
   },
   "adnFirstRunThatsIt": {
-    "message": "That's it? ok…",
+    "message": "Asta e tot? Ok…",
     "description": "English: Firstrun.html -> That's it? ok…"
   },
   "adnFirstRunBetterButStill": {
-    "message": "Better, but still…",
+    "message": "Mai bine, dar totuși…",
     "description": "English: Firstrun.html -> Better, but still…"
   },
   "adnFirstRunLetsGo": {
-    "message": "Let's go!",
+    "message": "Să începem!",
     "description": "English: Firstrun.html -> Let's go!"
   },
   "goToAdNauseamWebsite": {
-    "message": "Go to AdNauseam website",
+    "message": "Mergeți la site-ul AdNauseam",
     "description": "English: Menu icon title -> Go to AdNauseam website"
   },
   "adnPausedOnPage": {
-    "message": "AdNauseam is paused on this page",
-    "description": "English: Menu->display when paused on page/site"
+    "message": "AdNauseam este întrerupt pe această pagină",
+    "description": "English: Menu->display when paused on page\/site"
   },
   "adnNotHiding": {
-    "message": "AdNauseam is not currently hiding Ads",
+    "message": "AdNauseam nu ascunde în prezent reclame",
     "description": "English: Menu->display when not hiding Ads"
   },
   "adnVaultName": {
@@ -169,23 +173,23 @@
   },
   "topAdnetworks": {
     "message": "Top Ad Networks",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "topSites": {
     "message": "Top Sites",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypes": {
     "message": "Ad Types",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesImageAds": {
     "message": "Image Ads",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesTextAds": {
     "message": "Text Ads",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adnShowingRecentAds": {
     "message": "No Ads collected on this page (showing recent)",
@@ -216,7 +220,7 @@
     "description": "appears in ADN settings"
   },
   "adnPurgeConfirm": {
-    "message": "This action will permanently remove all ads with load image error. Make sure your internet is connected, otherwise all your ads will be deleted.",
+    "message": "This action will permanently remove all ads for which the image cannot be loaded. It is a good idea to backup your vault before purging, and also to make sure you have an active internet connection.",
     "description": "appears in ADN settings"
   },
   "adnAdClickingStatusPending": {
@@ -284,15 +288,15 @@
     "description": "Disable AdNaueam Block On this Domain -> Popup option that appears inside ADN menu"
   },
   "adnMenuDisableScopePage": {
-    "message": "on this page",
+    "message": "pe această pagină",
     "description": "Disable AdNaueam Block On This Page -> Popup option that appears inside ADN menu"
   },
   "adnMenuSettings": {
-    "message": "Settings",
+    "message": "Setări",
     "description": "appears in ADN popup menu"
   },
   "adnMenuExportOptions": {
-    "message": "Export Options",
+    "message": "Exportă opțiunile",
     "description": "appears in Menu - Export Dialog box"
   },
   "adnMenuExportAdsOnly": {
@@ -308,7 +312,7 @@
     "description": "appears in Menu - Export Dialog box"
   },
   "adnMenuImportAds": {
-    "message": "Import Ads",
+    "message": "Importă reclame",
     "description": "appears in ADN popup menu"
   },
   "adnMenuDisableAllLogging": {
@@ -344,11 +348,11 @@
     "description": "appears on vault page"
   },
   "adnVaultExport": {
-    "message": "Export",
+    "message": "Exportă",
     "description": "appears on vault page"
   },
   "adnVaultImport": {
-    "message": "Import",
+    "message": "Importă",
     "description": "appears on vault page"
   },
   "adnVaultClear": {
@@ -358,6 +362,18 @@
   "adnPurgeDeadAds": {
     "message": "Purge Dead Ads",
     "description": "appears on vault page"
+  },
+  "adnShowDeadAds": {
+    "message": "Show Dead Ads",
+    "description": "appears on vault page"
+  },
+  "adnHideDeadAds": {
+    "message": "Hide Dead Ads",
+    "description": "appears on vault page"
+  },
+  "adnCaptureVault": {
+    "message": "Capture",
+    "description": "appears on vault page in dev mode"
   },
   "adnVaultFound": {
     "message": "{{total}} ads collected",
@@ -456,7 +472,7 @@
     "description": "for the chrome web store: must be 132 characters or less"
   },
   "3pGroupEssentials": {
-    "message": "Essentials",
+    "message": "Esențiale",
     "description": "English: Essentials"
   },
   "3pGroupOther": {
@@ -468,15 +484,19 @@
     "description": "English: Malware"
   },
   "3pGroupRegions": {
-    "message": "Languages",
+    "message": "Limbi",
     "description": "English: Languages"
   },
   "3pPageUpdate": {
-    "message": "Update",
+    "message": "Actualizează",
+    "description": "English: update"
+  },
+  "adnUpdateButton": {
+    "message": "Actualizează",
     "description": "English: update"
   },
   "whitelistPageName": {
-    "message": "Trusted sites",
+    "message": "Siteuri de încredere",
     "description": "appears as tab name in dashboard"
   },
   "strictBlockListPageName": {
@@ -484,12 +504,20 @@
     "description": "appears as tab name in dashboard"
   },
   "eventLoggingPrompt": {
-    "message": "Activate debugging mode",
+    "message": "Debug mode",
     "description": "prompt for toggle"
   },
   "disableWarnings": {
     "message": "Disable warnings",
     "description": "English:Disable warnings"
+  },
+  "blurCollectedAds": {
+    "message": "Blur Collected ads",
+    "description": "English: Blur Collected ads"
+  },
+  "hideDeadAds": {
+    "message": "Hide Dead ads",
+    "description": "English: Hide Dead ads"
   },
   "showAdsDebugPrompt": {
     "message": "Show ads for ad-collection debugging",
@@ -502,5 +530,25 @@
   "settingsStrictBlockingMode": {
     "message": "Activate Strict-Blocking Mode",
     "description": "English: Activate Strict-Blocking Mode"
+  },
+  "adnRefreshButton": {
+    "message": "Refresh",
+    "description": "English: refresh page from menu notification button"
+  },
+  "adnRefreshNotification": {
+    "message": "Apply changes on current page",
+    "description": "English: refresh page from menu notification"
+  },
+  "supportS6P3S1": {
+    "message": "Make sure this issue is <b>AdNauseam-specific<\/b>.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P3S2": {
+    "message": "I have tested the same web-page on <a url='https:\/\/github.com\/gorhill\/uBlock'>#uBO#<\/a> and confirm this issue is <b>AdNauseam-specific<\/b>.",
+    "description": "A checkbox in the filter issue reporter section"
+  },
+  "supportS6Select1Option7": {
+    "message": "Ads not collected",
+    "description": "Ads are present on page but none are collected"
   }
 }

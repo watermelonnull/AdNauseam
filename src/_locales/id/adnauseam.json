@@ -36,15 +36,15 @@
     "description": "Message asking user to confirm reset"
   },
   "adnFirstRunHideAllAdsDescription": {
-    "message": "sembunyikan iklan di <span class='link' id='To3pfilter'>daftar filter</span> yang telah Anda pilih",
+    "message": "sembunyikan iklan di <span class='link' id='To3pfilter'>daftar filter<\/span> yang telah Anda pilih",
     "description": "English: Firstrun.html -> Hide Ads in your selected filter lists"
   },
   "adnFirstRunClickingAdsDescription": {
-    "message": "daftarkan kunjungan iklan yang telah ditemukan melalui <span class='link' id='To3pfilter'>daftar filter</span> Anda",
+    "message": "daftarkan kunjungan iklan yang telah ditemukan melalui <span class='link' id='To3pfilter'>daftar filter<\/span> Anda",
     "description": "English: Firstrun.html -> Register visits on Ads found via your filter lists"
   },
   "adnFirstRunBlockingMalwareDescription": {
-    "message": "Blokir pelacak dan malware lainnya (<span>Kustomisasi</span>)",
+    "message": "Blokir pelacak dan malware lainnya (<span>Kustomisasi<\/span>)",
     "description": "English: Firstrun.html -> Block trackers and other malware (customize)"
   },
   "adnNotificationReactivate": {
@@ -92,7 +92,7 @@
     "description": "English: Notifications -> The 'Content Blocking' settings in your browser may interfere with AdNauseam!"
   },
   "adnNotificationPrivacyMode": {
-    "message": "Anda telah memberi ijin adnauseam untuk mengakses aktifitas online anda saat melakukan private browsing.",
+    "message": "Anda telah memberi ijin adnauseam untuk mengakses aktivitas online anda saat melakukan penelusuran pribadi.",
     "description": "English: Notifications -> You have allowed adnauseam to have access to your online activities while private browsing."
   },
   "adnNotificationDNTAllowed": {
@@ -108,12 +108,16 @@
     "description": "English: Notifications -> This page respects Do Not Track, clicking not hiding."
   },
   "adnNotificationDNTJustSoYouKnow": {
-    "message": "Halaman ini menyetujui <b>Do Not Track</b>, agar Anda tahu.",
+    "message": "Halaman ini menyetujui <b>Do Not Track<\/b>, agar Anda tahu.",
     "description": "English: Notifications -> This page respects Do Not Track, just so you know."
   },
   "adnNotificationShowAdsDebug": {
-    "message": "The Advanced Setting \"Show Ads Debug\" is turned on",
+    "message": "Pengaturan Termutakhir \"Tampilkan Debug Iklan\" telah dinyalakan",
     "description": "English: Notifications -> The Advanced Setting \"Show Ads Debug\" is turned on"
+  },
+  "adnNewerVersionAvailableNotification": {
+    "message": "Versi terbaru AdNauseam tersedia",
+    "description": "English: Notifications -> A newer version of AdNauseam is available"
   },
   "adnTarget": {
     "message": "TARGET",
@@ -153,7 +157,7 @@
   },
   "adnPausedOnPage": {
     "message": "AdNauseam sedang diberhentikan di halaman ini",
-    "description": "English: Menu->display when paused on page/site"
+    "description": "English: Menu->display when paused on page\/site"
   },
   "adnNotHiding": {
     "message": "AdNauseam saat ini sedang tidak menyembunyikan iklan",
@@ -168,35 +172,35 @@
     "description": "appears in ADN vault, above ad slider"
   },
   "topAdnetworks": {
-    "message": "Top Ad Networks",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "Jaringan Iklan Teratas",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "topSites": {
     "message": "Situs Teratas",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypes": {
     "message": "Tipe Iklan",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesImageAds": {
     "message": "Iklan Gambar",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesTextAds": {
     "message": "Iklan Teks",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adnShowingRecentAds": {
     "message": "Tidak ada iklan yang dapat dikumpulkan di halaman ini (menampilkan informasi terbaru)",
     "description": "shown in menu when only 'recent' Ads are shown"
   },
   "adnThisPageStrictBlocked": {
-    "message": "{{domain}} is currently strict-blocked.",
+    "message": "{{domain}} telah diblokir secara ketat.",
     "description": "shown in menu when the current page is strict-blocked"
   },
   "adnStrictBlockListDescription": {
-    "message": "The strict-block list serves to help the users to strict-block specific domains or pages more easily.",
+    "message": "Daftar blokir ketat berguna untuk membantu pengguna memblokir secara ketat domain atau halaman secara spesifik dengan lebih mudah.",
     "description": "Description on the strict-block list tab, which is found on the dashboard"
   },
   "adnExportedAdsFilename": {
@@ -216,7 +220,7 @@
     "description": "appears in ADN settings"
   },
   "adnPurgeConfirm": {
-    "message": "This action will permanently remove all ads with load image error. Make sure your internet is connected, otherwise all your ads will be deleted.",
+    "message": "Tindakan ini akan menghapus secara permanen semua iklan yang gambarnya tidak dapat dimuat. Disarankan untuk melakukan cadangan vault Anda sebelum menghapus, dan pastikan Anda memiliki koneksi internet yang aktif.",
     "description": "appears in ADN settings"
   },
   "adnAdClickingStatusPending": {
@@ -268,23 +272,23 @@
     "description": "appears in ADN popup menu three state button"
   },
   "adnMenuDisable": {
-    "message": "Disable",
+    "message": "Nonaktifkan",
     "description": "Disabled Adnauseam -> appears in ADN popup menu three state button"
   },
   "adnMenuActive": {
-    "message": "Active",
+    "message": "Aktif",
     "description": "Make Adnauseam Active -> appears in ADN popup menu three state button"
   },
   "adnMenuStrict": {
-    "message": "Strict",
+    "message": "Ketat",
     "description": "Activate Strict-Block -> appears in ADN popup menu three state button"
   },
   "adnMenuDisableScopeDomain": {
-    "message": "on {{domain}}",
+    "message": "pada {{domain}}",
     "description": "Disable AdNaueam Block On this Domain -> Popup option that appears inside ADN menu"
   },
   "adnMenuDisableScopePage": {
-    "message": "on this page",
+    "message": "pada laman ini",
     "description": "Disable AdNaueam Block On This Page -> Popup option that appears inside ADN menu"
   },
   "adnMenuSettings": {
@@ -356,8 +360,20 @@
     "description": "appears on vault page"
   },
   "adnPurgeDeadAds": {
-    "message": "Purge Dead Ads",
+    "message": "Hapus Iklan yang Tidak Nonaktif",
     "description": "appears on vault page"
+  },
+  "adnShowDeadAds": {
+    "message": "Tampilkan Iklan yang Tidak Aktif",
+    "description": "appears on vault page"
+  },
+  "adnHideDeadAds": {
+    "message": "Sembunyikan Iklan yang Tidak Aktif",
+    "description": "appears on vault page"
+  },
+  "adnCaptureVault": {
+    "message": "Rekam",
+    "description": "appears on vault page in dev mode"
   },
   "adnVaultFound": {
     "message": "{{total}} iklan yang dikumpulkan",
@@ -475,32 +491,64 @@
     "message": "Perbarui",
     "description": "English: update"
   },
+  "adnUpdateButton": {
+    "message": "Perbarui",
+    "description": "English: update"
+  },
   "whitelistPageName": {
     "message": "Daftar yang dibolehkan",
     "description": "appears as tab name in dashboard"
   },
   "strictBlockListPageName": {
-    "message": "Strict-Block List",
+    "message": "Daftar Blokir Ketat",
     "description": "appears as tab name in dashboard"
   },
   "eventLoggingPrompt": {
-    "message": "Aktifkan mode debugging",
+    "message": "Mode Pengembang",
     "description": "prompt for toggle"
   },
   "disableWarnings": {
-    "message": "Disable warnings",
+    "message": "Nonaktifkan peringatan",
     "description": "English:Disable warnings"
   },
+  "blurCollectedAds": {
+    "message": "Buramkan iklan yang terkumpul",
+    "description": "English: Blur Collected ads"
+  },
+  "hideDeadAds": {
+    "message": "Sembunyikan Iklan yang Tidak Aktif",
+    "description": "English: Hide Dead ads"
+  },
   "showAdsDebugPrompt": {
-    "message": "Show ads for ad-collection debugging",
+    "message": "Tampilkan iklan untuk debug pengumpulan iklan",
     "description": "English: Show ads for ad-collection debugging"
   },
   "removeAdsInPrivate": {
-    "message": "Hapus iklan yang dikoleksi dari mode privasi",
+    "message": "Hapus iklan yang dikumpulkan dari mode privasi",
     "description": "English:Remove ads collected in private mode - settings page"
   },
   "settingsStrictBlockingMode": {
-    "message": "Activate Strict-Blocking Mode",
+    "message": "Aktifkan Mode Blokir Ketat",
     "description": "English: Activate Strict-Blocking Mode"
+  },
+  "adnRefreshButton": {
+    "message": "Muat Ulang",
+    "description": "English: refresh page from menu notification button"
+  },
+  "adnRefreshNotification": {
+    "message": "Terapkan perubahan pada halaman ini",
+    "description": "English: refresh page from menu notification"
+  },
+  "supportS6P3S1": {
+    "message": "Pastikan masalah ini adalah <b>AdNauseam-spesifik<\/b>.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P3S2": {
+    "message": "Saya telah menguji halaman web yang sama di <a url='https:\/\/github.com\/gorhill\/uBlock'>#uBO#<\/a> dan mengkonfirmasi masalah ini adalah <b>AdNauseam-spesifik<\/b>.",
+    "description": "A checkbox in the filter issue reporter section"
+  },
+  "supportS6Select1Option7": {
+    "message": "Iklan tidak dikumpulkan",
+    "description": "Ads are present on page but none are collected"
   }
 }

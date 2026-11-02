@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2014-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,8 +19,6 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-'use strict';
-
 /******************************************************************************/
 
 const i18n =
@@ -29,11 +27,7 @@ const i18n =
         ? self.browser.i18n
         : self.chrome.i18n;
 
-/******************************************************************************/
-
-function i18n$(...args) {
-    return i18n.getMessage(...args);
-}
+const i18n$ = (...args) => i18n.getMessage(...args);
 
 /******************************************************************************/
 
@@ -172,14 +166,14 @@ if ( isBackgroundProcess !== true ) {
         const re = /\{\{\w+\}\}/g;
         let textout = '';
         for (;;) {
-            let match = re.exec(textin);
+            const match = re.exec(textin);
             if ( match === null ) {
                 textout += textin;
                 break;
             }
             textout += textin.slice(0, match.index);
             let prop = match[0].slice(2, -2);
-            if ( dict.hasOwnProperty(prop) ) {
+            if ( Object.hasOwn(dict, prop) ) {
                 textout += dict[prop].replace(/</g, '&lt;')
                                      .replace(/>/g, '&gt;');
             } else {
@@ -254,11 +248,16 @@ if ( isBackgroundProcess !== true ) {
             elem.setAttribute('title', expandHtmlEntities(text));
         }
 
+        for ( const elem of root.querySelectorAll('[aria-label]') ) {
+            const text = i18n$(elem.getAttribute('aria-label'));
+            if ( !text ) { continue; }
+            elem.setAttribute('aria-label', expandHtmlEntities(text));
+        }
+
         for ( const elem of root.querySelectorAll('[placeholder]') ) {
-            elem.setAttribute(
-                'placeholder',
-                i18n$(elem.getAttribute('placeholder'))
-            );
+            const text = i18n$(elem.getAttribute('placeholder'));
+            if ( text === '' ) { continue; }
+            elem.setAttribute('placeholder', text);
         }
 
         for ( const elem of root.querySelectorAll('[data-i18n-tip]') ) {
@@ -270,6 +269,11 @@ if ( isBackgroundProcess !== true ) {
             if ( elem.getAttribute('aria-label') === 'data-tip' ) {
                 elem.setAttribute('aria-label', text);
             }
+        }
+
+        for ( const elem of root.querySelectorAll('[data-i18n-label]') ) {
+            const text = i18n$(elem.getAttribute('data-i18n-label'));
+            elem.setAttribute('label', text);
         }
     };
 
@@ -293,6 +297,51 @@ if ( isBackgroundProcess !== true ) {
             return i18n$('elapsedOneDayAgo');
         }
         return i18n$('elapsedManyDaysAgo').replace('{{value}}', Math.floor(value).toLocaleString());
+    };
+
+    const unicodeFlagToImageSrc = new Map([
+        [ '🇦🇱', 'al' ], [ '🇦🇷', 'ar' ], [ '🇦🇹', 'at' ], [ '🇧🇦', 'ba' ],
+        [ '🇧🇪', 'be' ], [ '🇧🇬', 'bg' ], [ '🇧🇷', 'br' ], [ '🇨🇦', 'ca' ],
+        [ '🇨🇭', 'ch' ], [ '🇨🇳', 'cn' ], [ '🇨🇴', 'co' ], [ '🇨🇾', 'cy' ],
+        [ '🇨🇿', 'cz' ], [ '🇩🇪', 'de' ], [ '🇩🇰', 'dk' ], [ '🇩🇿', 'dz' ],
+        [ '🇪🇪', 'ee' ], [ '🇪🇬', 'eg' ], [ '🇪🇸', 'es' ], [ '🇫🇮', 'fi' ],
+        [ '🇫🇴', 'fo' ], [ '🇫🇷', 'fr' ], [ '🇬🇷', 'gr' ], [ '🇭🇷', 'hr' ],
+        [ '🇭🇺', 'hu' ], [ '🇮🇩', 'id' ], [ '🇮🇱', 'il' ], [ '🇮🇳', 'in' ],
+        [ '🇮🇷', 'ir' ], [ '🇮🇸', 'is' ], [ '🇮🇹', 'it' ], [ '🇯🇵', 'jp' ],
+        [ '🇰🇷', 'kr' ], [ '🇰🇿', 'kz' ], [ '🇱🇰', 'lk' ], [ '🇱🇹', 'lt' ],
+        [ '🇱🇻', 'lv' ], [ '🇲🇦', 'ma' ], [ '🇲🇩', 'md' ], [ '🇲🇰', 'mk' ],
+        [ '🇲🇽', 'mx' ], [ '🇲🇾', 'my' ], [ '🇳🇱', 'nl' ], [ '🇳🇴', 'no' ],
+        [ '🇳🇵', 'np' ], [ '🇵🇱', 'pl' ], [ '🇵🇹', 'pt' ], [ '🇷🇴', 'ro' ],
+        [ '🇷🇸', 'rs' ], [ '🇷🇺', 'ru' ], [ '🇸🇦', 'sa' ], [ '🇸🇮', 'si' ],
+        [ '🇸🇰', 'sk' ], [ '🇸🇪', 'se' ], [ '🇸🇷', 'sr' ], [ '🇹🇭', 'th' ],
+        [ '🇹🇯', 'tj' ], [ '🇹🇼', 'tw' ], [ '🇹🇷', 'tr' ], [ '🇺🇦', 'ua' ],
+        [ '🇺🇿', 'uz' ], [ '🇻🇳', 'vn' ], [ '🇽🇰', 'xk' ],
+    ]);
+    const reUnicodeFlags = new RegExp(
+        Array.from(unicodeFlagToImageSrc).map(a => a[0]).join('|'),
+        'gu'
+    );
+    i18n.patchUnicodeFlags = function(text) {
+        const fragment = document.createDocumentFragment();
+        let i = 0;
+        for (;;) {
+            const match = reUnicodeFlags.exec(text);
+            if ( match === null ) { break; }
+            if ( match.index > i ) {
+                fragment.append(text.slice(i, match.index));
+            }
+            const img = document.createElement('img');
+            const countryCode = unicodeFlagToImageSrc.get(match[0]);
+            img.src = `/img/flags-of-the-world/${countryCode}.png`;
+            img.title = countryCode;
+            img.classList.add('countryFlag');
+            fragment.append(img, '\u200A');
+            i = reUnicodeFlags.lastIndex;
+        }
+        if ( i < text.length ) {
+            fragment.append(text.slice(i));
+        }
+        return fragment; 
     };
 
     i18n.render();

@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    AdNauseam Lite - a comprehensive, MV3-compliant content blocker
     Copyright (C) 2022-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,27 +19,48 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-/* jshint esversion:11 */
-
-'use strict';
-
-/******************************************************************************/
-
 import {
-    browser,
-    dnr,
-} from './ext.js';
-
-import {
+    broadcastMessage,
     hostnamesFromMatches,
     isDescendantHostnameOfIter,
+    toBroaderHostname,
 } from './utils.js';
 
 import {
-    TRUSTED_DIRECTIVE_BASE_RULE_ID,
-    BLOCKING_MODES_RULE_ID,
-    getDynamicRules
-} from './ruleset-manager.js';
+    browser,
+    localRead, localRemove, localWrite,
+    sessionRead, sessionWrite,
+} from './ext.js';
+
+import {
+    rulesetConfig,
+    saveRulesetConfig,
+} from './config.js';
+
+import { adminReadEx } from './admin.js';
+import { deferredTasks } from './deferred-tasks.js';
+import { filteringModesToDNR } from './ruleset-manager.js';
+import { hasBroadHostPermissions } from './ext-utils.js';
+
+
+/******************************************************************************/
+
+// 0:       no filtering
+// 1:    basic filtering
+// 2:  optimal filtering
+// 3: complete filtering
+
+export const     MODE_NONE = 0;
+export const    MODE_BASIC = 1;
+export const  MODE_OPTIMAL = 2;
+export const MODE_COMPLETE = 3;
+
+export const defaultFilteringModes = {
+    none: [],
+    basic: [],
+    optimal: [],
+    complete: [ 'all-urls' ], // ADN: default to Complete (full cosmetic filtering)
+};
 
 /******************************************************************************/
 
@@ -52,328 +73,364 @@ const pruneDescendantHostnamesFromSet = (hostname, hnSet) => {
     }
 };
 
-/******************************************************************************/
-
-const eqSets = (setBefore, setAfter) => {
-    for ( const hn of setAfter ) {
-        if ( setBefore.has(hn) === false ) { return false; }
+const pruneHostnameFromSet = (hostname, hnSet) => {
+    let hn = hostname;
+    for (;;) {
+        hnSet.delete(hn);
+        hn = toBroaderHostname(hn);
+        if ( hn === '*' ) { break; }
     }
-    for ( const hn of setBefore ) {
-        if ( setAfter.has(hn) === false ) { return false; }
-    }
-    return true;
 };
 
 /******************************************************************************/
 
-// 0:      no blocking => TRUSTED_DIRECTIVE_BASE_RULE_ID / requestDomains
-// 1:          network => BLOCKING_MODES_RULE_ID / excludedInitiatorDomains
-// 2: specific content => BLOCKING_MODES_RULE_ID / excludedRequestDomains
-// 3:  generic content => BLOCKING_MODES_RULE_ID / initiatorDomains
-
-let filteringModeDetailsPromise;
-
-function getActualFilteringModeDetails() {
-    if ( filteringModeDetailsPromise !== undefined ) {
-        return filteringModeDetailsPromise;
-    }
-    filteringModeDetailsPromise = Promise.all([
-        getDynamicRules(),
-        getAllTrustedSiteDirectives(),
-    ]).then(results => {
-        const [ dynamicRuleMap, trustedSiteDirectives ] = results;
-        const details = {
-            none: new Set(trustedSiteDirectives),
-        };
-        const rule = dynamicRuleMap.get(BLOCKING_MODES_RULE_ID);
-        if ( rule ) {
-            details.network = new Set(rule.condition.excludedInitiatorDomains);
-            details.extendedSpecific = new Set(rule.condition.excludedRequestDomains);
-            details.extendedGeneric = new Set(rule.condition.initiatorDomains);
-        } else {
-            details.network = new Set([ 'all-urls' ]);
-            details.extendedSpecific = new Set();
-            details.extendedGeneric = new Set();
-        }
-        return details;
-    });
-    return filteringModeDetailsPromise;
-}
-
-/******************************************************************************/
-
-async function getFilteringModeDetails() {
-    const actualDetails = await getActualFilteringModeDetails();
+const serializeModeDetails = details => {
     return {
-        none: new Set(actualDetails.none),
-        network: new Set(actualDetails.network),
-        extendedSpecific: new Set(actualDetails.extendedSpecific),
-        extendedGeneric: new Set(actualDetails.extendedGeneric),
+        none: Array.from(details.none),
+        basic: Array.from(details.basic),
+        optimal: Array.from(details.optimal),
+        complete: Array.from(details.complete),
     };
+};
+
+const unserializeModeDetails = details => {
+    return {
+        none: new Set(details.none),
+        basic: new Set(details.basic ?? details.network),
+        optimal: new Set(details.optimal ?? details.extendedSpecific),
+        complete: new Set(details.complete ?? details.extendedGeneric),
+    };
+};
+
+/******************************************************************************/
+
+function fixFilteringModeDetails(details) {
+    const { none, basic, optimal, complete } = unserializeModeDetails(details);
+    // Descendant hostnames cannot override no-filtering mode
+    for ( const exclude of none ) {
+        basic.delete(exclude);
+        pruneDescendantHostnamesFromSet(exclude, basic);
+        optimal.delete(exclude);
+        pruneDescendantHostnamesFromSet(exclude, optimal);
+        complete.delete(exclude);
+        pruneDescendantHostnamesFromSet(exclude, complete);
+    }
+    return { none, basic, optimal, complete };
 }
 
 /******************************************************************************/
 
-async function setFilteringModeDetails(afterDetails) {
-    const [ dynamicRuleMap, actualDetails ] = await Promise.all([
-        getDynamicRules(),
-        getActualFilteringModeDetails(),
-    ]);
-    const addRules = [];
-    const removeRuleIds = [];
-    if ( eqSets(actualDetails.none, afterDetails.none) === false ) {
-        actualDetails.none = afterDetails.none;
-        if ( dynamicRuleMap.has(TRUSTED_DIRECTIVE_BASE_RULE_ID) ) {
-            removeRuleIds.push(TRUSTED_DIRECTIVE_BASE_RULE_ID);
-            dynamicRuleMap.delete(TRUSTED_DIRECTIVE_BASE_RULE_ID);
-        }
-        const rule = {
-            id: TRUSTED_DIRECTIVE_BASE_RULE_ID,
-            action: { type: 'allowAllRequests' },
-            condition: {
-                requestDomains: [],
-                resourceTypes: [ 'main_frame' ],
-            },
-            priority: 100,
-        };
-        if ( actualDetails.none.size ) {
-            rule.condition.requestDomains = Array.from(actualDetails.none);
-            addRules.push(rule);
-            dynamicRuleMap.set(TRUSTED_DIRECTIVE_BASE_RULE_ID, rule);
-        }
-    }
-    if (
-        eqSets(actualDetails.network, afterDetails.network) === false ||
-        eqSets(actualDetails.extendedSpecific, afterDetails.extendedSpecific) === false ||
-        eqSets(actualDetails.extendedGeneric, afterDetails.extendedGeneric) === false
-    ) {
-        actualDetails.network = afterDetails.network;
-        actualDetails.extendedSpecific = afterDetails.extendedSpecific;
-        actualDetails.extendedGeneric = afterDetails.extendedGeneric;
-        if ( dynamicRuleMap.has(BLOCKING_MODES_RULE_ID) ) {
-            removeRuleIds.push(BLOCKING_MODES_RULE_ID);
-            dynamicRuleMap.delete(BLOCKING_MODES_RULE_ID);
-        }
-        const rule = {
-            id: BLOCKING_MODES_RULE_ID,
-            action: { type: 'allow' },
-            condition: {
-                resourceTypes: [ 'main_frame' ],
-                urlFilter: '||ubol-blocking-modes.invalid^',
-            },
-        };
-        if ( actualDetails.network.size ) {
-            rule.condition.excludedInitiatorDomains =
-                Array.from(actualDetails.network);
-        }
-        if ( actualDetails.extendedSpecific.size ) {
-            rule.condition.excludedRequestDomains =
-                Array.from(actualDetails.extendedSpecific);
-        }
-        if ( actualDetails.extendedGeneric.size ) {
-            rule.condition.initiatorDomains =
-                Array.from(actualDetails.extendedGeneric);
-        }
-        if (
-            actualDetails.network.size ||
-            actualDetails.extendedSpecific.size ||
-            actualDetails.extendedGeneric.size
-        )  {
-            addRules.push(rule);
-            dynamicRuleMap.set(BLOCKING_MODES_RULE_ID, rule);
-        }
-    }
-    if ( addRules.length === 0 && removeRuleIds.length === 0 ) { return; }
-    const updateOptions = {};
-    if ( addRules.length ) {
-        updateOptions.addRules = addRules;
-    }
-    if ( removeRuleIds.length ) {
-        updateOptions.removeRuleIds = removeRuleIds;
-    }
-    return dnr.updateDynamicRules(updateOptions);
-}
-
-/******************************************************************************/
-
-async function getFilteringMode(hostname) {
-    const filteringModes = await getFilteringModeDetails();
-    if ( filteringModes.none.has(hostname) ) { return 0; }
-    if ( filteringModes.network.has(hostname) ) { return 1; }
-    if ( filteringModes.extendedSpecific.has(hostname) ) { return 2; }
-    if ( filteringModes.extendedGeneric.has(hostname) ) { return 3; }
-    return getDefaultFilteringMode();
-}
-
-/******************************************************************************/
-
-async function setFilteringMode(hostname, afterLevel) {
+function lookupFilteringMode(filteringModes, hostname) {
+    const { none, basic, optimal, complete } = filteringModes;
     if ( hostname === 'all-urls' ) {
-        return setDefaultFilteringMode(afterLevel);
+        if ( filteringModes.none.has('all-urls') ) { return MODE_NONE; }
+        if ( filteringModes.basic.has('all-urls') ) { return MODE_BASIC; }
+        if ( filteringModes.optimal.has('all-urls') ) { return MODE_OPTIMAL; }
+        if ( filteringModes.complete.has('all-urls') ) { return MODE_COMPLETE; }
+        return MODE_BASIC;
     }
-    const [
-        beforeLevel,
-        defaultLevel,
-        filteringModes
-    ] = await Promise.all([
-        getFilteringMode(hostname),
-        getDefaultFilteringMode(),
-        getFilteringModeDetails(),
-    ]);
+    if ( none.has(hostname) ) { return MODE_NONE; }
+    if ( none.has('all-urls') === false ) {
+        if ( isDescendantHostnameOfIter(hostname, none) ) { return MODE_NONE; }
+    }
+    if ( basic.has(hostname) ) { return MODE_BASIC; }
+    if ( basic.has('all-urls') === false ) {
+        if ( isDescendantHostnameOfIter(hostname, basic) ) { return MODE_BASIC; }
+    }
+    if ( optimal.has(hostname) ) { return MODE_OPTIMAL; }
+    if ( optimal.has('all-urls') === false ) {
+        if ( isDescendantHostnameOfIter(hostname, optimal) ) { return MODE_OPTIMAL; }
+    }
+    if ( complete.has(hostname) ) { return MODE_COMPLETE; }
+    if ( complete.has('all-urls') === false ) {
+        if ( isDescendantHostnameOfIter(hostname, complete) ) { return MODE_COMPLETE; }
+    }
+    return lookupFilteringMode(filteringModes, 'all-urls');
+}
+
+/******************************************************************************/
+
+function applyFilteringMode(filteringModes, hostname, afterLevel) {
+    const defaultLevel = lookupFilteringMode(filteringModes, 'all-urls');
+    if ( hostname === 'all-urls' ) {
+        if ( afterLevel === defaultLevel ) { return afterLevel; }
+        switch ( afterLevel ) {
+        case MODE_NONE:
+            filteringModes.none.clear();
+            filteringModes.none.add('all-urls');
+            break;
+        case MODE_BASIC:
+            filteringModes.basic.clear();
+            filteringModes.basic.add('all-urls');
+            break;
+        case MODE_OPTIMAL:
+            filteringModes.optimal.clear();
+            filteringModes.optimal.add('all-urls');
+            break;
+        case MODE_COMPLETE:
+            filteringModes.complete.clear();
+            filteringModes.complete.add('all-urls');
+            break;
+        }
+        switch ( defaultLevel ) {
+        case MODE_NONE:
+            filteringModes.none.delete('all-urls');
+            break;
+        case MODE_BASIC:
+            filteringModes.basic.delete('all-urls');
+            break;
+        case MODE_OPTIMAL:
+            filteringModes.optimal.delete('all-urls');
+            break;
+        case MODE_COMPLETE:
+            filteringModes.complete.delete('all-urls');
+            break;
+        }
+        return lookupFilteringMode(filteringModes, 'all-urls');
+    }
+    const beforeLevel = lookupFilteringMode(filteringModes, hostname);
     if ( afterLevel === beforeLevel ) { return afterLevel; }
-    const {
-        none,
-        network,
-        extendedSpecific,
-        extendedGeneric,
-    } = filteringModes;
+    const { none, basic, optimal, complete } = filteringModes;
     switch ( beforeLevel ) {
-    case 0:
-        none.delete(hostname);
+    case MODE_NONE:
+        pruneHostnameFromSet(hostname, none);
         break;
-    case 1:
-        network.delete(hostname);
+    case MODE_BASIC:
+        pruneHostnameFromSet(hostname, basic);
         break;
-    case 2:
-        extendedSpecific.delete(hostname);
+    case MODE_OPTIMAL:
+        pruneHostnameFromSet(hostname, optimal);
         break;
-    case 3:
-        extendedGeneric.delete(hostname);
+    case MODE_COMPLETE:
+        pruneHostnameFromSet(hostname, complete);
         break;
     }
     if ( afterLevel !== defaultLevel ) {
         switch ( afterLevel ) {
-        case 0:
+        case MODE_NONE:
             if ( isDescendantHostnameOfIter(hostname, none) === false ) {
                 filteringModes.none.add(hostname);
                 pruneDescendantHostnamesFromSet(hostname, none);
             }
             break;
-        case 1:
-            if ( isDescendantHostnameOfIter(hostname, network) === false ) {
-                filteringModes.network.add(hostname);
-                pruneDescendantHostnamesFromSet(hostname, network);
+        case MODE_BASIC:
+            if ( isDescendantHostnameOfIter(hostname, basic) === false ) {
+                filteringModes.basic.add(hostname);
+                pruneDescendantHostnamesFromSet(hostname, basic);
             }
             break;
-        case 2:
-            if ( isDescendantHostnameOfIter(hostname, extendedSpecific) === false ) {
-                filteringModes.extendedSpecific.add(hostname);
-                pruneDescendantHostnamesFromSet(hostname, extendedSpecific);
+        case MODE_OPTIMAL:
+            if ( isDescendantHostnameOfIter(hostname, optimal) === false ) {
+                filteringModes.optimal.add(hostname);
+                pruneDescendantHostnamesFromSet(hostname, optimal);
             }
             break;
-        case 3:
-            if ( isDescendantHostnameOfIter(hostname, extendedGeneric) === false ) {
-                filteringModes.extendedGeneric.add(hostname);
-                pruneDescendantHostnamesFromSet(hostname, extendedGeneric);
+        case MODE_COMPLETE:
+            if ( isDescendantHostnameOfIter(hostname, complete) === false ) {
+                filteringModes.complete.add(hostname);
+                pruneDescendantHostnamesFromSet(hostname, complete);
             }
             break;
         }
     }
-    await setFilteringModeDetails(filteringModes);
-    return getFilteringMode(hostname);
+    return lookupFilteringMode(filteringModes, hostname);
 }
 
 /******************************************************************************/
 
-async function getDefaultFilteringMode() {
-    const filteringModes = await getFilteringModeDetails();
-    if ( filteringModes.none.has('all-urls') ) { return 0; }
-    if ( filteringModes.network.has('all-urls') ) { return 1; }
-    if ( filteringModes.extendedSpecific.has('all-urls') ) { return 2; }
-    if ( filteringModes.extendedGeneric.has('all-urls') ) { return 3; }
-    return 1;
-}
-
-/******************************************************************************/
-
-async function setDefaultFilteringMode(afterLevel) {
-    const [ beforeLevel, filteringModes ] = await Promise.all([
-        getDefaultFilteringMode(),
-        getFilteringModeDetails(),
+export async function readFilteringModeDetails(bypassCache = false) {
+    if ( bypassCache === false ) {
+        if ( readFilteringModeDetails.cache ) {
+            return readFilteringModeDetails.cache;
+        }
+        const sessionModes = await sessionRead('filteringModeDetails');
+        if ( sessionModes instanceof Object ) {
+            readFilteringModeDetails.cache = unserializeModeDetails(sessionModes);
+            return readFilteringModeDetails.cache;
+        }
+    }
+    let [
+        userModes = structuredClone(defaultFilteringModes),
+        adminDefaultFiltering,
+        adminNoFiltering,
+    ] = await Promise.all([
+        localRead('filteringModeDetails'),
+        adminReadEx('defaultFiltering'),
+        adminReadEx('noFiltering'),
     ]);
-    if ( afterLevel === beforeLevel ) { return afterLevel; }
-    switch ( afterLevel ) {
-    case 0:
-        filteringModes.none.clear();
-        filteringModes.none.add('all-urls');
-        break;
-    case 1:
-        filteringModes.network.clear();
-        filteringModes.network.add('all-urls');
-        break;
-    case 2:
-        filteringModes.extendedSpecific.clear();
-        filteringModes.extendedSpecific.add('all-urls');
-        break;
-    case 3:
-        filteringModes.extendedGeneric.clear();
-        filteringModes.extendedGeneric.add('all-urls');
-        break;
+    userModes = unserializeModeDetails(userModes);
+    if ( adminDefaultFiltering !== undefined ) {
+        const modefromName = {
+            none: MODE_NONE,
+            basic: MODE_BASIC,
+            optimal: MODE_OPTIMAL,
+            complete: MODE_COMPLETE,
+        };
+        const adminDefaultFilteringMode = modefromName[adminDefaultFiltering];
+        if ( adminDefaultFilteringMode !== undefined ) {
+            applyFilteringMode(userModes, 'all-urls', adminDefaultFilteringMode);
+        }
     }
-    switch ( beforeLevel ) {
-    case 0:
-        filteringModes.none.delete('all-urls');
-        break;
-    case 1:
-        filteringModes.network.delete('all-urls');
-        break;
-    case 2:
-        filteringModes.extendedSpecific.delete('all-urls');
-        break;
-    case 3:
-        filteringModes.extendedGeneric.delete('all-urls');
-        break;
+    if ( Array.isArray(adminNoFiltering) && adminNoFiltering.length !== 0 ) {
+        if ( adminNoFiltering.includes('-*') ) {
+            userModes.none.clear();
+        }
+        let modified = false;
+        for ( const token of adminNoFiltering ) {
+            if ( token.charAt(0) === '-' ) {
+                const hn = token.slice(1);
+                if ( userModes.none.has(hn) === false ) { continue; }
+                userModes.none.delete(hn);
+                modified = true;
+            } else if ( userModes.none.has(token) === false ) {
+                userModes.none.add(token);
+                modified = true;
+            }
+        }
+        if ( modified ) {
+            deferredTasks.add('registerContentScripts');
+            deferredTasks.add('registerUserScripts');
+        }
+        userModes = fixFilteringModeDetails(userModes);
     }
-    await setFilteringModeDetails(filteringModes);
-    return getDefaultFilteringMode();
+    filteringModesToDNR(userModes);
+    sessionWrite('filteringModeDetails', serializeModeDetails(userModes));
+    readFilteringModeDetails.cache = userModes;
+    return userModes;
 }
 
 /******************************************************************************/
 
-async function syncWithBrowserPermissions() {
-    const permissions = await browser.permissions.getAll();
-    const allowedHostnames = new Set(hostnamesFromMatches(permissions.origins || []));
-    const beforeMode = await getDefaultFilteringMode();
+async function writeFilteringModeDetails(afterDetails) {
+    await filteringModesToDNR(afterDetails);
+    const data = serializeModeDetails(afterDetails);
+    localWrite('filteringModeDetails', data);
+    sessionWrite('filteringModeDetails', data);
+    readFilteringModeDetails.cache = unserializeModeDetails(data);
+    return Promise.all([
+        getDefaultFilteringMode(),
+        hasBroadHostPermissions(),
+        localWrite('filteringModeDetails', data),
+        sessionWrite('filteringModeDetails', data),
+    ]).then(results => {
+        broadcastMessage({
+            defaultFilteringMode: results[0],
+            hasOmnipotence: results[1],
+            filteringModeDetails: readFilteringModeDetails.cache,
+        });
+    });
+}
+
+/******************************************************************************/
+
+export async function getFilteringModeDetails(serializable = false) {
+    const actualDetails = await readFilteringModeDetails();
+    const out = {
+        none: new Set(actualDetails.none),
+        basic: new Set(actualDetails.basic),
+        optimal: new Set(actualDetails.optimal),
+        complete: new Set(actualDetails.complete),
+    };
+    return serializable ? serializeModeDetails(out) : out;
+}
+
+export async function setFilteringModeDetails(details) {
+    await localWrite('filteringModeDetails',
+        serializeModeDetails(fixFilteringModeDetails(details))
+    );
+    await readFilteringModeDetails(true);
+}
+
+/******************************************************************************/
+
+export async function getFilteringMode(hostname) {
+    const filteringModes = await getFilteringModeDetails();
+    return lookupFilteringMode(filteringModes, hostname);
+}
+
+export async function setFilteringMode(hostname, afterLevel) {
+    const filteringModes = await getFilteringModeDetails();
+    const level = applyFilteringMode(filteringModes, hostname, afterLevel);
+    await writeFilteringModeDetails(filteringModes);
+    return level;
+}
+
+/******************************************************************************/
+
+export function getDefaultFilteringMode() {
+    return getFilteringMode('all-urls');
+}
+
+export function setDefaultFilteringMode(afterLevel) {
+    return setFilteringMode('all-urls', afterLevel);
+}
+
+/******************************************************************************/
+
+export async function persistHostPermissions(iter) {
+    if ( iter === undefined ) {
+        const permissions = await browser.permissions.getAll();
+        iter = hostnamesFromMatches(permissions.origins) || [];
+    }
+    const hostnames = Array.from(iter);
+    return hostnames.length !== 0
+        ? localWrite('permissions.hostnames', hostnames)
+        : localRemove('permissions.hostnames');
+}
+
+/******************************************************************************/
+
+export async function syncWithBrowserPermissions() {
+    const [
+        beforePermissions,
+        afterPermissions,
+        beforeMode,
+    ] = await Promise.all([
+        localRead('permissions.hostnames'),
+        browser.permissions.getAll(),
+        getDefaultFilteringMode(),
+    ]);
+    const beforeAllowedHostnames = new Set(beforePermissions);
+    const afterAllowedHostnames = new Set(hostnamesFromMatches(afterPermissions.origins || []));
+    await persistHostPermissions(afterAllowedHostnames);
+    const hasBroadHostPermissions = afterAllowedHostnames.has('all-urls');
+    const broadHostPermissionsToggled =
+        hasBroadHostPermissions !== rulesetConfig.hasBroadHostPermissions;
     let modified = false;
-    if ( beforeMode > 1 && allowedHostnames.has('all-urls') === false ) {
-        await setDefaultFilteringMode(1);
+    if ( beforeMode > MODE_BASIC && hasBroadHostPermissions === false ) {
+        await setDefaultFilteringMode(MODE_BASIC);
         modified = true;
+    } else if ( beforeMode === MODE_BASIC && hasBroadHostPermissions && broadHostPermissionsToggled ) {
+        await setDefaultFilteringMode(MODE_OPTIMAL);
+        modified = true;
+    }
+    if ( broadHostPermissionsToggled ) {
+        rulesetConfig.hasBroadHostPermissions = hasBroadHostPermissions;
+        saveRulesetConfig();
     }
     const afterMode = await getDefaultFilteringMode();
-    if ( afterMode > 1 ) { return false; }
+    if ( afterMode > MODE_BASIC ) { return afterMode !== beforeMode; }
     const filteringModes = await getFilteringModeDetails();
-    const { extendedSpecific, extendedGeneric } = filteringModes;
-    for ( const hn of extendedSpecific ) {
-        if ( allowedHostnames.has(hn) ) { continue; }
-        extendedSpecific.delete(hn);
-        modified = true;
+    if ( afterAllowedHostnames.has('all-urls') === false ) {
+        const { none, basic, optimal, complete } = filteringModes;
+        for ( const hn of new Set([ ...optimal, ...complete ]) ) {
+            if ( afterAllowedHostnames.has(hn) ) { continue; }
+            if ( isDescendantHostnameOfIter(hn, afterAllowedHostnames) ) { continue; }
+            applyFilteringMode(filteringModes, hn, afterMode);
+            modified = true;
+        }
+        for ( const hn of afterAllowedHostnames ) {
+            if ( beforeAllowedHostnames.has(hn) ) { continue; }
+            if ( optimal.has(hn) || complete.has(hn) ) { continue; }
+            if ( basic.has(hn) || none.has(hn) ) { continue; }
+            applyFilteringMode(filteringModes, hn, MODE_OPTIMAL);
+            modified = true;
+        }
+        if ( modified ) {
+            await writeFilteringModeDetails(filteringModes);
+        }
     }
-    for ( const hn of extendedGeneric ) {
-        if ( allowedHostnames.has(hn) ) { continue; }
-        extendedGeneric.delete(hn);
-        modified = true;
-    }
-    await setFilteringModeDetails(filteringModes);
     return modified;
 }
 
 /******************************************************************************/
-
-async function getAllTrustedSiteDirectives() {
-    const dynamicRuleMap = await getDynamicRules();
-    const rule = dynamicRuleMap.get(TRUSTED_DIRECTIVE_BASE_RULE_ID);
-    if ( rule === undefined ) { return []; }
-    return rule.condition.requestDomains;
-}
-
-/******************************************************************************/
-
-export {
-    getFilteringMode,
-    setFilteringMode,
-    getDefaultFilteringMode,
-    setDefaultFilteringMode,
-    getFilteringModeDetails,
-    getAllTrustedSiteDirectives,
-    syncWithBrowserPermissions,
-};

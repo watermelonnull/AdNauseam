@@ -1,0 +1,43 @@
+name: New Release Checklist
+title: "Release Checklist vX.X.X"
+description: "Checklist before for each non-beta AdNauseam release"
+labels: ["Documentation"]
+assignees:
+  - mneunomne
+  - dhowe
+body:
+  - type: input
+    attributes:
+      label: Version
+    validations:
+      required: true
+      
+  - type: checkboxes
+    attributes:
+      label: Testing
+      options:
+        - label: Release latest release candidate version (vX.X.XbX) on Github. 
+        - label: Validade the [full tests](https://github.com/dhowe/AdNauseam/wiki/Testing-New-Release-Candidates)
+
+  - type: checkboxes
+    attributes:
+      label: Release
+      options:
+        - label: Release lastest version on Github
+        - label: Check if https://adnauseam.io is linking to the correct latest version.
+
+  - type: checkboxes
+    attributes:
+      label: Upload
+      options:
+        - label: Upload on Mozilla Firefox Extension store
+        - label: Upload on Opera Extension store
+        - label: Upload on Edge Extension store (only @dhowe can do that for now)
+  
+  - type: checkboxes
+    attributes:
+      label: Approval
+      options:
+        - label: Approved on Mozilla Firefox Extension store
+        - label: Approved on Opera Extension store
+        - label: Approved on Edge Extension store

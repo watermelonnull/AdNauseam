@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2014-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,15 +19,10 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-/* eslint-disable-next-line no-redeclare */
 /* globals process */
 
-'use strict';
-
-/******************************************************************************/
-
-import { spawn } from "child_process";
 import { promisify } from 'util';
+import { spawn } from "child_process";
 
 /******************************************************************************/
 

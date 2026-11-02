@@ -4,20 +4,22 @@ DO_FIREFOX=true
 DO_CHROME=true
 DO_OPERA=true
 DO_EDGE=true
-
-OPERA_CRX=true # ADN: problems packaging with Opera app (set false for zip)
+DO_MV3=true
 
 # Different Operating Systems
 case "$(uname -sr)" in
   Darwin*)
     echo 'Mac OS X'
     CHROME=/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome
-    FIREFOX=/Applications/Firefox.app/Contents/MacOS/firefox-bin
+    FIREFOX=/Applications/Firefox.app/Contents/MacOS/firefox
     OPERA=/Applications/Opera.app/Contents/MacOS/Opera 
     ;;
   Linux*)
     echo 'Linux'
     # to-do 
+    CHROME=chrome
+    FIREFOX=firefox
+    OPERA=opera
     # add here paths for linux
     ;;
   CYGWIN*|MINGW*|MINGW32*|MSYS*)
@@ -31,13 +33,8 @@ esac
 hash web-ext 2>/dev/null || { echo >&2 "Webext is not installed. Please do npm install --global web-ext."; exit 1; }
 echo
 
-# In order to have consitent appid, you need the original .pem key
-# once you have it, use it as a an enveiroment variable:
-# export CHROME_PEM=/path/to/pem/adnauseam.chromium.pem
-
 DES=dist/build
 ARTS=artifacts
-
 CHROME_OPTS=--pack-extension=${DES}/adnauseam.chromium
 OPERA_OPTS=--pack-extension=${DES}/adnauseam.opera
 VERSION=`jq .version manifest.json | tr -d '"'`
@@ -45,13 +42,13 @@ VERSION=`jq .version manifest.json | tr -d '"'`
 # CLEAN
 rm -rf ${ARTS}
 mkdir ${ARTS}
-rm -rf ${DES}/*
+rm -rf ${DES}/adnauseam.*
 
 
-if [[ $DO_EDGE = false && $DO_CHROME = false && $DO_OPERA = false && $DO_FIREFOX = false ]]; 
+if [[ $DO_EDGE = false && $DO_CHROME = false && $DO_OPERA = false && $DO_FIREFOX = false && $DO_MV3 = false ]];
 then
     echo "FATAL: No actions specified \\n"
-    exit 
+    exit
 fi
 
 if [[ $DO_EDGE = true && $DO_CHROME = false ]]; 
@@ -66,26 +63,11 @@ then
   printf '%s' "*** Target -> "
   command "${CHROME}" --version || { echo >&2 "Chrome is not installed."; exit 1; }
   ./tools/make-chromium.sh
-  if [ -z $CHROME_PEM ]; then  # do we have the signing key?
-    "${CHROME}" "${CHROME_OPTS}"
-    mv ${DES}/adnauseam.chromium.crx ${ARTS}/adnauseam-${VERSION}.chromium-UNSIGNED.crx
-    echo "WARN: NO .pem key found for Chrome build\\n"
-  else
-    "${CHROME}" "${CHROME_OPTS}" "--pack-extension-key $CHROME_PEM" #> /dev/null 2>&1
-    mv ${DES}/adnauseam.chromium.crx ${ARTS}/adnauseam-${VERSION}.chromium.crx
-    echo "*** AdNauseam.chromium: Signed with local .pem\\n"
-  fi
-  #cp ${DES}/adnauseam.chromium.crx ${ARTS}/adnauseam-${VERSION}.chromium.crx
+  "${CHROME}" "${CHROME_OPTS}"
+  mv ${DES}/adnauseam.chromium.crx ${ARTS}/adnauseam-${VERSION}.chromium.crx
   cd ${DES} > /dev/null 2>&1
-
   zip -9 -r -q --exclude=*.DS_Store* ../../artifacts/adnauseam-${VERSION}.chromium.zip adnauseam.chromium
-
-  # see #2046
   cp ../../artifacts/adnauseam-${VERSION}.chromium.zip ../../artifacts/adnauseam.chromium.zip
-
-  # will a sym-link work here? not sure
-  #ln -s ../../artifacts/adnauseam-${VERSION}.chromium.zip ../../artifacts/adnauseam.chromium.zip
-
   cd - > /dev/null 2>&1
 fi
 
@@ -94,17 +76,8 @@ if [ $DO_OPERA = true ]
 then
   printf "*** Target -> Opera " && command "${OPERA}" --version || { echo >&2 "Opera is not installed."; exit 1; }
   ./tools/make-opera.sh
-  
-  if [ $OPERA_CRX = true ]
-  then
-    "${OPERA}" "${OPERA_OPTS}"  &> /dev/null
-    mv ${DES}/adnauseam.opera.crx ${ARTS}/adnauseam-${VERSION}.opera.crx
-  else
-    cd ${DES}
-    zip -9 -r -q --exclude=*.DS_Store* ../../artifacts/adnauseam-${VERSION}.opera.zip adnauseam.opera
-    cd -
-  fi
-  #mv ${DES}/adnauseam.opera.crx ${ARTS}/adnauseam-${VERSION}.opera.crx
+  "${OPERA}" "${OPERA_OPTS}" &> /dev/null
+  mv ${DES}/adnauseam.opera.crx ${ARTS}/adnauseam-${VERSION}.opera.crx
 fi
 
 
@@ -123,15 +96,30 @@ fi
 if [ $DO_FIREFOX = true ]
 then
   printf '\n%s' "*** Target -> "
-  command "${FIREFOX}" -v || { echo >&2 "Firefox is not installed."; exit 1; }
+  # command "${FIREFOX}" -v || { echo >&2 "Firefox is not installed."; exit 1; }
   ./tools/make-firefox.sh all
   web-ext build -s ${DES}/adnauseam.firefox -a ${ARTS}
   mv ${ARTS}/adnauseam-${VERSION}.zip ${ARTS}/adnauseam-${VERSION}.firefox.zip
 fi
 
 
-# NO PEMS
-mv ${DES}/*.pem /tmp
+# MV3 (CHROMIUM ZIP)
+if [ $DO_MV3 = true ]
+then
+  printf "\n*** Target -> MV3 (chromium)\n"
+  # the CodeMirror editor is a git submodule whose bundle is not committed;
+  # build it once if it's missing
+  CM_BUNDLE=platform/mv3/extension/lib/codemirror/codemirror-ubol/dist/cm6.bundle.ubol.min.js
+  if [ ! -f "$CM_BUNDLE" ]
+  then
+    ( cd platform/mv3/extension/lib/codemirror/codemirror-ubol && npm ci && npm run build )
+  fi
+  # FULL build with make-rulesets.js timestamp version (version lives in the manifest, not the filename)  # adn
+  ./tools/make-mv3.sh chromium full
+  MV3_VERSION=$(jq -r .version ${DES}/ADNLite.chromium/manifest.json)   # adn: timestamp from make-rulesets.js, used to locate the zip
+  cp ${DES}/AdnauseamLite_${MV3_VERSION}.chromium.zip ${ARTS}/adnauseam-lite.chromium.zip   # adn: stable, version-less artifact name
+fi
+
 
 echo
 

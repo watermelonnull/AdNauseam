@@ -36,15 +36,15 @@
     "description": "Message asking user to confirm reset"
   },
   "adnFirstRunHideAllAdsDescription": {
-    "message": "Paslėpti skelbimus jūsų pasirinktuose <span>filtruose</span>",
+    "message": "Paslėpti skelbimus jūsų pasirinktuose <span>filtruose<\/span>",
     "description": "English: Firstrun.html -> Hide Ads in your selected filter lists"
   },
   "adnFirstRunClickingAdsDescription": {
-    "message": "Registruoti apsilankymus skelbimuose jūsų pasirinktuose <span>filtruose</span>",
+    "message": "Registruoti apsilankymus skelbimuose jūsų pasirinktuose <span>filtruose<\/span>",
     "description": "English: Firstrun.html -> Register visits on Ads found via your filter lists"
   },
   "adnFirstRunBlockingMalwareDescription": {
-    "message": "Blokuoti sekimo ir kitas kenkėjiškas programas (<span>Tinkinti</span>)",
+    "message": "Blokuoti sekimo ir kitas kenkėjiškas programas (<span>Tinkinti<\/span>)",
     "description": "English: Firstrun.html -> Block trackers and other malware (customize)"
   },
   "adnNotificationReactivate": {
@@ -96,24 +96,28 @@
     "description": "English: Notifications -> You have allowed adnauseam to have access to your online activities while private browsing."
   },
   "adnNotificationDNTAllowed": {
-    "message": "Šis puslapis gerbia <b>Nesekti</b> nuostatą, skelbimai bus leidžiami.",
+    "message": "Šis puslapis gerbia <b>Nesekti<\/b> nuostatą, skelbimai bus leidžiami.",
     "description": "English: Notifications -> This page respects Do Not Track, Ads are allowed."
   },
   "adnNotificationDNTHidingNotClicking": {
-    "message": "Šis puslapis gerbia <b>Nesekti</b> nuostatą, skelbimai bus paslėpti, bet nespaudžiami.",
+    "message": "Šis puslapis gerbia <b>Nesekti<\/b> nuostatą, skelbimai bus paslėpti, bet nespaudžiami.",
     "description": "English: Notifications -> This page respects Do Not Track, hiding not clicking."
   },
   "adnNotificationDNTClickingNotHiding": {
-    "message": "Šis puslapis gerbia <b>Nesekti</b> nuostatą, skelbimai bus paspaudžiami, bet nepaslėpti",
+    "message": "Šis puslapis gerbia <b>Nesekti<\/b> nuostatą, skelbimai bus paspaudžiami, bet nepaslėpti",
     "description": "English: Notifications -> This page respects Do Not Track, clicking not hiding."
   },
   "adnNotificationDNTJustSoYouKnow": {
-    "message": "Jūsų žiniai, šis puslapis gerbia <b>Nesekti</b> nuostatą.",
+    "message": "Jūsų žiniai, šis puslapis gerbia <b>Nesekti<\/b> nuostatą.",
     "description": "English: Notifications -> This page respects Do Not Track, just so you know."
   },
   "adnNotificationShowAdsDebug": {
-    "message": "The Advanced Setting \"Show Ads Debug\" is turned on",
+    "message": "Išplėstinis nustatymas „Rodyti reklamas  Debug“ yra įjungtas",
     "description": "English: Notifications -> The Advanced Setting \"Show Ads Debug\" is turned on"
+  },
+  "adnNewerVersionAvailableNotification": {
+    "message": "Yra naujesnė AdNauseam versija",
+    "description": "English: Notifications -> A newer version of AdNauseam is available"
   },
   "adnTarget": {
     "message": "TAIKINYS",
@@ -153,7 +157,7 @@
   },
   "adnPausedOnPage": {
     "message": "Šiame puslapyje AdNauseam pristabdytas",
-    "description": "English: Menu->display when paused on page/site"
+    "description": "English: Menu->display when paused on page\/site"
   },
   "adnNotHiding": {
     "message": "AdNauseam šiuo metu neslėpia skelbimų",
@@ -169,23 +173,23 @@
   },
   "topAdnetworks": {
     "message": "Populiariausi skelbimų tinklai",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "topSites": {
     "message": "Populiariausios svetainės",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypes": {
     "message": "Skelbimų tipai",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesImageAds": {
     "message": "Vaizdo skelbimai",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesTextAds": {
     "message": "Tekstiniai skelbimai",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adnShowingRecentAds": {
     "message": "Jokių skelbimų nesurinktą šiame puslapyje (rodoma naujausius)",
@@ -216,7 +220,7 @@
     "description": "appears in ADN settings"
   },
   "adnPurgeConfirm": {
-    "message": "Šis veiksmas visam laikui pašalins visus skelbimus su įkėlimo vaizdo klaida. Įsitikinkite, kad internetas prijungtas, kitaip visi skelbimai bus ištrinti.",
+    "message": "Šiuo veiksmu visam laikui pašalinsite visus skelbimus, kurių vaizdo negalima įkelti. Prieš valant patartina sukurti atsarginę saugyklos kopiją ir įsitikinti, kad interneto ryšys aktyvus.",
     "description": "appears in ADN settings"
   },
   "adnAdClickingStatusPending": {
@@ -280,7 +284,7 @@
     "description": "Activate Strict-Block -> appears in ADN popup menu three state button"
   },
   "adnMenuDisableScopeDomain": {
-    "message": "domenas {{domain}}",
+    "message": "domene {{domain}}",
     "description": "Disable AdNaueam Block On this Domain -> Popup option that appears inside ADN menu"
   },
   "adnMenuDisableScopePage": {
@@ -356,8 +360,20 @@
     "description": "appears on vault page"
   },
   "adnPurgeDeadAds": {
-    "message": "Išvalykite nereikalingus skelbimus",
+    "message": "Išvalyti pasenusius skelbimus",
     "description": "appears on vault page"
+  },
+  "adnShowDeadAds": {
+    "message": "Rodyti pasenusius skelbimus",
+    "description": "appears on vault page"
+  },
+  "adnHideDeadAds": {
+    "message": "Slėpti pasenusius skelbimus",
+    "description": "appears on vault page"
+  },
+  "adnCaptureVault": {
+    "message": "Užfiksuoti",
+    "description": "appears on vault page in dev mode"
   },
   "adnVaultFound": {
     "message": "{{total}} surinktų skelbimų",
@@ -475,6 +491,10 @@
     "message": "Atnaujinti",
     "description": "English: update"
   },
+  "adnUpdateButton": {
+    "message": "Atnaujinti",
+    "description": "English: update"
+  },
   "whitelistPageName": {
     "message": "Išimtys",
     "description": "appears as tab name in dashboard"
@@ -484,12 +504,20 @@
     "description": "appears as tab name in dashboard"
   },
   "eventLoggingPrompt": {
-    "message": "Įjungti derinimo režimą",
+    "message": "Derinimo režimas",
     "description": "prompt for toggle"
   },
   "disableWarnings": {
     "message": "Išjungti įspėjimus",
     "description": "English:Disable warnings"
+  },
+  "blurCollectedAds": {
+    "message": "Sulieti surinktus skelbimus",
+    "description": "English: Blur Collected ads"
+  },
+  "hideDeadAds": {
+    "message": "Slėpti pasenusius skelbimus",
+    "description": "English: Hide Dead ads"
   },
   "showAdsDebugPrompt": {
     "message": "Rodyti skelbimus derinant skelbimų kolekciją",
@@ -502,5 +530,25 @@
   "settingsStrictBlockingMode": {
     "message": "Aktyvuoti griežto blokavimo režimą",
     "description": "English: Activate Strict-Blocking Mode"
+  },
+  "adnRefreshButton": {
+    "message": "Perkrauti",
+    "description": "English: refresh page from menu notification button"
+  },
+  "adnRefreshNotification": {
+    "message": "Pritaikyti pakeitimus dabartiniame puslapyje",
+    "description": "English: refresh page from menu notification"
+  },
+  "supportS6P3S1": {
+    "message": "Įsitikinkite ,kad ši problema <b>specifinė AdNauseam<\/b>.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P3S2": {
+    "message": "Aš ištestavau šį puslapį per <a url='https:\/\/github.com\/gorhill\/uBlock'>#uBO#<\/a> ir patvirtinau ,kad ši problema <b>specifinė AdNauseam<\/b>.",
+    "description": "A checkbox in the filter issue reporter section"
+  },
+  "supportS6Select1Option7": {
+    "message": "Nesurinkta reklamų",
+    "description": "Ads are present on page but none are collected"
   }
 }

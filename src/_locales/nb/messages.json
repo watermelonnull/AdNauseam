@@ -16,7 +16,7 @@
     "description": "A warning in the dashboard when navigating away from unsaved changes"
   },
   "dashboardUnsavedWarningStay": {
-    "message": "Bli",
+    "message": "Bli her",
     "description": "Label for button to prevent navigating away from unsaved changes"
   },
   "dashboardUnsavedWarningIgnore": {
@@ -220,7 +220,7 @@
     "description": "Tooltip when hovering the top-most cell of the global-rules column."
   },
   "popupTipLocalRules": {
-    "message": "Lokale regler: Denne kolonnen er for regler som bare gjelder for det gjeldende nettstedet.\nLokale regler har prioritet foran globale regler.",
+    "message": "Lokale regler: Denne kolonnen er for regler som bare gjelder for det gjeldende nettstedet.",
     "description": "Tooltip when hovering the top-most cell of the local-rules column."
   },
   "popupTipSaveRules": {
@@ -275,13 +275,13 @@
     "message": "Versjon",
     "description": "Example of use: Version 1.26.4"
   },
-  "popup3pScriptFilterTip": {
-    "message": "↑: Framhev rekker som har tredjeparts skript",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party scripts' cell"
+  "popup3pScriptFilter": {
+    "message": "skript",
+    "description": "Appears as an option to filter out firewall rows"
   },
-  "popup3pFrameFilterTip": {
-    "message": "↑: Framhev rekker som har tredjeparts rammer",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party frames' cell"
+  "popup3pFrameFilter": {
+    "message": "ramme",
+    "description": "Appears as an option to filter out firewall rows"
   },
   "pickerCreate": {
     "message": "Opprett",
@@ -469,35 +469,43 @@
   },
   "3pGroupDefault": {
     "message": "Innebygd",
-    "description": "Header for the uBlock filters section in 'Filter lists pane'"
+    "description": "Filter lists section name"
   },
   "3pGroupAds": {
     "message": "Reklame",
-    "description": "English: Ads"
+    "description": "Filter lists section name"
   },
   "3pGroupPrivacy": {
     "message": "Personvern",
-    "description": "English: Privacy"
+    "description": "Filter lists section name"
   },
   "3pGroupMalware": {
-    "message": "Domener med skadelig programvare",
-    "description": "English: Malware domains"
+    "message": "Beskyttelse mot skadelig programvare, sikkerhet",
+    "description": "Filter lists section name"
+  },
+  "3pGroupSocial": {
+    "message": "Sosiale moduler",
+    "description": "Filter lists section name"
+  },
+  "3pGroupCookies": {
+    "message": "Infokapselmeldinger",
+    "description": "Filter lists section name"
   },
   "3pGroupAnnoyances": {
     "message": "Irritasjonsmomenter",
-    "description": "The header identifying the filter lists in the category 'annoyances'"
+    "description": "Filter lists section name"
   },
   "3pGroupMultipurpose": {
     "message": "Multi-formål",
-    "description": "English: Multipurpose"
+    "description": "Filter lists section name"
   },
   "3pGroupRegions": {
     "message": "Regioner, språk",
-    "description": "English: Regions, languages"
+    "description": "Filter lists section name"
   },
   "3pGroupCustom": {
     "message": "Egendefinert",
-    "description": "English: Custom"
+    "description": "Filter lists section name"
   },
   "3pImport": {
     "message": "Importer…",
@@ -527,17 +535,25 @@
     "message": "En nettverksfeil forhindret ressursen i å bli oppdatert.",
     "description": "used as a tooltip for error icon beside a list"
   },
-  "1pFormatHint": {
-    "message": "Ett filter per linje. Et filter kan være et vanlig vertsnavn eller et EasyList-kompatibelt filter. Linjer med prefikset <code>!</code> blir ignorert.",
-    "description": "Short information about how to create custom filters"
+  "1pTrustWarning": {
+    "message": "Ikke legg til filtre fra ikke-betrodde kilder.",
+    "description": "Warning against copy-pasting filters from random sources"
+  },
+  "1pEnableMyFiltersLabel": {
+    "message": "Aktiver mine egendefinerte filtre",
+    "description": "Label for the checkbox use to enable/disable 'My filters' list"
+  },
+  "1pTrustMyFiltersLabel": {
+    "message": "Tillat egendefinerte filtre som krever tiltro",
+    "description": "Label for the checkbox use to trust the content of 'My filters' list"
   },
   "1pImport": {
-    "message": "Importer og legg til",
-    "description": "English: Import and append"
+    "message": "Importer og legg til…",
+    "description": "Button in the 'My filters' pane"
   },
   "1pExport": {
-    "message": "Eksporter",
-    "description": "English: Export"
+    "message": "Eksporter…",
+    "description": "Button in the 'My filters' pane"
   },
   "1pExportFilename": {
     "message": "mine-ublock-statiske-filtre_{{datetime}}.txt",
@@ -576,12 +592,12 @@
     "description": "Will discard manually-edited content and exit manual-edit mode"
   },
   "rulesImport": {
-    "message": "Importer fra fil",
+    "message": "Importer fra fil…",
     "description": ""
   },
   "rulesExport": {
-    "message": "Eksporter til fil",
-    "description": ""
+    "message": "Eksporter til fil…",
+    "description": "Button in the 'My rules' pane"
   },
   "rulesDefaultFileName": {
     "message": "mine-ublock-dynamiske-regler_{{datetime}}.txt",
@@ -616,12 +632,12 @@
     "description": "A concise description of the 'Trusted sites' pane."
   },
   "whitelistImport": {
-    "message": "Importer og legg til",
-    "description": "English: Import and append"
+    "message": "Importer og legg til…",
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExport": {
-    "message": "Eksporter",
-    "description": "English: Export"
+    "message": "Eksporter…",
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExportFilename": {
     "message": "mine-ublock-betrodde-sider_{{datetime}}.txt",
@@ -881,14 +897,14 @@
   },
   "supportOpenButton": {
     "message": "Åpne",
-    "description": "Text for button which open an external webpage in Support pane"
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportReportSpecificButton": {
-    "message": "Opprett ny rapport",
-    "description": "Text for button which open an external webpage in Support pane"
+    "message": "Opprett ny rapport på GitHub",
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportFindSpecificButton": {
-    "message": "Finn lignende rapporter",
+    "message": "Finn lignende rapporter på GitHub",
     "description": "A clickable link in the filter issue reporter section"
   },
   "supportS1H": {
@@ -939,16 +955,20 @@
     "message": "Nedenfor er teknisk informasjon som kan være nyttig når frivillige prøver å hjelpe deg med å løse et problem.",
     "description": "First paragraph of 'Troubleshooting Information' section in Support pane"
   },
-  "supportS5P2": {
-    "message": "<b>Viktig:</b> Potensielt privat eller sensitiv informasjon blir redigert som standard. Redigert informasjon kan gjøre det vanskeligere å løse et problem.",
-    "description": "Second paragraph of 'Troubleshooting Information' section in Support pane"
-  },
   "supportS6H": {
     "message": "Rapporter om filterproblem",
     "description": "Header of 'Report a filter issue' section in Support pane"
   },
   "supportS6P1S1": {
-    "message": "For å unngå å belaste frivillige med duplikate rapporter, kontroller at problemet ikke allerede er rapportert.",
+    "message": "For å unngå å belaste de frivillige med dobbeltrapporter, må du kontrollere at problemet ikke allerede har blitt rapportert. <b>Noter:</b> ved å klikke på knappen vil sidens opprinnelse bli sendt til GitHub.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S1": {
+    "message": "Filterlister oppdateres daglig. Forsikre deg om at problemet ikke har blitt løst allerede i de nyeste filterlistene.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S2": {
+    "message": "Verifiser at problemet fremdeles eksisterer etter å ha lastet den problematiske nettsiden på nytt.",
     "description": "A paragraph in the filter issue reporter section"
   },
   "supportS6URL": {
@@ -987,17 +1007,13 @@
     "message": "Åpner uønskede faner eller vinduer",
     "description": "An entry in the widget used to select the type of issue"
   },
+  "supportS6Select1Option7": {
+    "message": "Fører til skadelig programvare og/eller phishing",
+    "description": "An entry in the widget used to select the type of issue"
+  },
   "supportS6Checkbox1": {
     "message": "Merk nettsiden som “NSFW” (<a href=\"https://wikipedia.org/wiki/Not_safe_for_work\">“Not Safe For Work”</a>) (advarsel mot sider med upassende innhold)",
     "description": "A checkbox to use for NSFW sites"
-  },
-  "supportRedact": {
-    "message": "Rediger",
-    "description": "Text for 'Redact' button"
-  },
-  "supportUnredact": {
-    "message": "Ikke rediger",
-    "description": "Text for 'Unredact' button"
   },
   "aboutPrivacyPolicy": {
     "message": "Personvernpraksis",
@@ -1036,7 +1052,7 @@
     "description": "Shown in the About pane"
   },
   "aboutCDNsInfo": {
-    "message": "En tilfeldig valgt CDN blir brukt når en filterliste trenger å bli oppdatert",
+    "message": "En tilfeldig valgt CDN blir brukt når en filterliste trenger å bli oppdatert.",
     "description": "Shown in the About pane"
   },
   "aboutBackupDataButton": {
@@ -1070,10 +1086,6 @@
   "errorCantConnectTo": {
     "message": "Nettverksfeil: {{msg}}",
     "description": "English: Network error: {{msg}}"
-  },
-  "subscriberConfirm": {
-    "message": "Legge til følgende nettadresse i din egendefinerte filterliste?\n\nTittel: \"{{title}}\"\nNettadresse: {{url}}",
-    "description": "No longer used"
   },
   "subscribeButton": {
     "message": "Abonner",
@@ -1163,6 +1175,26 @@
     "message": "Fortsett",
     "description": "Button text to navigate to the blocked page"
   },
+  "docblockedRedirectPrompt": {
+    "message": "Den blokkerte siden ønsker å omdirigere til et annet nettsted. Hvis du velger å fortsette, vil du navigere direkte til: {{url}}",
+    "description": "Text warning about an incoming redirect"
+  },
+  "docblockedReasonLabel": {
+    "message": "Grunn:",
+    "description": "The label which prepend the actual reason why a page was blocked"
+  },
+  "docblockedReasonMalicious": {
+    "message": "Ondsinnet",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonTracker": {
+    "message": "Sporer",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonDisreputable": {
+    "message": "Tvilsom",
+    "description": "An actual reason why a page was blocked"
+  },
   "cloudPush": {
     "message": "Eksporter til nettlagring",
     "description": "tooltip"
@@ -1215,6 +1247,10 @@
     "message": "Tillat store mediaelementer midlertidig",
     "description": "A context menu entry, present when large media elements have been blocked on the current site"
   },
+  "contextMenuViewSource": {
+    "message": "Vis kildekode…",
+    "description": "A context menu entry, to view the source code of the target resource"
+  },
   "shortcutCapturePlaceholder": {
     "message": "Oppfør en snarvei",
     "description": "Placeholder string for input field used to capture a keyboard shortcut"
@@ -1234,6 +1270,10 @@
   "toggleCosmeticFiltering": {
     "message": "Slå av/på kosmetisk filtrering",
     "description": "Label for keyboard shortcut used to toggle cosmetic filtering"
+  },
+  "toggleJavascript": {
+    "message": "Slå av/på JavaScript",
+    "description": "Label for keyboard shortcut used to toggle no-scripting switch"
   },
   "relaxBlockingMode": {
     "message": "Lemp på blokkeringsmodus",
@@ -1258,6 +1298,14 @@
   "clickToLoad": {
     "message": "Klikk for å laste",
     "description": "Message used in frame placeholders"
+  },
+  "linterMainReport": {
+    "message": "Feil: {{count}}",
+    "description": "Summary of number of errors as reported by the linter "
+  },
+  "unprocessedRequestTooltip": {
+    "message": "Kan ikke filtrere riktig ved nettleseroppstart. Last siden på nytt for å sikre riktig filtrering.",
+    "description": "A warning which will appear in the popup panel if needed"
   },
   "dummy": {
     "message": "This entry must be the last one",

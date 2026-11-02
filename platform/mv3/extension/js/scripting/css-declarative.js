@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    AdNauseam Lite - a comprehensive, MV3-compliant content blocker
     Copyright (C) 2014-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,12 +19,6 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-/* jshint esversion:11 */
-
-'use strict';
-
-/******************************************************************************/
-
 // Important!
 // Isolate from global scope
 (function uBOL_cssDeclarative() {
@@ -32,84 +26,93 @@
 /******************************************************************************/
 
 const declarativeImports = self.declarativeImports || [];
-
-const lookupSelectors = (hn, out) => {
-    for ( const { argsList, hostnamesMap } of declarativeImports ) {
-        let argsIndices = hostnamesMap.get(hn);
-        if ( argsIndices === undefined ) { continue; }
-        if ( typeof argsIndices === 'number' ) { argsIndices = [ argsIndices ]; }
-        for ( const argsIndex of argsIndices ) {
-            const details = argsList[argsIndex];
-            if ( details.n && details.n.includes(hn) ) { continue; }
-            out.push(...details.a.map(json => JSON.parse(json)));
-        }
-    }
-};
-
-let hn;
-try { hn = document.location.hostname; } catch(ex) { }
-const selectors = [];
-while ( hn ) {
-    lookupSelectors(hn, selectors);
-    if ( hn === '*' ) { break; }
-    const pos = hn.indexOf('.');
-    if ( pos !== -1 ) {
-        hn = hn.slice(pos + 1);
-    } else {
-        hn = '*';
-    }
-}
-
-declarativeImports.length = 0;
+self.declarativeImports = undefined;
 
 /******************************************************************************/
 
-if ( selectors.length === 0 ) { return; }
+const selectors = [];
+const exceptions = [];
+
+const lookupHostname = (hostname, details, out) => {
+    let seqi = details.hostnamesMap.get(hostname);
+    if ( seqi === undefined ) { return; }
+    const { argsList, argsSeqs } = details;
+    for (;;) {
+        const argi = argsSeqs[seqi++];
+        const done = argi > 0;
+        out.push(...argsList[done ? argi : -argi].split('\n'));
+        if ( done ) { break; }
+    }
+};
+
+const lookupAll = hostname => {
+    for ( const details of declarativeImports ) {
+        lookupHostname(hostname, details, selectors);
+        lookupHostname(`~${hostname}`, details, exceptions);
+    }
+};
+
+self.isolatedAPI.forEachHostname(lookupAll, {
+    hasEntities: declarativeImports.some(a => a.hasEntities)
+});
+
+declarativeImports.length = 0;
+
+const exceptedSelectors = exceptions.length !== 0
+    ? selectors.filter(a => exceptions.includes(a) === false)
+    : selectors;
+if ( exceptedSelectors.length === 0 ) { return; }
+
+/******************************************************************************/
 
 const cssRuleFromProcedural = details => {
     const { tasks, action } = details;
-    let mq;
-    if ( tasks !== undefined ) {
-        if ( tasks.length > 1 ) { return; }
+    let mq, selector;
+    if ( Array.isArray(tasks) ) {
         if ( tasks[0][0] !== 'matches-media' ) { return; }
         mq = tasks[0][1];
+        if ( tasks.length > 2 ) { return; }
+        if ( tasks.length === 2 ) {
+            if ( tasks[1][0] !== 'spath' ) { return; }
+            selector = tasks[1][1];
+        }
     }
     let style;
     if ( Array.isArray(action) ) {
         if ( action[0] !== 'style' ) { return; }
+        selector = selector || details.selector;
         style = action[1];
     }
-    if ( mq === undefined && style === undefined ) { return; }
+    if ( mq === undefined && style === undefined && selector === undefined ) { return; }
     if ( mq === undefined ) {
-        return `${details.selector}\n{${style}}`;
+        return `${selector}\n{${style}}`;
     }
     if ( style === undefined ) {
-        return `@media ${mq} {\n${details.selector}\n{display:none!important;}\n}`;
+        return `@media ${mq} {\n${selector}\n{display:none!important;}\n}`;
     }
-    return `@media ${mq} {\n${details.selector}\n{${style}}\n}`;
+    return `@media ${mq} {\n${selector}\n{${style}}\n}`;
 };
 
 const sheetText = [];
-for ( const selector of selectors ) {
-    const ruleText = cssRuleFromProcedural(selector);
+for ( const selector of exceptedSelectors ) {
+    const details = JSON.parse(selector);
+    const ruleText = cssRuleFromProcedural(details);
     if ( ruleText === undefined ) { continue; }
     sheetText.push(ruleText);
 }
 
 if ( sheetText.length === 0 ) { return; }
 
-try {
-    const sheet = new CSSStyleSheet();
-    sheet.replace(`@layer{${sheetText.join('\n')}}`);
-    document.adoptedStyleSheets = [
-        ...document.adoptedStyleSheets,
-        sheet
-    ];
-} catch(ex) {
-}
+if ( chrome.runtime?.id === undefined ) { return; } // ADN: context invalidated
+
+chrome.runtime.sendMessage({
+    what: 'insertCSS',
+    css: sheetText.join('\n'),
+}).catch(( ) => {
+});
 
 /******************************************************************************/
 
 })();
 
-/******************************************************************************/
+void 0;

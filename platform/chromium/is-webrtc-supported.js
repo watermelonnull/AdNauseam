@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2015 Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@
 
 // https://github.com/gorhill/uBlock/issues/533#issuecomment-164292868
 // If WebRTC is supported, there won't be an exception if we
-// try to instanciate a peer connection object.
+// try to instantiate a peer connection object.
 
 // https://github.com/gorhill/uBlock/issues/533#issuecomment-168097594
 // Because Chromium leaks WebRTC connections after they have been closed
@@ -30,11 +30,9 @@
 // collected.
 
 (function() {
-    'use strict';
-
-    var pc = null;
+    let pc = null;
     try {
-        var PC = self.RTCPeerConnection || self.webkitRTCPeerConnection;
+        const PC = self.RTCPeerConnection || self.webkitRTCPeerConnection;
         if ( PC ) {
             pc = new PC(null);
         }

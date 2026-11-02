@@ -36,15 +36,15 @@
     "description": "Message asking user to confirm reset"
   },
   "adnFirstRunHideAllAdsDescription": {
-    "message": "Peida valitud reklaamid <span>filtreeri nimekirju</span>",
+    "message": "Peida valitud reklaamid <span>filtreeri nimekirju<\/span>",
     "description": "English: Firstrun.html -> Hide Ads in your selected filter lists"
   },
   "adnFirstRunClickingAdsDescription": {
-    "message": "Registreeri reklaamide külastusi mis on leitud läbi teie <span>filtreeritud nimekirjade</span>",
+    "message": "Registreeri reklaamide külastusi mis on leitud läbi teie <span>filtreeritud nimekirjade<\/span>",
     "description": "English: Firstrun.html -> Register visits on Ads found via your filter lists"
   },
   "adnFirstRunBlockingMalwareDescription": {
-    "message": "Blokeeri jälitajad ja muu pahavara (<span>kohanda</span>)",
+    "message": "Blokeeri jälitajad ja muu pahavara (<span>kohanda<\/span>)",
     "description": "English: Firstrun.html -> Block trackers and other malware (customize)"
   },
   "adnNotificationReactivate": {
@@ -96,24 +96,28 @@
     "description": "English: Notifications -> You have allowed adnauseam to have access to your online activities while private browsing."
   },
   "adnNotificationDNTAllowed": {
-    "message": "See leht austab <b>Ära jälgi</b>, reklaamid lubatud.",
+    "message": "See leht austab <b>Ära jälgi<\/b>, reklaamid lubatud.",
     "description": "English: Notifications -> This page respects Do Not Track, Ads are allowed."
   },
   "adnNotificationDNTHidingNotClicking": {
-    "message": "See leht austab <b>Ära jälgi</b>, peitmine mitte klikkamine.",
+    "message": "See leht austab <b>Ära jälgi<\/b>, peitmine mitte klikkamine.",
     "description": "English: Notifications -> This page respects Do Not Track, hiding not clicking."
   },
   "adnNotificationDNTClickingNotHiding": {
-    "message": "See lehekülg austab <b>Ära Jälgi</b>, klikkamine mitte peitmine",
+    "message": "See lehekülg austab <b>Ära Jälgi<\/b>, klikkamine mitte peitmine",
     "description": "English: Notifications -> This page respects Do Not Track, clicking not hiding."
   },
   "adnNotificationDNTJustSoYouKnow": {
-    "message": "See lehekülg austab <b>Ära Jälgi</b>, võtke teadmiseks.",
+    "message": "See lehekülg austab <b>Ära Jälgi<\/b>, võtke teadmiseks.",
     "description": "English: Notifications -> This page respects Do Not Track, just so you know."
   },
   "adnNotificationShowAdsDebug": {
     "message": "The Advanced Setting \"Show Ads Debug\" is turned on",
     "description": "English: Notifications -> The Advanced Setting \"Show Ads Debug\" is turned on"
+  },
+  "adnNewerVersionAvailableNotification": {
+    "message": "A newer version of AdNauseam is available",
+    "description": "English: Notifications -> A newer version of AdNauseam is available"
   },
   "adnTarget": {
     "message": "SIHTMÄRK",
@@ -153,7 +157,7 @@
   },
   "adnPausedOnPage": {
     "message": "AdNauseam on peatatud sellel lehel",
-    "description": "English: Menu->display when paused on page/site"
+    "description": "English: Menu->display when paused on page\/site"
   },
   "adnNotHiding": {
     "message": "AdNauseam ei peida hetkel reklaame",
@@ -169,23 +173,23 @@
   },
   "topAdnetworks": {
     "message": "Top Ad Networks",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "topSites": {
     "message": "Tip Veebilehed",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypes": {
     "message": "Reklaami Tüübid",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesImageAds": {
     "message": "Reklaami Pildid",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesTextAds": {
     "message": "Reklaami Tekst",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adnShowingRecentAds": {
     "message": "Sellel lehel ei ole reklaame kogutud (näitab hiljutisi)",
@@ -216,7 +220,7 @@
     "description": "appears in ADN settings"
   },
   "adnPurgeConfirm": {
-    "message": "This action will permanently remove all ads with load image error. Make sure your internet is connected, otherwise all your ads will be deleted.",
+    "message": "This action will permanently remove all ads for which the image cannot be loaded. It is a good idea to backup your vault before purging, and also to make sure you have an active internet connection.",
     "description": "appears in ADN settings"
   },
   "adnAdClickingStatusPending": {
@@ -359,6 +363,18 @@
     "message": "Purge Dead Ads",
     "description": "appears on vault page"
   },
+  "adnShowDeadAds": {
+    "message": "Show Dead Ads",
+    "description": "appears on vault page"
+  },
+  "adnHideDeadAds": {
+    "message": "Hide Dead Ads",
+    "description": "appears on vault page"
+  },
+  "adnCaptureVault": {
+    "message": "Capture",
+    "description": "appears on vault page in dev mode"
+  },
   "adnVaultFound": {
     "message": "{{total}} kogutud reklaame",
     "description": "appears on vault page"
@@ -475,6 +491,10 @@
     "message": "Uuenda",
     "description": "English: update"
   },
+  "adnUpdateButton": {
+    "message": "Update",
+    "description": "English: update"
+  },
   "whitelistPageName": {
     "message": "Valge loend",
     "description": "appears as tab name in dashboard"
@@ -484,12 +504,20 @@
     "description": "appears as tab name in dashboard"
   },
   "eventLoggingPrompt": {
-    "message": "Aktiveeri silumisrežiim",
+    "message": "Debug mode",
     "description": "prompt for toggle"
   },
   "disableWarnings": {
     "message": "Disable warnings",
     "description": "English:Disable warnings"
+  },
+  "blurCollectedAds": {
+    "message": "Blur Collected ads",
+    "description": "English: Blur Collected ads"
+  },
+  "hideDeadAds": {
+    "message": "Hide Dead ads",
+    "description": "English: Hide Dead ads"
   },
   "showAdsDebugPrompt": {
     "message": "Show ads for ad-collection debugging",
@@ -502,5 +530,25 @@
   "settingsStrictBlockingMode": {
     "message": "Activate Strict-Blocking Mode",
     "description": "English: Activate Strict-Blocking Mode"
+  },
+  "adnRefreshButton": {
+    "message": "Refresh",
+    "description": "English: refresh page from menu notification button"
+  },
+  "adnRefreshNotification": {
+    "message": "Apply changes on current page",
+    "description": "English: refresh page from menu notification"
+  },
+  "supportS6P3S1": {
+    "message": "Make sure this issue is <b>AdNauseam-specific<\/b>.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P3S2": {
+    "message": "I have tested the same web-page on <a url='https:\/\/github.com\/gorhill\/uBlock'>#uBO#<\/a> and confirm this issue is <b>AdNauseam-specific<\/b>.",
+    "description": "A checkbox in the filter issue reporter section"
+  },
+  "supportS6Select1Option7": {
+    "message": "Ads not collected",
+    "description": "Ads are present on page but none are collected"
   }
 }

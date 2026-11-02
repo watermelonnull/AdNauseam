@@ -1,7 +1,7 @@
 /*******************************************************************************
 
     AdNauseam - Fight back against advertising surveillance.
-    Copyright (C) 2014-2021 Daniel C. Howe
+    Copyright (C) 2014-2024 Daniel C. Howe
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,8 +21,10 @@
 
 'use strict';
 
-import { i18n$ } from "../i18n.js";
+import uDom from './uDom.js';
 
+import { i18n$ } from "../i18n.js";
+import { onBroadcast } from '../broadcast.js';
 import { renderNotifications } from './notifications.js';
 
 import {
@@ -38,14 +40,17 @@ import {
   handleImportAds,
   purgeDeadAds,
   decodeEntities,
-  clearAds
+  clearAds,
+  getExportFileName,
+  generateCaptureSvg
 } from './adn-utils.js';
+
+// note: this code is a mess and needs to be refactored
 
 const States = ['pending', 'visited', 'failed', 'dnt-allowed', 'image-error'],
   Zooms = [400, 200, 150, 100, 75, 50, 25, 12.5, 7.5, 5],
   EnableContextMenu = 1,
-  MaxStartNum = 300,
-  MaxPerSet = 9;
+  MaxStartNum = 300;
 
 const margin = {
   top: 50,
@@ -64,22 +69,23 @@ let userZoomScale = Zooms[Zooms.indexOf(100)];
 // determined by zoom in / out buttons
 let zoomIdx = 0;
 
-let zoomStyle, animatorId, resizeId, selectedAdSet;
+let animatorId, resizeId, selectedAdSet;
 let showInterface = true;
 let draggingVault = false;
 let vaultLoading = false;
-let isInspectingAd = false;
 
 const container_div = document.getElementById('container');
-const $container = $('#container')
-const $ratio = $('#ratio')
+const $container = $('#container');
+const $ratio = $('#ratio');
 
-var transitionTimeout = null
+let transitionTimeout = null;
 
-let gAds, gAdSets, gMin, gMax, gSliderRight, gSliderLeft, settings;
+let gAds, gAdSets, gMin, gMax, gSliderRight, gSliderLeft, settings, pack;
 let lastAdDetectedTime, waitingAds = []; // stateful
 
-vAPI.broadcastListener.add(request => {
+let hideDeadAds = false;
+
+onBroadcast(request => {
   //console.log("GOT BROADCAST", request);
   switch (request.what) {
     case 'adAttempt':
@@ -87,15 +93,13 @@ vAPI.broadcastListener.add(request => {
       break;
 
     case 'adDetected':
-      console.log('*** New-ad-detected ***', request.ad);
       waitingAds.push(request.ad);
       lastAdDetectedTime = new Date();
       const brush = document.getElementsByClassName('chart-bg')[0];
       const w = brush ? parseInt(brush.attributes.width.value) : null,
-        sliderPos = gSliderLeft ? parseFloat(/\((.*?),/g.exec(gSliderLeft)[1]) : null;
+        sliderPos = gSliderLeft !== undefined ? gSliderLeft : null;
 
       // only when the slider covers 'now' or when there is no slider (empty vault or one ad)
-      // console.log(w, sliderPos)
       if (w - sliderPos <= 1 || sliderPos == 0) setTimeout(autoUpdateVault, 3000);
 
       //  updateVault() would normally be triggered by the 'adDetected' message (above),
@@ -111,10 +115,12 @@ vAPI.broadcastListener.add(request => {
       adjustHeight();
       createSlider();
       break;
+
     case 'hideNotifications':
       uDom('#notifications').addClass("hide");
       adjustHeight();
       break;
+
     case 'showNotifications':
       uDom('#notifications').removeClass("hide");
       adjustHeight();
@@ -124,25 +130,15 @@ vAPI.broadcastListener.add(request => {
 
 /********************************************************************/
 
-function $width(ele) {
-
-  ele = ele ? (ele.length ? ele.nodes[0] : ele) : 0;
-  return ele ? ele.offsetWidth || ele.clientWidth : -1;
-}
-
-function $height(ele) {
-
-  ele = ele ? (ele.length ? ele.nodes[0] : ele) : 0;
-  return ele ? ele.offsetHeight || ele.clientHeight : -1;
-}
-
-const renderAds = function (json) {
-
-  // console.log('renderAds: ', json);
+const renderAds = function (json, purge) {
   gAds = json.data; // store
   addInterfaceHandlers();
   settings = json.prefs;
-  createSlider();
+  if (purge) {
+    createSlider("update");
+  } else {
+    createSlider();
+  }
   setCurrent(json.current);
 
   vAPI.messaging.send(
@@ -153,29 +149,70 @@ const renderAds = function (json) {
       'adnauseam', {
       what: 'getNotifications'
     }).then(data => {
-      if (data.notifications && data.notifications.length)
+      if (data.notifications && data.notifications.length) {
         renderNotifications(data.notifications, 'vault');
+      }
       adjustHeight();
     })
-  })
+  });
+
   // disable warnings #1910
   // Notifications need to be hidden right away for the correct height to be calculated
   vAPI.messaging.send(
+    'adnauseam', { what: 'getWarningDisabled' })
+    .then(isDisabled => {
+      if (isDisabled) {
+        uDom("#notifications").addClass('hide');
+      } else {
+        uDom("#notifications").removeClass('hide');
+      }
+      adjustHeight();
+    })
+
+  vAPI.messaging.send(
     'adnauseam', {
-    what: 'getWarningDisabled'
-  }
-  ).then(isDisabled => {
-    if (isDisabled) {
-      uDom("#notifications").addClass('hide');
+    what: 'getBlurCollectedAds'
+  }).then(blurCollectedAds => {
+    if (blurCollectedAds) {
+      uDom("#stage").addClass('blur');
     } else {
-      uDom("#notifications").removeClass('hide');
+      uDom("#stage").removeClass('blur');
     }
-    adjustHeight();
-  })
+  });
+
+  $('#show-dead-ads').on('click', function () {
+    hideDeadAds = false;
+    $('#show-dead-ads').hide();
+    $('#hide-dead-ads').show();
+    createSlider();
+  });
+  
+  $('#hide-dead-ads').on('click', function () {
+    hideDeadAds = true;
+    $('#show-dead-ads').show();
+    $('#hide-dead-ads').hide();
+    createSlider();
+  });
+
+  if (settings.devMode || settings.logEvents) {
+    console.log("DevMode: enabling capture button");
+    $('#capture').on('click', onCapture);
+    $('#capture').removeClass('item-hidden');
+
+    if (hideDeadAds) {
+      $('#show-dead-ads').show();
+      $('#hide-dead-ads').hide();
+    } else {
+      $('#show-dead-ads').hide();
+      $('#hide-dead-ads').show();
+    }
+  } else {
+    $('#show-dead-ads').hide();
+    $('#hide-dead-ads').hide();
+  }
 };
 
 const autoUpdateVault = function () {
-
   const gap = new Date() - lastAdDetectedTime;
   if (waitingAds != [] && gap >= 3000) {
     updateVault(waitingAds, true);
@@ -255,7 +292,7 @@ function setCurrent(ad) {
 function doLayout(adsets, update) {
 
   adsets = adsets || [];
-  // console.log('Vault.doLayout: ' + adsets.length + " ad-sets, total=" + numFound(adsets));
+  //console.log('Vault.doLayout: ' + adsets.length + " ad-sets, total=" + numFound(adsets));
   vaultLoading = true;
   if (!update) $('.item').remove();
 
@@ -302,6 +339,10 @@ function parseAd(ad, data) {
 }
 
 function analyze(adsets) {
+  displayStatistics(extractData(adsets));
+}
+
+function extractData(adsets) {
   let data = {
     totalImg: 0,
     totalText: 0,
@@ -316,6 +357,7 @@ function analyze(adsets) {
       data = parseAd(ad, data);
     } else {
       //adsets
+      console.log(i + ') multiple');
       for (const key in adsets[i].children) {
         const ad = adsets[i].children[key];
         data = parseAd(ad, data);
@@ -325,8 +367,9 @@ function analyze(adsets) {
   data.sites = sortDict(data.sites);
   data.adNetworks = sortDict(data.adNetworks);
   data.total = data.totalImg + data.totalText;
+
   //console.log(data);
-  displayStatistics(data);
+  return data;
 }
 
 function displayStatistics(data) {
@@ -464,6 +507,7 @@ function createDivs(adsets, update) {
 
     $div.hover(hoverOnDiv, hoverOffDiv);
   }
+
   // // Hide #container while appending new divs from 0
   if (!update) $container.css('opacity', '0');
 
@@ -691,7 +735,64 @@ function bulletIndex($div, adset) {
   }
 }
 
+var loadImageTimeout;
+
 function appendDisplayTo($div, adset) {
+
+  var type = adset.type();
+  var domain = adset.domain();
+  var pageTitle = adset.pageTitle();
+  var pageUrl = adset.pageUrl();
+  var targetHostname = adset.targetHostname();
+  var failedCount = adset.failedCount();
+  var dntCount = adset.dntCount();
+  var visitedCount = adset.visitedCount();
+  var deadCount = adset.deadCount();
+  var foundTs = adset.foundTs();
+  var w = adset.width();
+  var h = adset.height();
+  let img_src = adset.child(0).contentData.src;
+
+  if (deadCount > 0 && hideDeadAds) {
+    // still try to load the image in case it is not dead
+    let img = new Image();
+    img.src = img_src;
+    img.onload = function () {
+      messager.send('adnauseam', {
+        what: 'notDeadAd',
+        ad: adset.children[0]
+      });
+    }
+    // dont display add
+    return;
+  } 
+  
+
+  var hasSize = w && h;
+
+  const max_size = 800;
+  // Adjust dimensions to max size
+  if (w > max_size) {
+    const prop = max_size / w;
+    w = max_size;
+    h = h * prop;
+  } else if (h > max_size) {
+    const prop = max_size / h;
+    h = max_size;
+    w = w * prop;
+  }
+
+  // set attributes
+  $div.attr('data-width', w);
+  $div.attr('data-height', h);
+  $div.attr('data-domain', domain);
+  $div.attr('data-pageTitle', pageTitle);
+  $div.attr('data-pageUrl', pageUrl);
+  $div.attr('data-targetHostname', targetHostname);
+  $div.attr('data-foundTs', foundTs);
+
+  $div.width(w);
+  $div.height(h);
 
   const $ad = $('<div/>', {
     class: 'ad'
@@ -714,44 +815,38 @@ function appendDisplayTo($div, adset) {
 
   // add white background to transparent ads that are saved data strings 
   // https://github.com/dhowe/AdNauseam/issues/1978
-  let img_src = adset.child(0).contentData.src;
   var isPNGdata = img_src.includes('data:image/png');
   var cl = isPNGdata ? "white-bg" : "";
-
   const $img = $('<img/>', {
     src: img_src,
-    class: cl
+    class: cl,
+    width: w,
+    height: h
   }).appendTo($ad);
 
+  $img.width(w);
+  $img.height(h);
+
+  let isLoaded = false;
+
   $img.on("error", function () {
+    isLoaded = true;
     setItemClass($div, 'image-error');
-    $img.css({ width: 80, height: 40 });
     $img.attr('src', 'img/placeholder.svg');
     $img.attr('alt', 'Unable to load image');
+    $img.attr('data-error', 'error');
     $img.off("error");
+    $div.addClass('loaded');
+    // tell the addon
+    messager.send('adnauseam', {
+      what: 'deadAd',
+      ad: adset.children[0]
+    });
   });
-  // max ad size, addressing https://github.com/dhowe/AdNauseam/issues/2050
-  let max_size = 800;
-  // fix for #291
+
   $img.on('load', function () {
-    // cache the dimensions of the img-item AFTER load
-    const $this = $(this);
-    let w = $this.width()
-    let h = $this.height()
-    // adjust to max size
-    if (w > max_size) {
-      let prop = max_size / w
-      w = max_size;
-      h = h * prop
-    } else if (h > max_size) {
-      let prop = max_size / h
-      h = max_size;
-      w = w * prop
-    }
-    $this.width(w)
-    $this.height(h)
-    $div.attr('data-width', w);
-    $div.attr('data-height', h);
+    isLoaded = true;
+    $div.addClass('loaded');
   });
 }
 
@@ -803,6 +898,10 @@ function appendPrivatePlaceHolder($pdiv, adset) {
   // cache the dimensions of the text-item
   $pdiv.attr('data-width', $div.width());
   $pdiv.attr('data-height', $div.height());
+
+  // text/private items have no <img> load event, so reveal them here
+  // (otherwise they stay at opacity:0/scale(0,0) from the base .item rule)
+  $pdiv.addClass('loaded');
 }
 
 function appendTextDisplayTo($pdiv, adset) {
@@ -857,6 +956,10 @@ function appendTextDisplayTo($pdiv, adset) {
   // cache the dimensions of the text-item
   $pdiv.attr('data-width', $div.width());
   $pdiv.attr('data-height', $div.height());
+
+  // text/private items have no <img> load event, so reveal them here
+  // (otherwise they stay at opacity:0/scale(0,0) from the base .item rule)
+  $pdiv.addClass('loaded');
 }
 
 function indexCounterText(adset) {
@@ -921,73 +1024,82 @@ function computeStats(adsets) {
   const numVisits = numVisited(gAds);
 
   $('.since').text(i18n$("adnVaultSince").replace('{{datetime}}', sinceTime(adsets)));
-
   $('.clicked').text(i18n$("adnMenuAdsClicked").replace('{{number}}', numVisits));
-
   $('.total').text(i18n$("adnVaultFound").replace('{{total}}', numTotal()));
   $('#detected').text(numFound(adsets));
 
-  if (numTotal() != numFound(adsets))
+  if (numTotal() != numFound(adsets)) {
     $('.showing').show();
-  else
+  }
+  else {
     $('.showing').hide();
+  }
   setCost(numVisits);
 }
 
-function numVisible() {
-  return $('.item').length;
-}
-
 function numVisited(adsets) {
-  //TODO: update after visit
   let numv = 0;
-
-  for (let i = 0, j = adsets && adsets.length; i < j; i++)
+  for (let i = 0, j = adsets && adsets.length; i < j; i++) {
     numv += (adsets[i].visitedTs > 0);
-
+  }
   return numv;
 }
 
 function numFound(adsets) {
-
   let numv = 0;
-
-  for (let i = 0, j = adsets && adsets.length; i < j; i++)
+  for (let i = 0, j = adsets && adsets.length; i < j; i++) {
     numv += (adsets[i].count());
-
+  }
   return numv;
 }
 
 function numTotal() {
-
   return gAds.length;
 }
 
 function sinceTime(adsets) {
-
-  let idx = 0, oldest = +new Date();
-
+  let oldest = +new Date();
   for (let i = 0, j = adsets && adsets.length; i < j; i++) {
-
-    const foundTs = adsets[i].child(0).foundTs;
+    let foundTs;
+    if (!adsets[i].children) {
+      foundTs = adsets[i].foundTs;
+    } else {
+      foundTs = adsets[i].child(0).foundTs;
+    }
     if (foundTs < oldest) {
-
       oldest = foundTs;
-      idx = i;
     }
   }
-
   return formatDate(oldest);
+}
+
+function untilTime(adsets) {
+  let youngest = 0;
+  for (let i = 0, j = adsets && adsets.length; i < j; i++) {
+    let foundTs;
+    if (!adsets[i].children) {
+      foundTs = adsets[i].foundTs;
+    } else {
+      foundTs = adsets[i].child(0).foundTs;
+    }
+    if (foundTs > youngest) {
+      youngest = foundTs;
+    }
+  }
+  return formatDate(youngest);
 }
 
 function formatTargetDate(ad) {
   const dntNote = i18n$('adnAllowedByDNT') + "<a class='help-mark dnt' href='https://github.com/dhowe/AdNauseam/wiki/FAQ#what-is-the-effs-do-not-track-standard-and-how-it-is-supported-in-adnauseam'> ? </a>", frequencyNote = i18n$('adnAdClickingStatusSkippedFrequency'), userNote = i18n$('adnAdClickingStatusSkippedUser');
 
-  return ad.noVisit ? (ad.clickedByUser ? userNote : (ad.dntAllowed ? dntNote : frequencyNote)) : formatDate(ad.visitedTs);
+  const domainNote = i18n$('adnAdClickingStatusSkippedDomain');
+  return ad.noVisit ? (ad.clickedByUser ? userNote : (ad.dntAllowed ? dntNote : (ad.domainExcluded ? domainNote : frequencyNote))) : formatDate(ad.visitedTs);
 }
 
 function formatDate(ts) {
-  if (!ts) return settings.clickingDisabled ? i18n$('adnAdClickingStatusSkippedDisabled') : i18n$('adnNotYetVisited');
+  if (!ts) return settings.clickingDisabled ?
+    i18n$('adnAdClickingStatusSkippedDisabled')
+    : i18n$('adnNotYetVisited');
 
   function getLocale() {
     return navigator.languages[0] || navigator.language;
@@ -999,8 +1111,7 @@ function formatDate(ts) {
     hour: 'numeric', minute: 'numeric'
   };
 
-  const result = typeof Intl === "object" ? new Intl.DateTimeFormat(getLocale(), options).format(date) : date;
-  return result;
+  return typeof Intl === "object" ? new Intl.DateTimeFormat(getLocale(), options).format(date) : date;
 }
 
 function enableLightbox() {
@@ -1081,125 +1192,111 @@ function computeZoom(items) {
   // OK at current size, done
 }
 
+// Starts a CSS transition on the container and cleans up after it completes
+function beginTransition(durationMs) {
+  if (transitionTimeout !== null) {
+    clearTimeout(transitionTimeout);
+  }
+  $container.addClass("posTransition");
+  transitionTimeout = setTimeout(() => {
+    $container.removeClass("posTransition");
+    // Clean up translate(0,0) from FLIP animations so setScale works cleanly
+    const currentScale = userZoomScale / 100;
+    $container.css({ transform: 'scale(' + currentScale + ')' });
+    transitionTimeout = null;
+  }, durationMs || 600);
+}
+
+// Smoothly animate the container from current position/scale to a target using FLIP:
+// 1. Instantly set target margins (no visual change yet thanks to translate offset)
+// 2. Animate transform from translate(offset)+scale(old) → translate(0)+scale(new)
+function animateContainerTo(ml_target, mt_target, scaleTarget) {
+  const ml_current = parseFloat(container_div.style.marginLeft) || -10000;
+  const mt_current = parseFloat(container_div.style.marginTop) || -10000;
+  const scaleCurrent = userZoomScale / 100;
+
+  // FLIP step 1: set target margins instantly
+  $container.addClass('notransition');
+  $container.css({
+    "margin-left": ml_target + "px",
+    "margin-top": mt_target + "px"
+  });
+  // Compensate with translate so visually nothing changes yet
+  const tx = ml_current - ml_target;
+  const ty = mt_current - mt_target;
+  $container.css({
+    transform: 'translate(' + tx + 'px,' + ty + 'px) scale(' + scaleCurrent + ')'
+  });
+  $container[0].offsetHeight; // force reflow to lock the "before" frame
+  $container.removeClass('notransition');
+
+  // FLIP step 2: animate to final transform (translate 0, target scale)
+  beginTransition(600);
+  $container.css({
+    transform: 'translate(0px,0px) scale(' + scaleTarget + ')'
+  });
+}
+
 function centerZoom($ele) {
 
   if ($ele) {
 
-    // compute target positions for transform
-    let dm;
-
-    const spacing = 10;
     const metaOffset = 110;
-    const center = -10000;
-    // const elPos = itemPosition($ele);
-
-    // now compute the centered position based on item-offset
-    // let mleft = center - pos.left, mtop = center - pos.top;
-
-    // can these 2 be removed?
     const elWidth = parseInt($ele.attr('data-width'));
     const elHeight = parseInt($ele.attr('data-height'));
+    const element_div = $ele[0];
 
-    let element_div = $ele[0]
+    // Save current view state before changing
+    storeViewState(true);
 
-    // make sure left/bottom corner of meta-data is onscreen (#180)
-    /*
-    if (iw > ww - (metaOffset * 2 + spacing)) {
+    // Compute scale to fit the ad in the viewport
+    const posX = element_div.offsetLeft + elWidth / 2;
+    const posY = element_div.offsetTop + (elHeight + metaOffset) / 2;
 
-      //log('HITX:  iw='+iw+" ww="+ww+" diff="+(iw - ww)  + "  offx="+offx);
-      mleft += ((iw - ww) / 2) + (metaOffset + spacing);
-    }
-    if (ih > wh - (metaOffset * 2 + spacing)) {
+    let rescale = Math.min(window.innerHeight / elHeight, window.innerWidth / elWidth);
+    rescale = Math.min(rescale, 1) * 0.8;
 
-      //log('HITY:  ih='+ih+" wh="+wh+" diff="+(ih - wh)  + "  offy="+offy);
-      mtop -= ((ih - wh) / 2) + (metaOffset + spacing); // bottom-margin
-    }
-    */
+    // Target margins that center the ad
+    const ml_target = -10000 - (posX - 10000) * rescale;
+    const mt_target = -10000 - (posY - 10000) * rescale;
 
-    $container.addClass("posTransition")
-    // transition to center
+    // Smoothly animate from current position/scale to target
+    animateContainerTo(ml_target, mt_target, rescale);
 
-    // reset zoom based on ads size
-    let stdHeight = window.innerHeight;
-    let stdWidth = window.innerWidth;
-
-    let posX = element_div.offsetLeft + elWidth / 2
-    let posY = element_div.offsetTop + (elHeight + metaOffset) / 2
-
-    let rescale = stdHeight / elHeight < stdWidth / elWidth ? stdHeight / elHeight : stdWidth / elWidth;
-    rescale = rescale > 1 ? 1 : rescale;
-
-    //some space to leave
-    rescale *= 0.8;
-
-    let marginLeft = -10000 - (posX - 10000) * rescale;
-    let marginTop = -10000 - (posY - 10000) * rescale;
-
-    storeViewState(rescale);
-
-    setScale(rescale * 100, { marginLeft, marginTop })
-
-
-
-    //////////
-
-    if (transitionTimeout !== null) {
-      clearTimeout(transitionTimeout)
-      transitionTimeout = null
-    }
-
-    transitionTimeout = setTimeout(() => {
-      $container.removeClass("posTransition")
-      transitionTimeout = null
-    }, 1000)
+    userZoomScale = rescale * 100;
+    $ratio.text(Math.round(userZoomScale) + '%');
 
   } else { // restore zoom-state
-
-    storeViewState(-1);
+    storeViewState(false);
   }
 }
 
-// stores zoom/drag-offset for container
-function storeViewState(focusScale) {
+// stores zoom/drag-offset for container, or restores it
+function storeViewState(saving) {
 
-  if (focusScale > 0) {
+  if (saving) {
     viewState.zoomScale = userZoomScale;
-    viewState.focusScale = focusScale * 100;
-    userZoomScale = viewState.focusScale;
-    viewState.left = $container.css('margin-left');
-    viewState.top = $container.css('margin-top');
-  } else { // restore
-
-    $container.addClass("posTransition")
-    if (transitionTimeout !== null) {
-      clearTimeout(transitionTimeout)
-      transitionTimeout = null
-    }
-
-    transitionTimeout = setTimeout(() => {
-      $container.removeClass("posTransition")
-      transitionTimeout = null
-    }, 1000)
-
-    // restore zoom scale to userZoomScale
-    dynamicZoom(viewState.zoomScale - viewState.focusScale, { marginLeft: viewState.left, marginTop: viewState.top });
+    viewState.left = parseFloat(container_div.style.marginLeft) || -10000;
+    viewState.top = parseFloat(container_div.style.marginTop) || -10000;
+  } else {
+    // Smoothly animate back to saved position/scale
+    const s_target = viewState.zoomScale / 100;
+    animateContainerTo(viewState.left, viewState.top, s_target);
+    userZoomScale = viewState.zoomScale;
+    $ratio.text(Math.round(userZoomScale) + '%');
   }
 }
 
 function logAdSetInfo() {
-
   if (selectedAdSet) {
-
     console.log("Logging JSON for AdSet #" + selectedAdSet.gid);
-
     messager.send('adnauseam', {
       what: 'logAdSet',
       gid: selectedAdSet.gid,
       ids: selectedAdSet.childIds()
     }).then(data => {
       location.href = "data:text/plain," + encodeURI(data);
-    })
-
+    });
   }
 }
 
@@ -1208,17 +1305,14 @@ const ifs = ['#logo', '#ratio', '#stats', '#svgcon', '#x-close-button', '.zoom',
 function toggleInterface() {
 
   showInterface = !showInterface;
-
   if (!showInterface) {
 
-    $("body").css('background-image', 'none')
-      .css({
-        'background-color': '#fff'
-      });
+    $("body")
+      .css('background-image', 'none')
+      .css({ 'background-color': '#fff'})
+      .css({ 'pointer-events': 'none'});
 
-    ifs.forEach(function (s) {
-      $(s).hide();
-    });
+    ifs.forEach(s => $(s).hide());
 
     // remove all duplicate classes (TODO: just hide them)
     $(".item").removeClass(function (i, css) {
@@ -1226,15 +1320,11 @@ function toggleInterface() {
     }).addClass('dup-count-1');
 
   } else {
-
-    $("body").css('background-image', 'url(../img/gray_grid.png)')
-      .css({
-        'background-color': '#000'
-      });
-
-    ifs.forEach(function (s) {
-      $(s).show();
-    });
+    $("body")
+      .css('background-image', 'url(../img/gray_grid.png)')
+      .css({ 'background-color': '#000' })
+      .css({ 'pointer-events': 'all'});
+    ifs.forEach(s => $(s).show());
   }
 }
 
@@ -1243,16 +1333,14 @@ function lightboxMode($selected) {
   if ($selected && !$selected.hasClass('inspected')) {
 
     if ($container.hasClass("posTransition")) {
-      return
+      return;
     }
 
     const inspectedGid = parseInt($selected.attr('data-gid'));
-
     selectedAdSet = findAdSetByGid(inspectedGid); // throws
 
     // lazy-create the meta data for the adset (#61)
     if (!$selected.children('div.meta').length) {
-
       appendBulletsTo($selected, selectedAdSet);
     }
 
@@ -1262,14 +1350,12 @@ function lightboxMode($selected) {
 
       $selected.find('span.counter-index').show(); // show index-counter
       bulletIndex($selected, selectedAdSet);
-
       animateInspector($selected);
     }
 
     const next = selectedAdSet.nextPending(); // tell the addon
 
     if (next) {
-
       messager.send('adnauseam', {
         what: 'itemInspected',
         id: next.id
@@ -1277,7 +1363,6 @@ function lightboxMode($selected) {
     }
 
     centerZoom($selected);
-
     $container.addClass('lightbox');
 
   } else if ($container.hasClass('lightbox')) {
@@ -1322,16 +1407,12 @@ function animateInspector($inspected) {
 }
 
 function findAdById(id) {
-  if (gAdSets == undefined || gAdSets == null) return
+  if (gAdSets === undefined || gAdSets === null) return
 
   for (let i = 0, j = gAdSets.length; i < j; i++) {
-
     const childIdx = gAdSets[i].childIdxForId(id);
-
     if (childIdx > -1) {
-
       return {
-
         ad: gAdSets[i].child(childIdx),
         group: gAdSets[i],
         index: childIdx
@@ -1358,9 +1439,9 @@ function findItemDivByGid(gid) {
 function findAdSetByGid(gid) {
 
   for (let i = 0, j = gAdSets.length; i < j; i++) {
-
-    if (gAdSets[i].gid === gid)
+    if (gAdSets[i].gid === gid) {
       return gAdSets[i];
+    }
   }
 
   throw Error('No group for gid: ' + gid);
@@ -1371,14 +1452,15 @@ function zoomIn(immediate) {
   // calculate the suitable zoomIdx by userZoomScale
   const previousState = zoomIdx;
   for (let i = 0; zoomIdx === previousState && i < Zooms.length; i++) {
-
-    if (userZoomScale === Zooms[i])
+    if (userZoomScale === Zooms[i]) {
       zoomIdx = i;
-    else if (userZoomScale < Zooms[i] && userZoomScale > Zooms[i + 1])
+    }
+    else if (userZoomScale < Zooms[i] && userZoomScale > Zooms[i + 1]) {
       zoomIdx = i + 1;
+    }
   }
 
-  (zoomIdx > 0) && setZoom(--zoomIdx, immediate);
+  if (zoomIdx > 0) setZoom(--zoomIdx, immediate);
 }
 
 function zoomOut(immediate) {
@@ -1386,59 +1468,55 @@ function zoomOut(immediate) {
   // calculate the suitable zoomIdx by userZoomScale
   const previousState = zoomIdx;
   for (let i = 0; zoomIdx === previousState && i < Zooms.length - 1; i++) {
-
-    if (userZoomScale === Zooms[i])
+    if (userZoomScale === Zooms[i]) {
       zoomIdx = i;
-    else if (userZoomScale < Zooms[i] && userZoomScale > Zooms[i + 1])
+    }
+    else if (userZoomScale < Zooms[i] && userZoomScale > Zooms[i + 1]) {
       zoomIdx = i;
+    }
   }
 
-  (zoomIdx < Zooms.length - 1) && setZoom(++zoomIdx, immediate);
+  if (zoomIdx < Zooms.length - 1) setZoom(++zoomIdx, immediate);
 }
 
-function setScale(scale, targetPos) {
-
-  let _scale = scale / 100
-
-  $container.css({
-    transform: 'scale(' + _scale + ')'
-  });
-
+// focus: optional screen point {x, y} to zoom around (default: stage center)
+function setScale(scale, targetPos, focus) {
+  const s = scale / 100;
+  $container.css({ transform: 'scale(' + s + ')' });
   $ratio.text(Math.round(scale) + '%');
 
   let marginLeft, marginTop;
 
   if (targetPos) {
-    marginLeft = targetPos.marginLeft
-    marginTop = targetPos.marginTop
+    marginLeft = targetPos.marginLeft;
+    marginTop = targetPos.marginTop;
   } else {
-    let center = -10000
+    const center = -10000;
+    const ml = parseFloat(container_div.style.marginLeft) || center;
+    const mt = parseFloat(container_div.style.marginTop) || center;
+    const prevZoom = $container.data("zoom") || 100;
+    const zoomProp = scale / prevZoom;
 
-    let ml = parseFloat(container_div.style.getPropertyValue("margin-left"));
-    let mt = parseFloat(container_div.style.getPropertyValue("margin-top"));
+    $container.data("zoom", scale);
 
-    let prevZoom = $container.data("zoom") || 100
-    let zoomProp = scale / prevZoom
+    let offsetLeft = (center - ml) * (1 - zoomProp);
+    let offsetTop = (center - mt) * (1 - zoomProp);
 
-    $container.data("zoom", scale)
+    if (focus) {
+      // keep the point under the focus fixed: scaling is around the container's center
+      const r = container_div.getBoundingClientRect();
+      offsetLeft = (focus.x - (r.left + r.width / 2)) * (1 - zoomProp);
+      offsetTop = (focus.y - (r.top + r.height / 2)) * (1 - zoomProp);
+    }
 
-    let distToCenterX = (center - ml)
-    let distToCenterY = (center - mt)
-
-    let offsetLeft = distToCenterX * (1 - zoomProp)
-    let offsetTop = distToCenterY * (1 - zoomProp)
-
-    marginLeft = ml + offsetLeft + "px";
-    marginTop = mt + offsetTop + "px";
+    marginLeft = (ml + offsetLeft) + "px";
+    marginTop = (mt + offsetTop) + "px";
   }
 
-  $container.css({
-    "margin-left": marginLeft,
-    "margin-top": marginTop
-  });
+  $container.css({ "margin-left": marginLeft, "margin-top": marginTop });
 }
 
-function dynamicZoom(scaleInterval, targetPos) {
+function dynamicZoom(scaleInterval, targetPos, focus) {
 
   userZoomScale += scaleInterval;
   if (userZoomScale > Zooms[0])
@@ -1446,15 +1524,13 @@ function dynamicZoom(scaleInterval, targetPos) {
   else if (userZoomScale < Zooms[Zooms.length - 1])
     userZoomScale = Zooms[Zooms.length - 1];
 
-  setScale(userZoomScale, targetPos);
+  setScale(userZoomScale, targetPos, focus);
 
   // set zoom-text to 2 decimal places
   $ratio.text(Math.round(userZoomScale * 100) / 100 + '%');
 }
 
 function setZoom(idx, immediate, targetPos) {
-
-  //log('setZoom('+idx+','+(immediate===true)+')');
 
   // Disable transitions
   immediate && $container.addClass('notransition');
@@ -1474,32 +1550,23 @@ function setZoom(idx, immediate, targetPos) {
 
 function onscreen($this, winW, winH, scale, percentVisible) {
 
-  const off = $this.offset(), w = $this.width() * scale, h = $this.height() * scale, minX = (-w * (1 - percentVisible)), maxX = (winW - (w * percentVisible)), minY = (-h * (1 - percentVisible)), maxY = (winH - (h * percentVisible));
-
-  // console.log('onscreen() :: trying: '+Zooms[zoomIdx]+"%",$this.attr('data-gid'),off.left, minX, maxX);
-
-  return (!(off.left < minX || off.left > maxX || off.top < minY || off.top > maxY));
+  const off = $this.offset();
+  const w = $this.width() * scale;
+  const h = $this.height() * scale;
+  const minX = (-w * (1 - percentVisible));
+  const minY = (-h * (1 - percentVisible));
+  const maxX = (winW - (w * percentVisible));
+  const maxY = (winH - (h * percentVisible));
+  return !(off.left < minX || off.left > maxX || off.top < minY || off.top > maxY);
 }
 
 function openInNewTab(url) {
-
   window.open(url, '_blank').focus();
-}
-
-function asAdArray(adsets) { // remove
-
-  const ads = [];
-  for (let i = 0, j = adsets.length; i < j; i++) {
-    for (let k = 0, m = adsets[i].children.length; k < m; k++)
-      ads.push(adsets[i].children[k]);
-  }
-  return ads;
 }
 
 function addInterfaceHandlers(ads) {
 
   $('#x-close-button').click(function (e) {
-
     e.preventDefault();
     messager.send('adnauseam', {
       what: 'closeExtPage',
@@ -1514,14 +1581,11 @@ function addInterfaceHandlers(ads) {
   });
 
   $('#logo').click(function (e) {
-
     e.preventDefault();
     openInNewTab('http://adnauseam.io');
   });
 
   $(document).click(function (e) {
-
-
     if (e.which === 1) // Left-button only
       if ($(e.target).parents('.meta-item').length > 0) {
         return
@@ -1530,19 +1594,15 @@ function addInterfaceHandlers(ads) {
   });
 
   $(document).keyup(function (e) {
-
     (e.keyCode === 27) && lightboxMode(false); // esc
     (e.keyCode === 73) && toggleInterface(); // 'i'
     (e.keyCode === 68) && logAdSetInfo(); // 'd'
     (e.keyCode === 80) && repack(); // 'p'
     (e.keyCode === 85) && updateVault(waitingAds, true); // 'u'
-    //console.log(e);
   });
 
   /////////// DRAG-STAGE ///////////
-  let offsetX = 0;
-  let offsetY = 0;
-
+  let offsetX = 0, offsetY = 0;
   container_div.addEventListener('mousedown', mouseDown, false);
   container_div.addEventListener('touchstart', touchStart, false);
   window.addEventListener('touchend', touchEnd, false);
@@ -1602,7 +1662,6 @@ function addInterfaceHandlers(ads) {
 
     container_div.style.marginLeft = (ml += x_change) + 'px';
     container_div.style.marginTop = (mt += y_change) + 'px';
-    // container_div.style.transformOrigin = Math.abs(ml+=x_change) + 'px ' + Math.abs(mt+=y_change) + 'px';
 
     offsetX = e.pageX;
     offsetY = e.pageY;
@@ -1708,7 +1767,8 @@ function addInterfaceHandlers(ads) {
     const rawDeltaY = e.deltaY * e.deltaFactor;
     const scale = (Math.abs(rawDeltaY) >= 100) ? rawDeltaY / 100 : rawDeltaY / 10;
 
-    dynamicZoom(scale);
+    // zoom around the mouse position
+    dynamicZoom(scale, undefined, { x: e.clientX, y: e.clientY });
   });
 }
 
@@ -1717,42 +1777,30 @@ function addInterfaceHandlers(ads) {
 // Here is where we group individual ads into AdSets, based on their hash,
 // created from the domain it was found on, and its content-data
 // If we get too many cross-domain duplicate images, we may need to revisit
-// -- called just once per layout
+// Note: called just once per layout
 function createAdSets(ads) {
   //console.log('Vault-Slider.createAdSets: ' + ads.length + '/' + gAds.length + ' ads');
-
-  let key;
-
-  let ad;
+  let key, ad;
   const hash = {};
   const adsets = [];
 
   // set hidden val for each ad
   for (let i = 0; i < ads.length; i++) {
-
     ad = ads[i];
-
     key = getHash(ad);
-
     if (!key) continue;
-
     if (!hash[key]) {
-
       // new: add a hash entry
       hash[key] = new AdSet(ad);
       adsets.push(hash[key]);
-
     } else {
-
       // dup: add as child
       hash[key].add(ad);
     }
   }
 
   // sort adset children by foundTs
-
   for (let i = 0; i < adsets.length; i++) {
-
     adsets[i].children.sort(byField('-foundTs'));
   }
 
@@ -1760,65 +1808,55 @@ function createAdSets(ads) {
 }
 
 function repack() {
-  let done = false;
+  $container.css('opacity', '0');
+  document.querySelector('#loading-img').style = '';
   const $items = $(".item");
   const visible = $items.length;
-
+  // it seems that the packing needs to happen on a separate thread so that the css 
+  // changes can be applied before the packery is initiated, therefore the setTimeout
   setTimeout(function () {
-    if (!done) $('#loading-img').show();
-  }, 1000);
-
-  showVaultAlert(visible ? false : 'no ads found');
-
-  const loader = imagesLoaded($container, function () {
-
+    showVaultAlert(visible ? false : 'no ads found');
     if (visible > 1) {
-
-      const p = new Packery('#container', {
-
+      pack = new Packery('#container', {
         centered: {
           y: 10000
         }, // centered at half min-height
         itemSelector: '.item',
         gutter: 1
-      });
-
+      })
       computeZoom($items);
 
     } else if (visible === 1) {
-
       $items.css({ // center single
-
         top: (10000 - $items.height() / 2) + 'px',
         left: (10000 - $items.width() / 2) + 'px'
       });
     }
-
-    done = true;
-
     $('#loading-img').hide();
     // Show #container after repack
     $container.css('opacity', '1');
     vaultLoading = false;
-  });
+
+  }, 1000);
 }
 
 /********************************************************************/
 
 function createSlider(mode) {
-  // console.log('Vault-Slider.createSlider: '+gAds.length);
+  //console.log('Vault-Slider.createSlider: ' + gAds.length);
   // three special modes:
   // all three special modes: remember brush
 
   let lastBrush = null;
 
   if (mode != undefined && !d3.select('.brush').empty()) {
-    lastBrush = {};
-    lastBrush.w = d3.transform(d3.select(".resize.w").attr("transform")).translate[0];
-    lastBrush.e = d3.transform(d3.select(".resize.e").attr("transform")).translate[0];
-    lastBrush.extentX = d3.select(".extent").attr("x");
-    lastBrush.extentWidth = d3.select(".extent").attr("width");
-    lastBrush.width = d3.select('.chart-bg').attr("width");
+    const sel = d3.brushSelection(d3.select('.brush').node());
+    if (sel) {
+      lastBrush = {};
+      lastBrush.w = sel[0];
+      lastBrush.e = sel[1];
+      lastBrush.width = d3.select('.chart-bg').attr("width");
+    }
   }
 
   // clear all the old svg
@@ -1845,13 +1883,14 @@ function createSlider(mode) {
   // finding the first and last ad
   const minDate = d3.min(gAds, function (d) {
     return d.foundTs;
-  }),
-    maxDate = d3.max(gAds, function (d) {
-      return d.foundTs;
-    });
+  });
+
+  const maxDate = d3.max(gAds, function (d) {
+    return d.foundTs;
+  });
 
   // mapping the scales
-  const xScale = d3.time.scale()
+  const xScale = d3.scaleTime()
     .domain([minDate, maxDate])
     .range([0, width]);
 
@@ -1860,14 +1899,22 @@ function createSlider(mode) {
     return parseInt(xScale(d.foundTs));
   });
 
-  // setup the histogram layout
-  const histogram = d3.layout.histogram()
-    .bins(400)(map);
+  // setup the histogram layout (400 equal bins, as d3 v3 did)
+  const histogram = d3.bin()
+    .domain([0, width])
+    .thresholds(d3.range(1, 400).map(i => i * width / 400))(map);
+
+  // pick the first format whose test passes (was d3.time.format.multi in v3)
+  const multiFormat = function (formats) {
+    formats = formats.map(f => [d3.timeFormat(f[0]), f[1]]);
+    return function (d) {
+      return formats.find(f => f[1](d))[0](d);
+    };
+  };
 
   // setup the x axis
-  const xAxis = d3.svg.axis()
-    .scale(xScale)
-    .tickFormat(d3.time.format.multi([
+  const xAxis = d3.axisBottom(xScale)
+    .tickFormat(multiFormat([
       [".%L", function (d) {
         return d.getMilliseconds();
       }],
@@ -1915,7 +1962,7 @@ function createSlider(mode) {
     .attr("fill", "#000")
     .attr("fill-opacity", ".5");
 
-  const barw = histogram[0].dx - 1; //relative width
+  const barw = histogram[0].x1 - histogram[0].x0 - 1; //relative width
 
   // Create groups for the bars
   const bars = svg.selectAll(".bar")
@@ -1924,64 +1971,68 @@ function createSlider(mode) {
     .append("g");
 
   // Y scale
-  const yScale = d3.scale.linear()
+  const yScale = d3.scaleLinear()
     .domain([0, d3.max(histogram, function (d) { return d.length; })])
     .range([-2, -46]);
 
   bars.append("line")
     .attr("x1", function (d) {
-      return d.x + barw / 2;
+      return d.x0 + barw / 2;
     })
     .attr("y1", -2)
     .attr("x2", function (d) {
-      return d.x + barw / 2;
+      return d.x0 + barw / 2;
     })
     .attr("y2", function (d) {
-      return yScale(d.y);
+      return yScale(d.length);
     })
     .attr("style", "stroke-width:" + barw + "; stroke-dasharray: 1,0.5; stroke: #999");
 
   // setup the brush
+  // the brush covers the height of the chart
   const bExtent = [computeMinDateFor(gAds, minDate), maxDate],
-    brush = d3.svg.brush()
-      .x(xScale)
-      .extent(bExtent)
-      .on("brushend", brushend);
+    brush = d3.brushX()
+      .extent([[0, -50], [width, -1]])
+      .on("brush", moveHandles)
+      .on("end", brushend);
 
   const gBrush = svg.append("g")
     .attr("class", "brush")
     .call(brush);
 
-  // set the height of the brush to that of the chart
-  gBrush.selectAll(".brush .extent")
-    .attr("height", 49)
-    .attr("y", -50)
+  // clicking the background does not start a new selection (as in v3)
+  gBrush.select(".overlay")
+    .attr("pointer-events", "none");
+
+  gBrush.select(".selection")
     .attr("fill", "#0076FF")
-    .attr("fill-opacity", ".25");
+    .attr("fill-opacity", ".25")
+    .attr("stroke", null);
 
-  // set the height of the brush to that of the chart
-  // gBrush.selectAll("rect")
-  //   .attr("y", -50);
-
-  // attach handle image
-  gBrush.selectAll(".resize").append("image")
-    .attr("xlink:href", "../img/timeline-handle.svg")
+  // attach handle images (dragging is done by the brush's own handles)
+  const handleImgs = gBrush.selectAll(".handle-img")
+    .data(["w", "e"])
+    .enter().append("image")
+    .attr("class", "handle-img")
+    .attr("href", "../img/timeline-handle.svg")
     .attr("width", 5)
     .attr("height", 50)
     .attr("y", -50)
-    .attr("x", -3);
+    .attr("pointer-events", "none");
 
+  // position the slider: last position, or the default extent
+  let bSel = bExtent.map(xScale);
   if (lastBrush && mode != undefined) {
     // map all values if resize
     const r = mode == "resize" ? d3.select('.chart-bg').attr("width") / lastBrush.width : 1;
-    d3.select(".extent").attr("width", lastBrush.extentWidth * r);
-    d3.select(".extent").attr("x", lastBrush.extentX * r);
-    d3.select(".resize.w").attr("transform", "translate(" + lastBrush.w * r + ",0)");
-    d3.select(".resize.e").attr("transform", "translate(" + lastBrush.e * r + ",0)");
+    bSel = [lastBrush.w * r, lastBrush.e * r];
   }
+  // an empty selection would hide the sliders, so use the full width
+  if (bSel[1] - bSel[0] < 1) bSel = [0, width];
+  gBrush.call(brush.move, bSel);
 
   // cases:
-  // 1) [default]]reload vault: doLayout, update slider - runFilter()
+  // 1) [default] reload vault: doLayout, update slider - runFilter()
   // 2) "update": updateLayout, same slider
   // 3) "delete": skipLayout, same slider
   // 4) "resize": repack, remap slider
@@ -1995,11 +2046,10 @@ function createSlider(mode) {
       vaultLoading = false;
       break;
     case "resize":
-      repack();
+      // repack();
       runFilter([gMin, gMax])
       break;
     case "update":
-      // console.log(gMin, new Date())
       const ext = [gMin, new Date()];
       doLayout(runFilter(ext), true)
       break;
@@ -2012,20 +2062,10 @@ function createSlider(mode) {
   // this is called on brushend() and createSlider()
   function runFilter(ext) {
 
-    // console.log('vault.js::runFilter: '+ext[0]+","+ext[1]);
     centerContainer();
     gMin = ext[0], gMax = ext[1];
 
-    gSliderRight = d3.select('.w.resize')[0][0].attributes.transform.value;
-    gSliderLeft = d3.select('.e.resize')[0][0].attributes.transform.value;
-
-    // make sure the sliders are always visible
-    if (gMax - gMin <= 0) d3.select('.resize').style("display", "block");
-
-    // if (gAdSets != null && gAds.length !== 1 && gMax - gMin < 0) {
-    //   //console.log('vault-slider::ignore-micro: ' + ext[0] + "," + ext[1]);
-    //   return; // gAdSets || (gAdSets = createAdSets(gAds)); // fix for gh #100
-    // }
+    [gSliderRight, gSliderLeft] = d3.brushSelection(gBrush.node());
 
     if (gAds.length >= MaxStartNum) {
       uDom("a[class=showing-help]").text("?")
@@ -2078,15 +2118,11 @@ function createSlider(mode) {
 
   function dateFilter(min, max) {
 
-    //log('dateFilter: min='+min+', max='+max);
-
     const filtered = [];
 
     // NOTE: always need to start from full-set (all) here
     for (let i = 0, j = gAds.length; i < j; i++) {
-
       if (!(gAds[i].foundTs < min || gAds[i].foundTs > max)) {
-
         filtered.push(gAds[i]);
       }
     }
@@ -2094,38 +2130,167 @@ function createSlider(mode) {
     return filtered;
   }
 
-  function brushend() {
+  function moveHandles(event) {
+    if (!event.selection) return;
+    handleImgs.attr("x", (d, i) => event.selection[i] - 3);
+  }
+
+  function brushend(event) {
+    if (!event.sourceEvent) return; // programmatic brush.move
+
+    // collapsed to nothing: put the sliders back where they were
+    if (!event.selection) {
+      gBrush.call(brush.move, [gSliderRight, gSliderLeft]);
+      return;
+    }
+
     const lastgSliderRight = gSliderRight;
     const lastgSliderLeft = gSliderLeft;
-    gSliderRight = d3.select('.w.resize')[0][0].attributes.transform.value;
-    gSliderLeft = d3.select('.e.resize')[0][0].attributes.transform.value;
+    [gSliderRight, gSliderLeft] = event.selection;
 
-    if (!lastgSliderRight || !lastgSliderLeft) return;
+    if (lastgSliderRight === undefined || lastgSliderLeft === undefined) return;
 
     if (gSliderRight === lastgSliderRight && gSliderLeft === lastgSliderLeft) {
       return;
     } else {
-      const filtered = runFilter(d3.event.target.extent());
+      const filtered = runFilter(event.selection.map(xScale.invert));
       filtered && doLayout(filtered);
     }
   }
 }
 
+function parsePackElements(packElements, gMin, gMax) {
+  const ads = packElements.filter(packEl => {
+    let error = packEl.element.getAttribute('data-error');
+    if (error) return false;
+    let foundTs = packEl.element.getAttribute('data-foundTs');
+    if (foundTs < gMin || foundTs > gMax) return false;
+    return true;
+  }).map(packEl => {
+    let type = packEl.element.querySelector('img') ? 'image' : 'text';
+    let pos = { x: packEl.position.x - 10000, y: packEl.position.y - 10000 };
+    let height = packEl.rect.height;
+    let width = packEl.rect.width;
+    let foundTs = packEl.element.getAttribute('data-foundTs');
+    let gid = packEl.element.getAttribute('data-gid');
+    if (type == 'image') { // image
+      let src = packEl.element.querySelector('img').src;
+      return { src, pos, height, width, foundTs, gid, type }
+    } else {
+      let text = packEl.element.querySelector('.ads-creative').innerText;
+      let title = packEl.element.querySelector('.title').innerText;
+      let href = packEl.element.querySelector('cite');
+      return { pos, height, width, foundTs, gid, text, title, href, type }
+    }
+  })
+  return ads
+}
+
+function onCapture() { // save screenshot
+  let dbug = true;
+  if (dbug) console.log('onCapture');
+  toggleInterface(showInterface = true);
+  setTimeout(() => {
+    const ads = parsePackElements(pack.items, gMin, gMax)
+    if (dbug) console.log("parsedPackElements", ads)
+    if (dbug) console.log('captureVisibleTab');
+    browser.tabs.captureVisibleTab(null, {}, imgUrl => {
+      if (dbug) console.log('callback');
+      const saveImageToFile = (image, meta) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = image.width;
+        canvas.height = image.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(image, 0, 0);
+
+        // create a meta data string and fname for the image
+        let metaText = `Clicked ${meta.clicked} of ${meta.count} ads, from ${meta.minDate} to ${meta.maxDate}, costing $${meta.cost}.`;
+        let metaName = `${meta.clicked}-${meta.count}-${meta.minTs}-${meta.maxTs}-${meta.cost}.png`;
+        console.log('Saving image: ' + metaName);
+
+        // write meta data to upper left corner
+        ctx.fillStyle = 'black';
+        ctx.fillText(metaText, 20, 20);
+
+        // Convert canvas to data URL
+        const dataURL = canvas.toDataURL();
+
+        // Create a link element and trigger a download
+        const anchor = document.createElement('a');
+        anchor.href = dataURL;
+        anchor.download = metaName;
+        anchor.click();
+      };
+
+      // create a subset of visited ads where foundTs is within the range gMin to gMax
+      let subset = gAds.filter(ad => ad.foundTs >= gMin && ad.foundTs <= gMax);
+
+      //console.log('subset:', subset.length, gMin, gMax);
+
+      let meta = extractData(subset);
+      meta.count = subset.length;
+      meta.clicked = numVisited(subset);
+      meta.cost = (meta.clicked * 1.03).toFixed(2);
+      meta.minDate = gMin ? gMin : sinceTime(subset);
+      meta.maxDate = gMax ? gMax : untilTime(subset);
+      meta.minTs = formatDate(meta.minDate);
+      meta.maxTs = formatDate(meta.maxDate);
+      if (dbug) console.log('meta:', meta);
+
+      let capture = {
+        ads: ads,
+        meta: meta
+      }
+
+      generateCaptureSvg(capture, userZoomScale/100, $("#svg-loaded"), $("#svg-total")).then(svgUrl => {
+
+        let exportData = JSON.stringify(capture, null, '  ')
+        let filename = getExportFileName();
+        const url = URL.createObjectURL(new Blob([exportData], { type: "text/plain" }));
+
+        filename = "AdNauseam_Capture" + filename.substr(9, filename.length);
+
+        // download svg
+        vAPI.download({
+          'url': svgUrl,
+          'filename': filename.replace(/.json/g, ".svg")
+        });
+
+        // download json
+        vAPI.download({
+          'url': url,
+          'filename': filename
+        });
+
+        $("#svg-progress").hide();
+
+        const screenshot = new Image();
+        screenshot.src = imgUrl;
+        screenshot.onload = () => {
+          saveImageToFile(screenshot, meta);
+          setTimeout(() => {
+            toggleInterface(showInterface = false);
+          }, 5000);
+        };
+      });
+
+    });
+  }, 1000);
+};
+
 function onPurgeDeadAds() {
   let deadAds = getDeadAds()
   if (deadAds.length > 0) {
-    purgeDeadAds(getDeadAds())
+    purgeDeadAds(getDeadAds(), function (response) {
+      renderAds(response, true)
+    })
   } else {
     console.log("no dead ads to purge")
   }
 }
+
 function getDeadAds() {
-  let adsGids = []
-  document.querySelectorAll(".image-error").forEach(el => {
-    adsGids.push(parseInt(el.getAttribute('data-gid')))
-  })
-  let deadAds = gAdSets.filter(adset => adsGids.includes(adset.gid))
-  return deadAds
+  return gAdSets.filter(adset => adset.deadCount() > 0)
 }
 
 /********************************************************************/
@@ -2134,7 +2299,6 @@ const TEXT_MINW = 150,
   TEXT_MAXW = 450;
 
 function AdSet(ad) {
-
   this.gid = Math.abs(createGid(ad));
   this.children = [];
   this.index = 0;
@@ -2142,114 +2306,107 @@ function AdSet(ad) {
 }
 
 AdSet.prototype.id = function (i) {
-
   return this.child(i).id;
 };
 
 AdSet.prototype.childIds = function () {
-
   const ids = [];
-
   for (let i = 0, j = this.children.length; i < j; i++) {
-
     this.children[i] && ids.push(this.children[i].id);
   }
-
   return ids;
 };
 
 AdSet.prototype.childIdxForId = function (id) {
-
   for (let i = 0, j = this.children.length; i < j; i++) {
-
-    if (this.children[i].id === id)
-      return i;
+    if (this.children[i].id === id) return i;
   }
-
   return -1;
 };
 
 AdSet.prototype.child = function (i) {
-
   return this.children[(typeof i === 'undefined') ? this.index : i];
 };
 
 AdSet.prototype.state = function (i) {
-
   const ad = this.child(i) || i;
-
   if (!ad) console.warn('invalid index!');
-
-  if (ad.dntAllowed) {
-    return 'dnt-allowed';
-  }
+  if (ad.dntAllowed) return 'dnt-allowed';
 
   // ad should not be 'failed' until 3 failed visits (gh #64)
   if (ad.visitedTs === 0 || (ad.attempts < 3 && ad.visitedTs < 0)) {
     return 'pending';
   }
-
   return ad.visitedTs < 0 ? 'failed' : 'visited';
 };
 
 AdSet.prototype.type = function () {
-
   return this.children[0].contentType; // same-for-all
 };
 
+AdSet.prototype.domain = function () {
+  return this.children[0].domain;
+}
+
+AdSet.prototype.pageTitle = function () {
+  return this.children[0].pageTitle;
+}
+
+AdSet.prototype.pageUrl = function () {
+  return this.children[0].pageUrl;
+}
+
+AdSet.prototype.targetHostname = function () {
+  return this.children[0].targetHostname;
+}
+
 AdSet.prototype.failedCount = function () {
-
   const containerObj = this;
+  return this.children.filter((d) => containerObj.state(d) === 'failed').length;
+};
 
-  return this.children.filter(function (d) {
-
-    return containerObj.state(d) === 'failed';
-
-  }).length;// === containerObj.children.length;
+AdSet.prototype.deadCount = function () {
+  const containerObj = this;
+  return this.children[0]?.dead;
 };
 
 AdSet.prototype.dntCount = function () {
-
   const containerObj = this;
-
-  return this.children.filter(function (d) {
-
-    return containerObj.state(d) === 'dnt-allowed';
-
-  }).length;// === containerObj.children.length;
+  return this.children.filter((d) => containerObj.state(d) === 'dnt-allowed').length;
 };
 
 AdSet.prototype.visitedCount = function () {
-
-  return this.children.filter(function (d) {
-
-    return d.visitedTs > 0;
-
-  }).length;
+  return this.children.filter((d) => d.visitedTs > 0).length;
 };
 
 AdSet.prototype.nextPending = function () {
-
   const ads = this.children.slice();
   ads.sort(byField('-foundTs'));
-
   for (let i = 0, j = ads.length; i < j; i++) {
-
     if (ads[i].visitedTs === 0) // pending
       return ads[i];
   }
-
   return null;
 };
 
 AdSet.prototype.count = function () {
-
   return this.children.length;
 };
 
-AdSet.prototype.add = function (ad) {
+AdSet.prototype.foundTs = function () {
+  return this.children[0].foundTs;
+}
 
+AdSet.prototype.add = function (ad) {
   ad && this.children.push(ad);
+};
+
+AdSet.prototype.width = function () {
+  return this.children[0].contentData.width;
+};
+
+AdSet.prototype.height = function () {
+  return this.children[0].contentData.height;
 };
 
 function createGid(ad) {
@@ -2265,7 +2422,7 @@ function createGid(ad) {
 }
 
 const adjustHeight = function () {
-  let notificationsHeight = $("#notifications").hasClass("hide") ? 0 : $("#notifications").height();
+  let notificationsHeight = $("#notifications#capture").hasClass("hide") ? 0 : $("#notifications").height();
   $("#stage").css('height', String($(window).height() - notificationsHeight) + "px");
 }
 
@@ -2301,15 +2458,20 @@ AdSet.prototype.groupState = function () {
   }
 
   const failed = this.failedCount();
-
   return failed ? 'failed' : 'pending';
 };
 
-messager.send('adnauseam', {
-  what: 'adsForVault'
-}).then(details => {
-  renderAds(details);
-})
+vAPI.messaging.send(
+  'adnauseam', {
+  what: 'getHideDeadAds'
+}).then(_hideDeadAds => {
+  hideDeadAds = _hideDeadAds;
+  messager.send('adnauseam', {
+    what: 'adsForVault'
+  }).then(details => {
+    renderAds(details);
+  })  
+});
 
 $('#export').on('click', exportToFile);
 $('#import').on('click', startImportFilePicker);

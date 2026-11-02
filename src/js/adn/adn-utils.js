@@ -1,7 +1,7 @@
 /*******************************************************************************
 
     AdNauseam - Fight back against advertising surveillance.
-    Copyright (C) 2014-2021 Daniel C. Howe
+    Copyright (C) 2014-2024 Daniel C. Howe
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,13 +24,29 @@
 'use strict';
 
 import { i18n$ } from '../i18n.js';
+import uDom from './uDom.js';
 
 /**************************** exports *********************************/
 
 // targets on these domains are never internal (may need to be regex)
-export const internalLinkDomainsDefault = ['google.com', 'asiaxpat.com', 'nytimes.com',
+export const internalLinkDomainsDefault = ['google.com', 'asiaxpat.com',
 'columbiagreenemedia.com', '163.com', 'sohu.com', 'zol.com.cn', 'baidu.com',
-'yahoo.com', 'facebook.com', 'youtube.com', 'flashback.org'
+'yahoo.com', 'facebook.com', 'flashback.org',
+"amazon.ae","amazon.ca","amazon.cn","amazon.co.jp","amazon.co.uk","amazon.com","amazon.com.au","amazon.com.be","amazon.com.br","amazon.com.mx","amazon.com.tr","amazon.de","amazon.eg","amazon.es","amazon.fr","amazon.in","amazon.it","amazon.nl","amazon.pl","amazon.sa","amazon.se","amazon.sg",
+];
+
+// Lists whose blocks are kept (red icon on the filter-lists page). Blocks from any
+// other list become adn-allows so the ads can be collected (purple icon).
+// Asset keys from assets.json, see activeBlockList() in core.js
+export const enabledBlockListsDefault = [
+  'adnauseam-filters', 'eff-dnt-whitelist',
+  'ublock-badware', 'ublock-unbreak',
+  'urlhaus-1', 'curben-phishing', // malware
+  'fanboy-social', 'adguard-social', 'fanboy-thirdparty_social', // social
+  'adguard-cookies', 'ublock-cookies-adguard', 'fanboy-cookiemonster', 'ublock-cookies-easylist', // cookie notices
+  'adguard-popup-overlays', 'adguard-mobile-app-banners', 'adguard-other-annoyances', 'adguard-widgets', // annoyances
+  'easylist-annoyances', 'easylist-chat', 'fanboy-ai-suggestions', 'easylist-newsletters', 'easylist-notifications',
+  'ublock-annoyances'
 ];
 
 export const makeCloneable = function (notes) {
@@ -107,14 +123,14 @@ export const rand = function (min, max) {
 };
 
 export const setCost = function (numVisited) {
-  var constPerClick = 0
+  var costPerClick = 0
   vAPI.messaging.send('dashboard', {what:'getCostPerClick'}).then(response => {
-    constPerClick = response
+    costPerClick = response
     const $west = uDom('#worth-estimate'), $cost = uDom('.cost');
   
     if (numVisited > 0) {
       $cost.removeClass('hidden');
-      $west.text('= $' + (numVisited * constPerClick).toFixed(2));
+      $west.text('= $' + (numVisited * costPerClick).toFixed(2));
     } else {
       $cost.addClass('hidden');
     }
@@ -150,7 +166,7 @@ export const type = function (obj) { // from Angus Croll
   return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
 };
 
-const getExportFileName = function () {
+export const getExportFileName = function () {
   return i18n$('adnExportedAdsFilename')
     .replace('{{datetime}}', new Date().toLocaleString())
     .replace(/[:/,]+/g, '.').replace(/ +/g, '');
@@ -283,6 +299,7 @@ export const exportToFile = function (action) {
 
 // loading while ads are being imported #1877
 export const toogleVaultLoading = function(show) {
+  console.log("toogleVaultLoading")
   var $container = $("#container")
   if (show) {
     $container.css('opacity', '0');
@@ -359,13 +376,15 @@ export const clearAds = function () {
   }
 };
 
-export const purgeDeadAds = function (deadAds) {
+export const purgeDeadAds = function (deadAds, callback) {
   const msg = i18n$('adnPurgeConfirm');
   const proceed = window.confirm(msg); // changed from vAPI.confirm merge1.14.12
   if (proceed) {
     vAPI.messaging.send('adnauseam', {
       what: 'purgeDeadAds',
       'deadAds': deadAds
+    }).then(data => {
+      callback(data);
     });
   }
 };
@@ -422,3 +441,71 @@ export const decodeEntities = (function () {
   }
   return decodeHTMLEntities;
 })();
+
+
+
+/********* advault capture feature  *********/
+
+export async function generateCaptureSvg (jsonData, currentZoom, $loaded, $total) {
+  // create hidden div to hold the SVG
+  const output = document.createElement('div');
+  output.style.display = 'none';
+  const svgContent = await generateSVG(jsonData, currentZoom, $loaded, $total);
+  output.innerHTML = svgContent;
+  // Make the SVG downloadable
+  const blob = new Blob([svgContent], { type: 'image/svg+xml' });  
+  const url = URL.createObjectURL(blob);
+  return url;
+}
+
+export async function fetchImageAsBase64(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'Anonymous'; // Handle CORS
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const base64 = canvas.toDataURL('image/png'); // Convert to PNG format
+      resolve(base64);
+    };
+    img.onerror = () => reject(new Error(`Failed to load image: ${url}`));
+    img.src = url;
+  });
+}
+
+export async function generateSVG(json, currentZoom, $loaded, $total) {
+  if (!json.ads || !Array.isArray(json.ads)) {
+    throw new Error('Invalid JSON structure. Expected an "ads" array.');
+  }
+
+  const svgHeader = `<svg xmlns="http://www.w3.org/2000/svg" width="${window.innerWidth}" height="${window.innerHeight}" viewBox="0 0 ${window.innerWidth} ${window.innerHeight}">\n`;
+  const svgFooter = `</svg>`;
+
+  console.log("Adn Capture: Total images", json.ads.length);
+  var imageCounter = 0;
+  $total.parent().show();
+  $total.text(json.ads.length);
+  // Fetch and encode all image URLs to Base64
+  const images = await Promise.all(
+    json.ads.map(async (ad) => {
+      let src = ad.src;
+      if (src.startsWith('http')) {
+        src = await fetchImageAsBase64(src);
+      }
+      //console.log("Parsed image", ad);
+      imageCounter++
+      console.log("Adn Capture: Image", imageCounter, "of", json.ads.length);
+      $loaded.text(imageCounter);
+      let x = ad.pos.x*currentZoom + window.innerWidth/2;
+      let y = ad.pos.y*currentZoom + window.innerHeight/2;
+      let w = ad.width*currentZoom;
+      let h = ad.height*currentZoom;
+      return `<image href="${src}" x="${x}" y="${y}" height="${h}" width="${w}" />`;
+    })
+  );
+
+  return `${svgHeader}${images.join('\n')}\n${svgFooter}`;
+}

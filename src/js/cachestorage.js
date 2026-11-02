@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2016-present The uBlock Origin authors
 
     This program is free software: you can redistribute it and/or modify
@@ -19,467 +19,705 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-/* global IDBDatabase, indexedDB */
-
-'use strict';
-
 /******************************************************************************/
 
-import lz4Codec from './lz4.js';
-import µb from './background.js';
+import * as s14e from './s14e-serializer.js';
+
+import { ubolog } from './console.js';
 import webext from './webext.js';
+import µb from './background.js';
 
 /******************************************************************************/
-
-// The code below has been originally manually imported from:
-// Commit: https://github.com/nikrolls/uBlock-Edge/commit/d1538ea9bea89d507219d3219592382eee306134
-// Commit date: 29 October 2016
-// Commit author: https://github.com/nikrolls
-// Commit message: "Implement cacheStorage using IndexedDB"
-
-// The original imported code has been subsequently modified as it was not
-// compatible with Firefox.
-// (a Promise thing, see https://github.com/dfahlander/Dexie.js/issues/317)
-// Furthermore, code to migrate from browser.storage.local to vAPI.storage
-// has been added, for seamless migration of cache-related entries into
-// indexedDB.
-
-// https://bugzilla.mozilla.org/show_bug.cgi?id=1371255
-//   Firefox-specific: we use indexedDB because browser.storage.local() has
-//   poor performance in Firefox.
-// https://github.com/uBlockOrigin/uBlock-issues/issues/328
-//   Use IndexedDB for Chromium as well, to take advantage of LZ4
-//   compression.
-// https://github.com/uBlockOrigin/uBlock-issues/issues/399
-//   Revert Chromium support of IndexedDB, use advanced setting to force
-//   IndexedDB.
-// https://github.com/uBlockOrigin/uBlock-issues/issues/409
-//   Allow forcing the use of webext storage on Firefox.
 
 const STORAGE_NAME = 'uBlock0CacheStorage';
+const extensionStorage = webext.storage.local;
+const pendingWrite = new Map();
 
-// Default to webext storage.
-const storageLocal = webext.storage.local;
-
-const cacheStorage = {
-    name: 'browser.storage.local',
-    get: storageLocal.get.bind(storageLocal),
-    set: storageLocal.set.bind(storageLocal),
-    remove: storageLocal.remove.bind(storageLocal),
-    clear: storageLocal.clear.bind(storageLocal),
-    // Not all platforms support getBytesInUse
-    getBytesInUse: storageLocal.getBytesInUse
-        ? storageLocal.getBytesInUse.bind(storageLocal)
-        : undefined,
-    select: function(selectedBackend) {
-        let actualBackend = selectedBackend;
-        if ( actualBackend === undefined || actualBackend === 'unset' ) {
-            actualBackend = vAPI.webextFlavor.soup.has('firefox')
-                ? 'indexedDB'
-                : 'browser.storage.local';
-        }
-        if ( actualBackend === 'indexedDB' ) {
-            return selectIDB().then(success => {
-                if ( success || selectedBackend === 'indexedDB' ) {
-                    clearWebext();
-                    return 'indexedDB';
-                }
-                clearIDB();
-                return 'browser.storage.local';
-            });
-        }
-        if ( actualBackend === 'browser.storage.local' ) {
-            clearIDB();
-        }
-        return Promise.resolve('browser.storage.local');
-        
-    },
-    error: undefined
+const keysFromGetArg = arg => {
+    if ( arg === null || arg === undefined ) { return []; }
+    const type = typeof arg;
+    if ( type === 'string' ) { return [ arg ]; }
+    if ( Array.isArray(arg) ) { return arg; }
+    if ( type !== 'object' ) { return; }
+    return Object.keys(arg);
 };
 
-// Reassign API entries to that of indexedDB-based ones
-const selectIDB = async function() {
-    let db;
+let fastCache = 'indexedDB';
+
+/*******************************************************************************
+ * 
+ * Extension storage
+ * 
+ * Always available.
+ * 
+ * */
+
+const cacheStorage = (( ) => {
+
+    const exGet = async (api, wanted, outbin) => {
+        ubolog('cacheStorage.get:', api.name || 'storage.local', wanted.join());
+        const missing = [];
+        for ( const key of wanted ) {
+            if ( pendingWrite.has(key) ) {
+                outbin[key] = pendingWrite.get(key);
+            } else {
+                missing.push(key);
+            }
+        }
+        if ( missing.length === 0 ) { return; }
+        return api.get(missing).then(inbin => {
+            inbin = inbin || {};
+            const found = Object.keys(inbin);
+            Object.assign(outbin, inbin);
+            if ( found.length === wanted.length ) { return; }
+            const missing = [];
+            for ( const key of wanted ) {
+                if ( Object.hasOwn(outbin, key) ) { continue; }
+                missing.push(key);
+            }
+            return missing;
+        });
+    };
+
+    const compress = async (bin, key, data) => {
+        const µbhs = µb.hiddenSettings;
+        const after = await s14e.serializeAsync(data, {
+            compress: µbhs.cacheStorageCompression,
+            compressThreshold: µbhs.cacheStorageCompressionThreshold,
+            multithreaded: µbhs.cacheStorageMultithread,
+        });
+        bin[key] = after;
+    };
+
+    const decompress = async (bin, key) => {
+        const data = bin[key];
+        if ( s14e.isSerialized(data) === false ) { return; }
+        const µbhs = µb.hiddenSettings;
+        const isLarge = data.length >= µbhs.cacheStorageCompressionThreshold;
+        bin[key] = await s14e.deserializeAsync(data, {
+            multithreaded: isLarge && µbhs.cacheStorageMultithread || 1,
+        });
+    };
+
+    const api = {
+        get(argbin) {
+            const outbin = {};
+            return exGet(
+                cacheAPIs[fastCache],
+                keysFromGetArg(argbin),
+                outbin
+            ).then(wanted => {
+                if ( wanted === undefined ) { return; }
+                return exGet(extensionStorage, wanted, outbin);
+            }).then(wanted => {
+                if ( wanted === undefined ) { return; }
+                if ( argbin instanceof Object === false ) { return; }
+                if ( Array.isArray(argbin) ) { return; }
+                for ( const key of wanted ) {
+                    if ( Object.hasOwn(argbin, key) === false ) { continue; }
+                    outbin[key] = argbin[key];
+                }
+            }).then(( ) => {
+                const promises = [];
+                for ( const key of Object.keys(outbin) ) {
+                    promises.push(decompress(outbin, key));
+                }
+                return Promise.all(promises).then(( ) => outbin);
+            }).catch(reason => {
+                ubolog(reason);
+            });
+        },
+
+        async keys(regex) {
+            const results = await Promise.all([
+                cacheAPIs[fastCache].keys(regex),
+                extensionStorage.get(null).catch(( ) => {}),
+            ]);
+            const keys = new Set(results[0]);
+            const bin = results[1] || {};
+            for ( const key of Object.keys(bin) ) {
+                if ( regex && regex.test(key) === false ) { continue; }
+                keys.add(key);
+            }
+            return keys;
+        },
+
+        async set(rawbin) {
+            const keys = Object.keys(rawbin);
+            if ( keys.length === 0 ) { return; }
+            ubolog('cacheStorage.set:', keys.join());
+            for ( const key of keys ) {
+                pendingWrite.set(key, rawbin[key]);
+            }
+            try {
+                const serializedbin = {};
+                const promises = [];
+                for ( const key of keys ) {
+                    promises.push(compress(serializedbin, key, rawbin[key]));
+                }
+                await Promise.all(promises);
+                await Promise.all([
+                    cacheAPIs[fastCache].set(rawbin, serializedbin),
+                    extensionStorage.set(serializedbin),
+                ]);
+            } catch(reason) {
+                ubolog(reason);
+            }
+            for ( const key of keys ) {
+                pendingWrite.delete(key);
+            }
+        },
+
+        remove(...args) {
+            cacheAPIs[fastCache].remove(...args);
+            return extensionStorage.remove(...args).catch(reason => {
+                ubolog(reason);
+            });
+        },
+
+        clear(...args) {
+            cacheAPIs[fastCache].clear(...args);
+            return extensionStorage.clear(...args).catch(reason => {
+                ubolog(reason);
+            });
+        },
+
+        select(api) {
+            if ( Object.hasOwn(cacheAPIs, api) === false ) { return fastCache; }
+            fastCache = api;
+            for ( const k of Object.keys(cacheAPIs) ) {
+                if ( k === api ) { continue; }
+                cacheAPIs[k]['clear']();
+            }
+            return fastCache;
+        },
+    };
+
+    // Not all platforms support getBytesInUse
+    if ( extensionStorage.getBytesInUse instanceof Function ) {
+        api.getBytesInUse = function(...args) {
+            return extensionStorage.getBytesInUse(...args).catch(reason => {
+                ubolog(reason);
+            });
+        };
+    }
+
+    return api;
+})();
+
+/*******************************************************************************
+ * 
+ * Cache API
+ * 
+ * Purpose is to mirror cache-related items from extension storage, as its
+ * read/write operations are faster. May not be available/populated in
+ * private/incognito mode.
+ * 
+ * */
+
+const cacheAPI = (( ) => {
+    const caches = globalThis.caches;
+    let cacheStoragePromise;
+
+    const getAPI = ( ) => {
+        if ( cacheStoragePromise !== undefined ) { return cacheStoragePromise; }
+        cacheStoragePromise = new Promise(resolve => {
+            if ( typeof caches !== 'object' || caches === null ) {
+                ubolog('CacheStorage API not available');
+                resolve(null);
+                return;
+            }
+            resolve(caches.open(STORAGE_NAME));
+        }).catch(reason => {
+            ubolog(reason);
+            return null;
+        });
+        return cacheStoragePromise;
+    };
+
+    const urlPrefix = 'https://ublock0.invalid/';
+
+    const keyToURL = key =>
+        `${urlPrefix}${encodeURIComponent(key)}`;
+
+    const urlToKey = url =>
+        decodeURIComponent(url.slice(urlPrefix.length));
+
+    // Cache API is subject to quota so we will use it only for what is key
+    // performance-wise
+    const shouldCache = bin => {
+        const out = {};
+        for ( const key of Object.keys(bin) ) {
+            if ( key.startsWith('cache/' ) ) {
+                if ( /^cache\/(compiled|selfie)\//.test(key) === false ) { continue; }
+            }
+            out[key] = bin[key];
+        }
+        if ( Object.keys(out).length !== 0 ) { return out; }
+    };
+
+    const getOne = async key => {
+        const cache = await getAPI();
+        if ( cache === null ) { return; }
+        return cache.match(keyToURL(key)).then(response => {
+            if ( response === undefined ) { return; }
+            return response.text();
+        }).then(text => {
+            if ( text === undefined ) { return; }
+            return { key, text };
+        }).catch(reason => {
+            ubolog(reason);
+        });
+    };
+
+    const getAll = async ( ) => {
+        const cache = await getAPI();
+        if ( cache === null ) { return; }
+        return cache.keys().then(requests => {
+            const promises = [];
+            for ( const request of requests ) {
+                promises.push(getOne(urlToKey(request.url)));
+            }
+            return Promise.all(promises);
+        }).then(responses => {
+            const bin = {};
+            for ( const response of responses ) {
+                if ( response === undefined ) { continue; }
+                bin[response.key] = response.text;
+            }
+            return bin;
+        }).catch(reason => {
+            ubolog(reason);
+        });
+    };
+
+    const setOne = async (key, text) => {
+        if ( text === undefined ) { return removeOne(key); }
+        const blob = new Blob([ text ], { type: 'text/plain;charset=utf-8'});
+        const cache = await getAPI();
+        if ( cache === null ) { return; }
+        return cache
+            .put(keyToURL(key), new Response(blob))
+            .catch(reason => {
+                ubolog(reason);
+            });
+    };
+
+    const removeOne = async key => {
+        const cache = await getAPI();
+        if ( cache === null ) { return; }
+        return cache.delete(keyToURL(key)).catch(reason => {
+            ubolog(reason);
+        });
+    };
+
+    return {
+        name: 'cacheAPI',
+        async get(arg) {
+            const keys = keysFromGetArg(arg);
+            if ( keys === undefined ) { return; }
+            if ( keys.length === 0 ) {
+                return getAll();
+            }
+            const bin = {};
+            const toFetch = keys.slice();
+            const hasDefault = typeof arg === 'object' && Array.isArray(arg) === false;
+            for ( let i = 0; i < toFetch.length; i++ ) {
+                const key = toFetch[i];
+                if ( hasDefault && arg[key] !== undefined ) {
+                    bin[key] = arg[key];
+                }
+                toFetch[i] = getOne(key);
+            }
+            const responses = await Promise.all(toFetch);
+            for ( const response of responses ) {
+                if ( response === undefined ) { continue; }
+                const { key, text } = response;
+                if ( typeof key !== 'string' ) { continue; }
+                if ( typeof text !== 'string' ) { continue; }
+                bin[key] = text;
+            }
+            if ( Object.keys(bin).length === 0 ) { return; }
+            return bin;
+        },
+
+        async keys(regex) {
+            const cache = await getAPI();
+            if ( cache === null ) { return []; }
+            return cache.keys().then(requests =>
+                requests.map(r => urlToKey(r.url))
+                        .filter(k => regex === undefined || regex.test(k))
+            ).catch(( ) => []);
+        },
+
+        async set(rawbin, serializedbin) {
+            const bin = shouldCache(serializedbin);
+            if ( bin === undefined ) { return; }
+            const keys = Object.keys(bin);
+            const promises = [];
+            for ( const key of keys ) {
+                promises.push(setOne(key, bin[key]));
+            }
+            return Promise.all(promises);
+        },
+
+        remove(keys) {
+            const toRemove = [];
+            if ( typeof keys === 'string' ) {
+                toRemove.push(removeOne(keys));
+            } else if ( Array.isArray(keys) ) {
+                for ( const key of keys ) {
+                    toRemove.push(removeOne(key));
+                }
+            }
+            return Promise.all(toRemove);
+        },
+
+        async clear() {
+            if ( typeof caches !== 'object' || caches === null ) { return; }
+            return globalThis.caches.delete(STORAGE_NAME).catch(reason => {
+                ubolog(reason);
+            });
+        },
+        
+        shutdown() {
+            cacheStoragePromise = undefined;
+            return this.clear();
+        },
+    };
+})();
+
+/*******************************************************************************
+ * 
+ * In-memory storage
+ * 
+ * */
+
+const memoryStorage = (( ) => {
+
+    const sessionStorage = vAPI.sessionStorage;
+
+    // This should help speed up loading from suspended state in Firefox for
+    // Android.
+    // 20240228 Observation: Slows down loading from suspended state in
+    // Firefox desktop. Could be different in Firefox for Android.
+    const shouldCache = bin => {
+        const out = {};
+        for ( const key of Object.keys(bin) ) {
+            if ( key.startsWith('cache/compiled/') ) { continue; }
+            out[key] = bin[key];
+        }
+        if ( Object.keys(out).length !== 0 ) { return out; }
+    };
+
+    return {
+        name: 'memoryStorage',
+        get(...args) {
+            return sessionStorage.get(...args).then(bin => {
+                return bin;
+            }).catch(reason => {
+                ubolog(reason);
+            });
+        },
+
+        async keys(regex) {
+            const bin = await this.get(null);
+            const keys = [];
+            for ( const key of Object.keys(bin || {}) ) {
+                if ( regex && regex.test(key) === false ) { continue; }
+                keys.push(key);
+            }
+            return keys;
+        },
+
+        async set(rawbin, serializedbin) {
+            const bin = shouldCache(serializedbin);
+            if ( bin === undefined ) { return; }
+            return sessionStorage.set(bin).catch(reason => {
+                ubolog(reason);
+            });
+        },
+
+        remove(...args) {
+            return sessionStorage.remove(...args).catch(reason => {
+                ubolog(reason);
+            });
+        },
+
+        clear(...args) {
+            return sessionStorage.clear(...args).catch(reason => {
+                ubolog(reason);
+            });
+        },
+
+        shutdown() {
+            return this.clear();
+        },
+    };
+})();
+
+/*******************************************************************************
+ * 
+ * IndexedDB
+ * 
+ * Deprecated, exists only for the purpose of migrating from older versions.
+ * 
+ * */
+
+const idbStorage = (( ) => {
     let dbPromise;
-    let dbTimer;
-
-    const noopfn = function () {
-    };
-
-    const disconnect = function() {
-        if ( dbTimer !== undefined ) {
-            clearTimeout(dbTimer);
-            dbTimer = undefined;
-        }
-        if ( db instanceof IDBDatabase ) {
-            db.close();
-            db = undefined;
-        }
-    };
-
-    const keepAlive = function() {
-        if ( dbTimer !== undefined ) {
-            clearTimeout(dbTimer);
-        }
-        dbTimer = vAPI.setTimeout(
-            ( ) => {
-                dbTimer = undefined;
-                disconnect();
-            },
-            Math.max(
-                µb.hiddenSettings.autoUpdateAssetFetchPeriod * 2 * 1000,
-                180000
-            )
-        );
-    };
-
-    // https://github.com/gorhill/uBlock/issues/3156
-    //   I have observed that no event was fired in Tor Browser 7.0.7 +
-    //   medium security level after the request to open the database was
-    //   created. When this occurs, I have also observed that the `error`
-    //   property was already set, so this means uBO can detect here whether
-    //   the database can be opened successfully. A try-catch block is
-    //   necessary when reading the `error` property because we are not
-    //   allowed to read this property outside of event handlers in newer
-    //   implementation of IDBRequest (my understanding).
 
     const getDb = function() {
-        keepAlive();
-        if ( db !== undefined ) {
-            return Promise.resolve(db);
-        }
-        if ( dbPromise !== undefined ) {
-            return dbPromise;
-        }
+        if ( dbPromise !== undefined ) { return dbPromise; }
         dbPromise = new Promise(resolve => {
-            let req;
-            try {
-                req = indexedDB.open(STORAGE_NAME, 1);
-                if ( req.error ) {
-                    console.log(req.error);
-                    req = undefined;
-                }
-            } catch(ex) {
-            }
-            if ( req === undefined ) {
-                db = null;
-                dbPromise = undefined;
-                return resolve(null);
-            }
-            req.onupgradeneeded = function(ev) {
+            const req = indexedDB.open(STORAGE_NAME, 1);
+            req.onupgradeneeded = ev => {
                 if ( ev.oldVersion === 1 ) { return; }
                 try {
                     const db = ev.target.result;
                     db.createObjectStore(STORAGE_NAME, { keyPath: 'key' });
-                } catch(ex) {
+                } catch {
                     req.onerror();
                 }
             };
-            req.onsuccess = function(ev) {
+            req.onsuccess = ev => {
                 if ( resolve === undefined ) { return; }
-                req = undefined;
-                db = ev.target.result;
-                dbPromise = undefined;
-                resolve(db);
+                resolve(ev.target.result || null);
                 resolve = undefined;
             };
-            req.onerror = req.onblocked = function() {
+            req.onerror = req.onblocked = ( ) => {
                 if ( resolve === undefined ) { return; }
-                req = undefined;
-                console.log(this.error);
-                db = null;
-                dbPromise = undefined;
+                ubolog(req.error);
                 resolve(null);
                 resolve = undefined;
             };
-            setTimeout(( ) => {
+            vAPI.defer.once(10000).then(( ) => {
                 if ( resolve === undefined ) { return; }
-                db = null;
-                dbPromise = undefined;
                 resolve(null);
                 resolve = undefined;
-            }, 5000);
+            });
+        }).catch(reason => {
+            ubolog(`idbStorage() / getDb() failed: ${reason}`);
+            return null;
         });
         return dbPromise;
     };
 
-    const fromBlob = function(data) {
-        if ( data instanceof Blob === false ) {
-            return Promise.resolve(data);
-        }
+    // Cache API is subject to quota so we will use it only for what is key
+    // performance-wise
+    const shouldCache = key => {
+        if ( key.startsWith('cache/') === false ) { return true; }
+        return /^cache\/(compiled|selfie)\//.test(key);
+    };
+
+    const getAllEntries = async function() {
+        const db = await getDb();
+        if ( db === null ) { return []; }
         return new Promise(resolve => {
-            const blobReader = new FileReader();
-            blobReader.onloadend = ev => {
-                resolve(new Uint8Array(ev.target.result));
-            };
-            blobReader.readAsArrayBuffer(data);
-        });
-    };
-
-    const toBlob = function(data) {
-        const value = data instanceof Uint8Array
-            ? new Blob([ data ])
-            : data;
-        return Promise.resolve(value);
-    };
-
-    const compress = function(store, key, data) {
-        return lz4Codec.encode(data, toBlob).then(value => {
-            store.push({ key, value });
-        });
-    };
-
-    const decompress = function(store, key, data) {
-        return lz4Codec.decode(data, fromBlob).then(data => {
-            store[key] = data;
-        });
-    };
-
-    const getFromDb = async function(keys, keyvalStore, callback) {
-        if ( typeof callback !== 'function' ) { return; }
-        if ( keys.length === 0 ) { return callback(keyvalStore); }
-        const promises = [];
-        const gotOne = function() {
-            if ( typeof this.result !== 'object' ) { return; }
-            const { key, value } = this.result;
-            keyvalStore[key] = value;
-            if ( value instanceof Blob === false ) { return; }
-            promises.push(decompress(keyvalStore, key, value));
-        };
-        try {
-            const db = await getDb();
-            if ( !db ) { return callback(); }
+            const entries = [];
             const transaction = db.transaction(STORAGE_NAME, 'readonly');
             transaction.oncomplete =
             transaction.onerror =
             transaction.onabort = ( ) => {
-                Promise.all(promises).then(( ) => {
-                    callback(keyvalStore);
-                });
+                resolve(Promise.all(entries));
+            };
+            const table = transaction.objectStore(STORAGE_NAME);
+            const req = table.openCursor();
+            req.onsuccess = ev => {
+                const cursor = ev.target && ev.target.result;
+                if ( !cursor ) { return; }
+                const { key, value } = cursor.value;
+                if ( value instanceof Blob === false ) {
+                    entries.push({ key, value });
+                }
+                cursor.continue();
+            };
+        }).catch(reason => {
+            ubolog(`idbStorage() / getAllEntries() failed: ${reason}`);
+            return [];
+        });
+    };
+
+    const getAllKeys = async function(regex) {
+        const db = await getDb();
+        if ( db === null ) { return []; }
+        return new Promise(resolve => {
+            const keys = [];
+            const transaction = db.transaction(STORAGE_NAME, 'readonly');
+            transaction.oncomplete =
+            transaction.onerror =
+            transaction.onabort = ( ) => {
+                resolve(keys);
+            };
+            const table = transaction.objectStore(STORAGE_NAME);
+            const req = table.openCursor();
+            req.onsuccess = ev => {
+                const cursor = ev.target && ev.target.result;
+                if ( !cursor ) { return; }
+                if ( regex && regex.test(cursor.key) === false ) { return; }
+                keys.push(cursor.key);
+                cursor.continue();
+            };
+        }).catch(reason => {
+            ubolog(`idbStorage() / getAllKeys() failed: ${reason}`);
+            return [];
+        });
+    };
+
+    const getEntries = async function(keys) {
+        const db = await getDb();
+        if ( db === null ) { return []; }
+        return new Promise(resolve => {
+            const entries = [];
+            const gotOne = ev => {
+                const { result } = ev.target;
+                if ( typeof result !== 'object' ) { return; }
+                if ( result === null ) { return; }
+                const { key, value } = result;
+                if ( value instanceof Blob ) { return; }
+                entries.push({ key, value });
+            };
+            const transaction = db.transaction(STORAGE_NAME, 'readonly');
+            transaction.oncomplete =
+            transaction.onerror =
+            transaction.onabort = ( ) => {
+                resolve(Promise.all(entries));
             };
             const table = transaction.objectStore(STORAGE_NAME);
             for ( const key of keys ) {
                 const req = table.get(key);
                 req.onsuccess = gotOne;
-                req.onerror = noopfn;
+                req.onerror = ( ) => { };
             }
-        }
-        catch(reason) {
-            console.info(`cacheStorage.getFromDb() failed: ${reason}`);
-            callback();
-        }
-    };
-
-    const visitAllFromDb = async function(visitFn) {
-        const db = await getDb();
-        if ( !db ) { return visitFn(); }
-        const transaction = db.transaction(STORAGE_NAME, 'readonly');
-        transaction.oncomplete =
-        transaction.onerror =
-        transaction.onabort = ( ) => visitFn();
-        const table = transaction.objectStore(STORAGE_NAME);
-        const req = table.openCursor();
-        req.onsuccess = function(ev) {
-            let cursor = ev.target && ev.target.result;
-            if ( !cursor ) { return; }
-            let entry = cursor.value;
-            visitFn(entry);
-            cursor.continue();
-        };
-    };
-
-    const getAllFromDb = function(callback) {
-        if ( typeof callback !== 'function' ) { return; }
-        const promises = [];
-        const keyvalStore = {};
-        visitAllFromDb(entry => {
-            if ( entry === undefined ) {
-                Promise.all(promises).then(( ) => {
-                    callback(keyvalStore);
-                });
-                return;
-            }
-            const { key, value } = entry;
-            keyvalStore[key] = value;
-            if ( entry.value instanceof Blob === false ) { return; }
-            promises.push(decompress(keyvalStore, key, value));
         }).catch(reason => {
-            console.info(`cacheStorage.getAllFromDb() failed: ${reason}`);
-            callback();
+            ubolog(`idbStorage() / getEntries() failed: ${reason}`);
+            return [];
         });
     };
 
-    // https://github.com/uBlockOrigin/uBlock-issues/issues/141
-    //   Mind that IDBDatabase.transaction() and IDBObjectStore.put()
-    //   can throw:
-    //   https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/transaction
-    //   https://developer.mozilla.org/en-US/docs/Web/API/IDBObjectStore/put
-
-    const putToDb = async function(keyvalStore, callback) {
-        if ( typeof callback !== 'function' ) {
-            callback = noopfn;
+    const getAll = async ( ) => {
+        const entries = await getAllEntries();
+        const outbin = {};
+        for ( const { key, value } of entries ) {
+            outbin[key] = value;
         }
-        const keys = Object.keys(keyvalStore);
-        if ( keys.length === 0 ) { return callback(); }
-        const promises = [ getDb() ];
-        const entries = [];
-        const dontCompress =
-            µb.hiddenSettings.cacheStorageCompression !== true;
-        for ( const key of keys ) {
-            const value = keyvalStore[key];
-            const isString = typeof value === 'string';
-            if ( isString === false || dontCompress ) {
-                entries.push({ key, value });
-                continue;
-            }
-            promises.push(compress(entries, key, value));
-        }
-        const finish = ( ) => {
-            if ( callback === undefined ) { return; }
-            let cb = callback;
-            callback = undefined;
-            cb();
-        };
-        try {
-            const results = await Promise.all(promises);
-            const db = results[0];
-            if ( !db ) { return callback(); }
-            const transaction = db.transaction(
-                STORAGE_NAME,
-                'readwrite'
-            );
-            transaction.oncomplete =
-            transaction.onerror =
-            transaction.onabort = finish;
-            const table = transaction.objectStore(STORAGE_NAME);
-            for ( const entry of entries ) {
-                table.put(entry);
-            }
-        } catch (ex) {
-            finish();
-        }
+        return outbin;
     };
 
-    const deleteFromDb = async function(input, callback) {
-        if ( typeof callback !== 'function' ) {
-            callback = noopfn;
-        }
-        const keys = Array.isArray(input) ? input.slice() : [ input ];
-        if ( keys.length === 0 ) { return callback(); }
-        const finish = ( ) => {
-            if ( callback === undefined ) { return; }
-            let cb = callback;
-            callback = undefined;
-            cb();
-        };
-        try {
-            const db = await getDb();
-            if ( !db ) { return callback(); }
-            const transaction = db.transaction(STORAGE_NAME, 'readwrite');
-            transaction.oncomplete =
-            transaction.onerror =
-            transaction.onabort = finish;
-            const table = transaction.objectStore(STORAGE_NAME);
+    const setEntries = async inbin => {
+        const keys = Object.keys(inbin);
+        if ( keys.length === 0 ) { return; }
+        const db = await getDb();
+        if ( db === null ) { return; }
+        return new Promise(resolve => {
+            const entries = [];
             for ( const key of keys ) {
-                table.delete(key);
+                entries.push({ key, value: inbin[key] });
             }
-        } catch (ex) {
-            finish();
-        }
-    };
-
-    const clearDb = async function(callback) {
-        if ( typeof callback !== 'function' ) {
-            callback = noopfn;
-        }
-        try {
-            const db = await getDb();
-            if ( !db ) { return callback(); }
             const transaction = db.transaction(STORAGE_NAME, 'readwrite');
             transaction.oncomplete =
             transaction.onerror =
             transaction.onabort = ( ) => {
-                callback();
+                resolve();
             };
-            transaction.objectStore(STORAGE_NAME).clear();
-        }
-        catch(reason) {
-            console.info(`cacheStorage.clearDb() failed: ${reason}`);
-            callback();
-        }
-    };
-
-    await getDb();
-    if ( !db ) { return false; }
-
-    cacheStorage.name = 'indexedDB';
-    cacheStorage.get = function get(keys) {
-        return new Promise(resolve => {
-            if ( keys === null ) {
-                return getAllFromDb(bin => resolve(bin));
+            const table = transaction.objectStore(STORAGE_NAME);
+            for ( const entry of entries ) {
+                table.put(entry);
             }
-            let toRead, output = {};
-            if ( typeof keys === 'string' ) {
-                toRead = [ keys ];
-            } else if ( Array.isArray(keys) ) {
-                toRead = keys;
-            } else /* if ( typeof keys === 'object' ) */ {
-                toRead = Object.keys(keys);
-                output = keys;
+        }).catch(reason => {
+            ubolog(`idbStorage() / setEntries() failed: ${reason}`);
+        });
+    };
+
+    const deleteEntries = async arg => {
+        const keys = Array.isArray(arg) ? arg.slice() : [ arg ];
+        if ( keys.length === 0 ) { return; }
+        const db = await getDb();
+        if ( db === null ) { return; }
+        return new Promise(resolve => {
+            const transaction = db.transaction(STORAGE_NAME, 'readwrite');
+            transaction.oncomplete =
+            transaction.onerror =
+            transaction.onabort = ( ) => {
+                resolve();
+            };
+            const table = transaction.objectStore(STORAGE_NAME);
+            for ( const key of keys ) {
+                table.delete(key);
             }
-            getFromDb(toRead, output, bin => resolve(bin));
+        }).catch(reason => {
+            ubolog(`idbStorage() / deleteEntries() failed: ${reason}`);
         });
     };
-    cacheStorage.set = function set(keys) {
-        return new Promise(resolve => {
-            putToDb(keys, details => resolve(details));
-        });
-    };
-    cacheStorage.remove = function remove(keys) {
-        return new Promise(resolve => {
-            deleteFromDb(keys, ( ) => resolve());
-        });
-    };
-    cacheStorage.clear = function clear() {
-        return new Promise(resolve => {
-            clearDb(( ) => resolve());
-        });
-    };
-    cacheStorage.getBytesInUse = function getBytesInUse() {
-        return Promise.resolve(0);
-    };
-    return true;
-};
 
-// https://github.com/uBlockOrigin/uBlock-issues/issues/328
-//   Delete cache-related entries from webext storage.
-const clearWebext = async function() {
-    const bin = await webext.storage.local.get('assetCacheRegistry');
-    if (
-        bin instanceof Object === false ||
-        bin.assetCacheRegistry instanceof Object === false
-    ) {
-        return;
-    }
-    const toRemove = [
-        'assetCacheRegistry',
-        'assetSourceRegistry',
-        'resourcesSelfie',
-        'selfie'
-    ];
-    for ( const key in bin.assetCacheRegistry ) {
-        if ( bin.assetCacheRegistry.hasOwnProperty(key) ) {
-            toRemove.push('cache/' + key);
-        }
-    }
-    webext.storage.local.remove(toRemove);
-};
+    return {
+        name: 'idbStorage',
+        async get(argbin) {
+            const keys = keysFromGetArg(argbin);
+            if ( keys === undefined ) { return; }
+            if ( keys.length === 0 ) { return getAll(); }
+            const entries = await getEntries(keys);
+            const outbin = {};
+            const toRemove = [];
+            for ( const { key, value } of entries ) {
+                if ( shouldCache(key) === false ) {
+                    toRemove.push(key);
+                    continue;
+                }
+                outbin[key] = value;
+            }
+            if ( argbin instanceof Object && Array.isArray(argbin) === false ) {
+                for ( const key of keys ) {
+                    if ( Object.hasOwn(outbin, key) ) { continue; }
+                    outbin[key] = argbin[key];
+                }
+            }
+            if ( toRemove.length !== 0 ) {
+                deleteEntries(toRemove);
+            }
+            return outbin;
+        },
 
-const clearIDB = function() {
-    try {
-        indexedDB.deleteDatabase(STORAGE_NAME);
-    } catch(ex) {
-    }
+        async set(rawbin) {
+            const bin = {};
+            for ( const key of Object.keys(rawbin) ) {
+                if ( shouldCache(key) === false ) { continue; }
+                bin[key] = rawbin[key];
+            }
+            return setEntries(bin);
+        },
+
+        keys(...args) {
+            return getAllKeys(...args);
+        },
+
+        remove(...args) {
+            return deleteEntries(...args);
+        },
+
+        clear() {
+            return getDb().then(db => {
+                if ( db === null ) { return; }
+                db.close();
+                indexedDB.deleteDatabase(STORAGE_NAME);
+            }).catch(reason => {
+                ubolog(`idbStorage.clear() failed: ${reason}`);
+            });
+        },
+
+        async shutdown() {
+            await this.clear();
+            dbPromise = undefined;
+        },
+    };
+})();
+
+/******************************************************************************/
+
+const cacheAPIs = {
+    'indexedDB': idbStorage,
+    'cacheAPI': cacheAPI,
+    'browser.storage.session': memoryStorage,
 };
 
 /******************************************************************************/

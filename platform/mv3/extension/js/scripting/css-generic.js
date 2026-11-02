@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    AdNauseam Lite - a comprehensive, MV3-compliant content blocker
     Copyright (C) 2014-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,26 +19,29 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-/* jshint esversion:11 */
-
-'use strict';
-
 /******************************************************************************/
 
 // Important!
 // Isolate from global scope
 (function uBOL_cssGeneric() {
 
-const genericSelectorMap = self.genericSelectorMap || new Map();
-if ( genericSelectorMap.size === 0 ) { return; }
+const genericSelectorMaps = self.genericSelectorMaps ?? [];
+self.genericSelectorMaps = undefined;
 
-self.genericSelectorMap = undefined;
+const genericDetails = self.genericDetails ?? [];
+self.genericDetails = undefined;
+
+if ( genericDetails.length === 0 ) { return; }
+if ( document.documentElement === null ) { return; }
 
 /******************************************************************************/
 
 const maxSurveyTimeSlice = 4;
 const maxSurveyNodeSlice = 64;
-const styleSheetSelectors = [];
+const seenHashes = new Set();
+const pendingHashes = new Set();
+const pendingSelectors = [];
+const adnStyleSheetSelectors = []; // adn: selectors waiting for the next frame
 const stopAllRatio = 0.95; // To be investigated
 
 let surveyCount = 0;
@@ -47,50 +50,6 @@ let styleSheetTimer;
 let processTimer;
 let domChangeTimer;
 let lastDomChange = Date.now();
-
-/******************************************************************************/
-
-// https://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
-const hashFromStr = (type, s) => {
-    const len = s.length;
-    const step = len + 7 >>> 3;
-	let hash = type;
-	for ( let i = 0; i < len; i += step ) {
-		hash = (hash << 5) - hash + s.charCodeAt(i) | 0;
-	}
-	return hash & 0x00FFFFFF;
-};
-
-/******************************************************************************/
-
-// Extract all classes/ids: these will be passed to the cosmetic
-// filtering engine, and in return we will obtain only the relevant
-// CSS selectors.
-
-// https://github.com/gorhill/uBlock/issues/672
-// http://www.w3.org/TR/2014/REC-html5-20141028/infrastructure.html#space-separated-tokens
-// http://jsperf.com/enumerate-classes/6
-
-const uBOL_idFromNode = (node, out) => {
-    const raw = node.id;
-    if ( typeof raw !== 'string' || raw.length === 0 ) { return; }
-    out.push(hashFromStr(0x23 /* '#' */, raw.trim()));
-};
-
-// https://github.com/uBlockOrigin/uBlock-issues/discussions/2076
-//   Performance: avoid using Element.classList
-const uBOL_classesFromNode = (node, out) => {
-    const s = node.getAttribute('class');
-    if ( typeof s !== 'string' ) { return; }
-    const len = s.length;
-    for ( let beg = 0, end = 0; beg < len; beg += 1 ) {
-        end = s.indexOf(' ', beg);
-        if ( end === beg ) { continue; }
-        if ( end === -1 ) { end = len; }
-        out.push(hashFromStr(0x2E /* '.' */, s.slice(beg, end)));
-        beg = end;
-    }
-};
 
 /******************************************************************************/
 
@@ -103,9 +62,7 @@ const pendingNodes = {
     next(out) {
         for ( const added of this.addedNodes ) {
             if ( this.nodeSet.has(added) ) { continue; }
-            if ( added.nodeType === 1 ) {
-                this.nodeSet.add(added);
-            }
+            this.nodeSet.add(added);
             if ( added.firstElementChild === null ) { continue; }
             for ( const descendant of added.querySelectorAll('[id],[class]') ) {
                 this.nodeSet.add(descendant);
@@ -125,56 +82,142 @@ const pendingNodes = {
 
 /******************************************************************************/
 
+// http://www.cse.yorku.ca/~oz/hash.html#djb2
+//   Must mirror dnrRulesetFromRawLists's version
+
+const hashFromStr = (type, s) => {
+    const len = s.length;
+    const step = len + 7 >>> 3;
+    let hash = (type << 5) + type ^ len;
+    for ( let i = 0; i < len; i += step ) {
+        hash = (hash << 5) + hash ^ s.charCodeAt(i);
+    }
+    return hash & 0xFFFF;
+};
+
+/******************************************************************************/
+
+// Extract all classes/ids: these will be passed to the cosmetic
+// filtering engine, and in return we will obtain only the relevant
+// CSS selectors.
+
+// https://github.com/gorhill/uBlock/issues/672
+// http://www.w3.org/TR/2014/REC-html5-20141028/infrastructure.html#space-separated-tokens
+// http://jsperf.com/enumerate-classes/6
+
+const uBOL_idFromNode = node => {
+    const raw = node.id;
+    if ( typeof raw !== 'string' || raw.length === 0 ) { return; }
+    const hash = hashFromStr(0x23 /* '#' */, raw.trim());
+    if ( seenHashes.has(hash) ) { return; }
+    seenHashes.add(hash);
+    pendingHashes.add(hash);
+};
+
+// https://github.com/uBlockOrigin/uBlock-issues/discussions/2076
+//   Performance: avoid using Element.classList
+const uBOL_classesFromNode = node => {
+    const s = node.getAttribute('class');
+    if ( typeof s !== 'string' ) { return; }
+    const len = s.length;
+    for ( let beg = 0, end = 0; beg < len; beg += 1 ) {
+        end = s.indexOf(' ', beg);
+        if ( end === beg ) { continue; }
+        if ( end === -1 ) { end = len; }
+        const token = s.slice(beg, end).trimEnd();
+        beg = end;
+        if ( token.length === 0 ) { continue; }
+        const hash = hashFromStr(0x2E /* '.' */, token);
+        if ( seenHashes.has(hash) ) { continue; }
+        seenHashes.add(hash);
+        pendingHashes.add(hash);
+    }
+};
+
+/******************************************************************************/
+
+const processPendingHashes = ( ) => {
+    for ( const hash of pendingHashes ) {
+        for ( const selectorMap of genericSelectorMaps ) {
+            const selectors = selectorMap.get(hash);
+            if ( selectors === undefined ) { continue; }
+            selectorMap.delete(hash);
+            pendingSelectors.push(selectors);
+        }
+    }
+};
+
+/******************************************************************************/
+
+const exceptPendingSelectors = ( ) => {
+    if ( exceptionSet.size === 0 ) { return pendingSelectors.join(',\n'); }
+    const selectorSet = new Set(pendingSelectors.map(a => a.split(',\n')).flat());
+    return Array.from(selectorSet.difference(exceptionSet)).join(',\n');
+};
+
+/******************************************************************************/
+
 const uBOL_processNodes = ( ) => {
     const t0 = Date.now();
-    const hashes = [];
     const nodes = [];
     const deadline = t0 + maxSurveyTimeSlice;
     for (;;) {
         pendingNodes.next(nodes);
         if ( nodes.length === 0 ) { break; }
         for ( const node of nodes ) {
-            uBOL_idFromNode(node, hashes);
-            uBOL_classesFromNode(node, hashes);
+            uBOL_idFromNode(node);
+            uBOL_classesFromNode(node);
         }
         nodes.length = 0;
         if ( performance.now() >= deadline ) { break; }
     }
-    for ( const hash of hashes ) {
-        const selectorList = genericSelectorMap.get(hash);
-        if ( selectorList === undefined ) { continue; }
-        styleSheetSelectors.push(selectorList);
-        genericSelectorMap.delete(hash);
-    }
     surveyCount += 1;
-    if ( styleSheetSelectors.length === 0 ) {
+    processPendingHashes();
+    const styleSheetSelectors = exceptPendingSelectors();
+    pendingHashes.clear();
+    pendingSelectors.length = 0;
+    if ( styleSheetSelectors === '' ) {
         surveyMissCount += 1;
-        if (
-            surveyCount >= 100 &&
-            (surveyMissCount / surveyCount) >= stopAllRatio
-        ) {
-            stopAll(`too many misses in surveyor (${surveyMissCount}/${surveyCount})`);
+        if ( surveyCount >= 64 ) {
+            if ( (surveyMissCount / surveyCount) >= stopAllRatio ) {
+                stopAll(`too many misses in surveyor (${surveyMissCount}/${surveyCount})`);
+            }
         }
         return;
     }
+    const adnSet = (self.adnAdSelectors ||= new Set()); // ADN: expose ad selectors to parser
+    for ( const s of styleSheetSelectors.split(',\n') ) { adnSet.add(s); } // ADN
+    // adn: these selectors are already marked as seen, so they must be kept
+    // when a frame is still pending, or the elements are never hidden
+    adnStyleSheetSelectors.push(styleSheetSelectors); // adn
     if ( styleSheetTimer !== undefined ) { return; }
+    surveyMissCount = 0;
     styleSheetTimer = self.requestAnimationFrame(( ) => {
         styleSheetTimer = undefined;
-        uBOL_injectStyleSheet();
+        const selectors = adnStyleSheetSelectors.splice(0).join(',\n'); // adn
+        self.cssAPI.insert(`${selectors}{display:none!important;}`); // adn
     });
 };
 
 /******************************************************************************/
 
 const uBOL_processChanges = mutations => {
-    for ( let i = 0; i < mutations.length; i++ ) {
-        const mutation = mutations[i];
-        for ( const added of mutation.addedNodes ) {
-            if ( added.nodeType !== 1 ) { continue; }
-            pendingNodes.add(added);
+    for ( const mutation of mutations ) {
+        if ( mutation.type === 'childList' ) {
+            for ( const added of mutation.addedNodes ) {
+                if ( added.nodeType !== 1 ) { continue; }
+                if ( added.parentElement === null ) { continue; }
+                pendingNodes.add(added);
+            }
+        } else if ( mutation.attributeName === 'class' ) {
+            uBOL_classesFromNode(mutation.target);
+        } else {
+            uBOL_idFromNode(mutation.target);
         }
     }
-    if ( pendingNodes.hasNodes() === false ) { return; }
+    if ( pendingNodes.hasNodes() === false ) {
+        if ( pendingHashes.size === 0 ) { return; }
+    }
     lastDomChange = Date.now();
     if ( processTimer !== undefined ) { return; }
     processTimer = self.setTimeout(( ) => {
@@ -185,26 +228,66 @@ const uBOL_processChanges = mutations => {
 
 /******************************************************************************/
 
-const uBOL_injectStyleSheet = ( ) => {
-    try {
-        const sheet = new CSSStyleSheet();
-        sheet.replace(`@layer{${styleSheetSelectors.join(',')}{display:none!important;}}`);
-        document.adoptedStyleSheets = [
-            ...document.adoptedStyleSheets,
-            sheet
-        ];
-    } catch(ex) {
+const stopAll = ( ) => {
+    if ( domChangeTimer !== undefined ) {
+        self.clearTimeout(domChangeTimer);
+        domChangeTimer = undefined;
     }
-    styleSheetSelectors.length = 0;
+    if ( domMutationObserver ) {
+        domMutationObserver.disconnect();
+        domMutationObserver.takeRecords();
+        domMutationObserver = undefined;
+    }
+    genericSelectorMaps.length = 0;
 };
 
 /******************************************************************************/
 
-pendingNodes.add(document);
+// Perform once:
+// - Inject highly generics
+// - Collate exceptions matching current context
+
+const exceptionSet = new Set();
+for ( const entry of genericDetails ) {
+    const { highlyGeneric, exceptions, hostnames } = entry;
+    if ( highlyGeneric ) {
+        pendingSelectors.push(highlyGeneric);
+    }
+    if ( hostnames.length === 0 ) { continue; }
+    let i = -1;
+    for ( const hostname of self.isolatedAPI.contexts.hostnames ) {
+        i = self.isolatedAPI.binarySearch(hostnames, hostname, i);
+        if ( i >= 0 ) {
+            exceptions[i].split('\n').forEach(a => exceptionSet.add(a));
+        } else {
+            i = ~i + 1;
+        }
+    }
+    if ( entry.hasEntities ) {
+        i = -1;
+        for ( const entity of self.isolatedAPI.contexts.entities ) {
+            i = self.isolatedAPI.binarySearch(hostnames, entity, i);
+            if ( i >= 0 ) {
+                exceptions[i].split('\n').forEach(a => exceptionSet.add(a));
+            } else {
+                i = ~i + 1;
+            }
+        }
+    }
+}
+genericDetails.length = 0;
+
+/******************************************************************************/
+
+// Start applying generic cosmetic filters
+
+pendingNodes.add(document.documentElement);
 uBOL_processNodes();
 
 let domMutationObserver = new MutationObserver(uBOL_processChanges);
 domMutationObserver.observe(document, {
+    attributeFilter: [ 'class', 'id' ],
+    attributes: true,
     childList: true,
     subtree: true,
 });
@@ -212,27 +295,13 @@ domMutationObserver.observe(document, {
 const needDomChangeObserver = ( ) => {
     domChangeTimer = undefined;
     if ( domMutationObserver === undefined ) { return; }
-    if ( (Date.now() - lastDomChange) > 20000 ) {
+    if ( (Date.now() - lastDomChange) > 30000 ) {
         return stopAll('no more DOM changes');
     }
-    domChangeTimer = self.setTimeout(needDomChangeObserver, 20000);
+    domChangeTimer = self.setTimeout(needDomChangeObserver, 30000);
 };
 
 needDomChangeObserver();
-
-/******************************************************************************/
-
-const stopAll = reason => {
-    if ( domChangeTimer !== undefined ) {
-        self.clearTimeout(domChangeTimer);
-        domChangeTimer = undefined;
-    }
-    domMutationObserver.disconnect();
-    domMutationObserver.takeRecords();
-    domMutationObserver = undefined;
-    genericSelectorMap.clear();
-    console.info(`uBOL: Generic cosmetic filtering stopped because ${reason}`);
-};
 
 /******************************************************************************/
 

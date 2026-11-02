@@ -52,6 +52,7 @@ do
     awk '{gsub(/uBlock\/wiki/, "AdNauseam/wiki")}1' $outfile > /tmp/outfile && mv /tmp/outfile $outfile
     awk '{gsub(/uBlockOrigin\/uBlock-issue/, "dhowe/AdNauseam")}1' $outfile > /tmp/outfile && mv /tmp/outfile $outfile
     awk '{gsub(/uBlockOrigin\/uAssets/, "dhowe/AdNauseam")}1' $outfile > /tmp/outfile && mv /tmp/outfile $outfile
+    awk '{gsub(/#uBO#/, "uBlock Origin")}1' $outfile > /tmp/outfile && mv /tmp/outfile $outfile # sometimes the name "uBlock Origin" is needed to be displayed in adnauseam application, this is a work-around
     awk '{gsub(/Ctrl+click/, "Alt+click")}1' $outfile > /tmp/outfile && mv /tmp/outfile $outfile
     awk '{gsub(/ ＋ /, " / ")}1' $outfile > /tmp/outfile && mv /tmp/outfile $outfile
   fi

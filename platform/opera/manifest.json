@@ -10,8 +10,9 @@
   },
   "browser_action": {
     "default_icon": {
-      "16": "img/icon-16.png",
-      "32": "img/icon-32.png"
+      "16": "img/icon_16.png",
+      "32": "img/icon_32.png",
+      "64": "img/icon_64.png"
     },
     "default_title": "AdNauseam",
     "default_popup": "menu.html"
@@ -38,6 +39,9 @@
     },
     "toggle-cosmetic-filtering": {
       "description": "__MSG_toggleCosmeticFiltering__"
+    },
+    "toggle-javascript": {
+      "description": "__MSG_toggleJavascript__"
     }
   },
   "content_scripts": [
@@ -64,20 +68,32 @@
         "https://filterlists.com/*",
         "https://forums.lanik.us/*",
         "https://github.com/*",
-        "https://*.github.io/*",
-        "https://*.letsblock.it/*"
+        "https://*.github.io/*"
       ],
       "js": [
         "/js/scriptlets/subscriber.js"
       ],
       "run_at": "document_idle",
       "all_frames": false
+    },
+    {
+      "matches": [
+        "https://github.com/uBlockOrigin/*",
+        "https://ublockorigin.github.io/*",
+        "https://*.reddit.com/r/uBlockOrigin/*"
+      ],
+      "js": [
+        "/js/scriptlets/updater.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
     }
   ],
-  "minimum_opera_version": "53.0",
   "incognito": "split",
+  "minimum_opera_version": "79.0",
   "options_page": "dashboard.html",
   "permissions": [
+    "alarms",
     "contextMenus",
     "privacy",
     "storage",

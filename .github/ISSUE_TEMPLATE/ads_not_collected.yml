@@ -1,0 +1,50 @@
+name: Ads Not Collected Report
+description: Report an Ad that is hidden but not collected with AdNauseam
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please keep in mind that ads on websites such as YouTube, Facebook and Instagram change their structure so frequently that it is not always possible to keep our parsers up-to-date.
+  - type: checkboxes
+    attributes:
+      label: What type of Ad is not being collected
+      options:
+        - label: Image
+          required: false
+        - label: Text
+          required: false
+        - label: Video 
+          required: false
+        - label: Mid-roll Video Ad 
+          required: false
+        - label: Popup
+          required: false
+
+  - type: textarea
+    attributes:
+      label: URL(s) where the ads appear.
+      description: |
+        At least one URL is **MANDATORY** for an issue affecting a web page.
+        The backticks (`) surrounding the URL(s) are important, it prevents the URL(s) from being clickable. Warn with **"NSFW"** where applicable.
+      placeholder: |
+        `https://example.com`
+        `https://example.org`
+        `https://example.net`
+    validations:
+      required: true
+      
+  - type: textarea
+    attributes:
+      label: Your location/country.
+      description: |
+        If the issue is website specific, knowing your approximate location will help us to reproduce it.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Screenshot(s) of uncollected ads (disable AdNauseam if they are being correctly hidden)
+      description: |
+        Post **LINKS** instead of inline images for screenshots containing **ADULT MATERIAL**.
+    validations:
+      required: true

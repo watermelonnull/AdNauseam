@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    AdNauseam Lite - a comprehensive, MV3-compliant content blocker
     Copyright (C) 2022-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,56 +19,28 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-/* jshint esversion:11 */
-
-'use strict';
-
-/******************************************************************************/
-
-import { browser } from './ext.js';
-import { fetchJSON } from './fetch.js';
-import { getFilteringModeDetails } from './mode-manager.js';
-import { getEnabledRulesetsDetails } from './ruleset-manager.js';
-
 import * as ut from './utils.js';
+
+import {
+    browser,
+    localKeys, localRemove, localWrite,
+    sessionKeys, sessionRead, sessionRemove,
+    webextFlavor,
+} from './ext.js';
+import { ubolErr, ubolLog } from './debug.js';
+import { log as adnLog } from './adn/log.js'; // adn
+
+import { fetchJSON } from './fetch.js';
+import { getEnabledRulesetsDetails } from './ruleset-manager.js';
+import { getFilteringModeDetails } from './mode-manager.js';
+import { registerCustomFilters } from './filter-manager.js';
+import { registerJob } from './alarms.js';
+import { registerPreventPopup } from './prevent-popup.js';
+import { registerToolbarIconToggler } from './action.js';
 
 /******************************************************************************/
 
 const resourceDetailPromises = new Map();
-
-function getSpecificDetails() {
-    let promise = resourceDetailPromises.get('specific');
-    if ( promise !== undefined ) { return promise; }
-    promise = fetchJSON('/rulesets/specific-details').then(entries => {
-        const out = new Map();
-        for ( const entry of entries ) {
-            out.set(entry[0], new Map(entry[1]));
-        }
-        return out;
-    });
-    resourceDetailPromises.set('specific', promise);
-    return promise;
-}
-
-function getDeclarativeDetails() {
-    let promise = resourceDetailPromises.get('declarative');
-    if ( promise !== undefined ) { return promise; }
-    promise = fetchJSON('/rulesets/declarative-details').then(
-        entries => new Map(entries)
-    );
-    resourceDetailPromises.set('declarative', promise);
-    return promise;
-}
-
-function getProceduralDetails() {
-    let promise = resourceDetailPromises.get('procedural');
-    if ( promise !== undefined ) { return promise; }
-    promise = fetchJSON('/rulesets/procedural-details').then(
-        entries => new Map(entries)
-    );
-    resourceDetailPromises.set('procedural', promise);
-    return promise;
-}
 
 function getScriptletDetails() {
     let promise = resourceDetailPromises.get('scriptlet');
@@ -92,686 +64,379 @@ function getGenericDetails() {
 
 /******************************************************************************/
 
-// Important: We need to sort the arrays for fast comparison
-const arrayEq = (a = [], b = [], sort = true) => {
-    const alen = a.length;
-    if ( alen !== b.length ) { return false; }
-    if ( sort ) { a.sort(); b.sort(); }
-    for ( let i = 0; i < alen; i++ ) {
-        if ( a[i] !== b[i] ) { return false; }
+const normalizeMatches = matches => {
+    if ( matches.length <= 1 ) { return; }
+    if ( matches.includes('<all_urls>') === false ) {
+        if ( matches.includes('*://*/*') === false ) { return; }
     }
-    return true;
+    matches.length = 0;
+    matches.push('<all_urls>');
 };
 
 /******************************************************************************/
 
-// The extensions API does not always return exactly what we fed it, so we
-// need to normalize some entries to be sure we properly detect changes when
-// comparing registered entries vs. entries to register.
-
-const normalizeRegisteredContentScripts = registered => {
-    for ( const entry of registered ) {
-        const { js } = entry;
-        for ( let i = 0; i < js.length; i++ ) {
-            const path = js[i];
-            if ( path.startsWith('/') ) { continue; }
-            js[i] = `/${path}`;
-        }
-    }
-    return registered;
-};
+async function resetCSSCache() {
+    const keys = await sessionKeys();
+    return sessionRemove(keys.filter(a => a.startsWith('cache.css.')));
+}
 
 /******************************************************************************/
 
 function registerGeneric(context, genericDetails) {
-    const { before, filteringModeDetails, rulesetsDetails } = context;
+    const { filteringModeDetails, rulesetsDetails } = context;
 
-    const excludeHostnames = [];
+    const excludedByFilter = [];
+    const includedByFilter = [];
     const js = [];
     for ( const details of rulesetsDetails ) {
         const hostnames = genericDetails.get(details.id);
-        if ( hostnames !== undefined ) {
-            excludeHostnames.push(...hostnames);
+        if ( hostnames ) {
+            if ( hostnames.unhide ) {
+                excludedByFilter.push(...hostnames.unhide);
+            }
+            if ( hostnames.hide ) {
+                includedByFilter.push(...hostnames.hide);
+            }
         }
-        if ( details.css.generic instanceof Object === false ) { continue; }
-        if ( details.css.generic.count === 0 ) { continue; }
+        const count = details.css?.generic || 0;
+        if ( count === 0 ) { continue; }
         js.push(`/rulesets/scripting/generic/${details.id}.js`);
     }
 
     if ( js.length === 0 ) { return; }
 
+    js.unshift('/js/scripting/css-api.js', '/js/scripting/isolated-api.js');
     js.push('/js/scripting/css-generic.js');
 
-    const matches = [];
-    const excludeMatches = [];
-    if ( filteringModeDetails.extendedGeneric.has('all-urls') ) {
-        excludeMatches.push(...ut.matchesFromHostnames(filteringModeDetails.none));
-        excludeMatches.push(...ut.matchesFromHostnames(filteringModeDetails.network));
-        excludeMatches.push(...ut.matchesFromHostnames(filteringModeDetails.extendedSpecific));
-        excludeMatches.push(...ut.matchesFromHostnames(excludeHostnames));
-        matches.push('<all_urls>');
-    } else {
-        matches.push(
+    const { none, basic, optimal, complete } = filteringModeDetails;
+    const includedByMode = [ ...complete ];
+    const excludedByMode = [ ...none, ...basic, ...optimal ];
+
+    if ( complete.has('all-urls') === false ) {
+        const matches = [
             ...ut.matchesFromHostnames(
-                ut.subtractHostnameIters(
-                    Array.from(filteringModeDetails.extendedGeneric),
-                    excludeHostnames
-                )
-            )
-        );
-    }
-
-    if ( matches.length === 0 ) { return; }
-
-    const registered = before.get('css-generic');
-    before.delete('css-generic'); // Important!
-
-    // register
-    if ( registered === undefined ) {
-        context.toAdd.push({
-            id: 'css-generic',
+                ut.subtractHostnameIters(includedByMode, excludedByFilter)
+            ),
+            ...ut.matchesFromHostnames(
+                ut.intersectHostnameIters(includedByMode, includedByFilter)
+            ),
+        ];
+        if ( matches.length === 0 ) { return; }
+        const directive = {
+            id: 'css-generic-some',
             js,
+            allFrames: true,
             matches,
-            excludeMatches,
             runAt: 'document_idle',
-        });
+        };
+        context.toAdd.push(directive);
         return;
     }
 
-    // update
-    const directive = { id: 'css-generic' };
-    if ( arrayEq(registered.js, js, false) === false ) {
-        directive.js = js;
+    const excludeMatches = [
+        ...ut.matchesFromHostnames(excludedByMode),
+        ...ut.matchesFromHostnames(excludedByFilter),
+    ];
+    const directiveAll = {
+        id: 'css-generic-all',
+        js,
+        allFrames: true,
+        matches: [ '<all_urls>' ],
+        runAt: 'document_idle',
+    };
+    if ( excludeMatches.length !== 0 ) {
+        directiveAll.excludeMatches = excludeMatches;
     }
-    if ( arrayEq(registered.matches, matches) === false ) {
-        directive.matches = matches;
-    }
-    if ( arrayEq(registered.excludeMatches, excludeMatches) === false ) {
-        directive.excludeMatches = excludeMatches;
-    }
-    if ( directive.js || directive.matches || directive.excludeMatches ) {
-        context.toUpdate.push(directive);
-    }
+    context.toAdd.push(directiveAll);
+
+    const matches = [
+        ...ut.matchesFromHostnames(
+            ut.subtractHostnameIters(includedByFilter, excludedByMode)
+        ),
+    ];
+    if ( matches.length === 0 ) { return; }
+    const directiveSome = {
+        id: 'css-generic-some',
+        js,
+        allFrames: true,
+        matches,
+        runAt: 'document_idle',
+    };
+    context.toAdd.push(directiveSome);
 }
 
 /******************************************************************************/
 
-function registerProcedural(context, proceduralDetails) {
-    const { before, filteringModeDetails, rulesetsDetails } = context;
+async function registerCosmetic(context) {
+    const { filteringModeDetails, rulesetsDetails } = context;
 
-    const js = [];
-    const hostnameMatches = [];
-    for ( const details of rulesetsDetails ) {
-        if ( details.css.procedural === 0 ) { continue; }
-        js.push(`/rulesets/scripting/procedural/${details.id}.js`);
-        if ( proceduralDetails.has(details.id) ) {
-            hostnameMatches.push(...proceduralDetails.get(details.id));
+    {
+        const keys = await localKeys();
+        localRemove(keys.filter(a => a.startsWith('css.specific.')));
+        // TODO: remove after a few versions after 2026.516.1652
+        localRemove(keys.filter(a => a.startsWith('css.procedural.')));
+    }
+
+    const rulesetIds = [];
+    for ( const rulesetDetails of rulesetsDetails ) {
+        const count = rulesetDetails.css?.specific ?? 0;
+        if ( count === 0 ) { continue; }
+        rulesetIds.push(rulesetDetails.id);
+    }
+    if ( rulesetIds.length === 0 ) { return; }
+
+    const { none, basic, optimal, complete } = filteringModeDetails;
+    const matches = [
+        ...ut.matchesFromHostnames(optimal),
+        ...ut.matchesFromHostnames(complete),
+    ];
+    if ( matches.length === 0 ) { return; }
+
+    {
+        const promises = [];
+        for ( const id of rulesetIds ) {
+            promises.push(
+                fetchJSON(`/rulesets/scripting/specific/${id}`).then(data => {
+                    return localWrite(`css.specific.${id}`, data);
+                })
+            );
+        }
+        await Promise.all(promises);
+    }
+
+    normalizeMatches(matches);
+
+    const js = rulesetIds.map(id => `/rulesets/scripting/specific/${id}.js`);
+    js.unshift('/js/scripting/css-api.js', '/js/scripting/isolated-api.js');
+    if ( webextFlavor === 'safari' ) {
+        js.push('/js/scripting/css-procedural-api.js');
+    }
+    js.push('/js/scripting/css-specific.js');
+
+    const excludeMatches = [];
+    if ( none.has('all-urls') === false && basic.has('all-urls') === false ) {
+        const toExclude = [
+            ...ut.matchesFromHostnames(none),
+            ...ut.matchesFromHostnames(basic),
+        ];
+        for ( const hn of toExclude ) {
+            excludeMatches.push(hn);
         }
     }
 
-    if ( js.length === 0 ) { return; }
-
-    js.push('/js/scripting/css-procedural.js');
-
-    const {
-        none,
-        network,
-        extendedSpecific,
-        extendedGeneric,
-    } = filteringModeDetails;
-
-    const matches = [];
-    const excludeMatches = [];
-    if ( extendedSpecific.has('all-urls') || extendedGeneric.has('all-urls') ) {
-        excludeMatches.push(...ut.matchesFromHostnames(none));
-        excludeMatches.push(...ut.matchesFromHostnames(network));
-        matches.push(...ut.matchesFromHostnames(hostnameMatches));
-    } else if ( extendedSpecific.size !== 0 || extendedGeneric.size !== 0 ) {
-        matches.push(
-            ...ut.matchesFromHostnames(
-                ut.intersectHostnameIters(
-                    [ ...extendedSpecific, ...extendedGeneric ],
-                    hostnameMatches
-                )
-            )
-        );
-    }
-
-    if ( matches.length === 0 ) { return; }
-
-    const registered = before.get('css-procedural');
-    before.delete('css-procedural'); // Important!
-
-    // register
-    if ( registered === undefined ) {
-        context.toAdd.push({
-            id: 'css-procedural',
-            js,
-            allFrames: true,
-            matches,
-            excludeMatches,
-            runAt: 'document_end',
-        });
-        return;
-    }
-
-    // update
-    const directive = { id: 'css-procedural' };
-    if ( arrayEq(registered.js, js, false) === false ) {
-        directive.js = js;
-    }
-    if ( arrayEq(registered.matches, matches) === false ) {
-        directive.matches = matches;
-    }
-    if ( arrayEq(registered.excludeMatches, excludeMatches) === false ) {
+    const directive = {
+        id: 'css-specific',
+        js,
+        matches,
+        allFrames: true,
+        runAt: 'document_start',
+    };
+    if ( excludeMatches.length !== 0 ) {
         directive.excludeMatches = excludeMatches;
     }
-    if ( directive.js || directive.matches || directive.excludeMatches ) {
-        context.toUpdate.push(directive);
-    }
-}
-
-/******************************************************************************/
-
-function registerDeclarative(context, declarativeDetails) {
-    const { before, filteringModeDetails, rulesetsDetails } = context;
-
-    const js = [];
-    const hostnameMatches = [];
-    for ( const details of rulesetsDetails ) {
-        if ( details.css.declarative === 0 ) { continue; }
-        js.push(`/rulesets/scripting/declarative/${details.id}.js`);
-        if ( declarativeDetails.has(details.id) ) {
-            hostnameMatches.push(...declarativeDetails.get(details.id));
-        }
-    }
-
-    if ( js.length === 0 ) { return; }
-
-    js.push('/js/scripting/css-declarative.js');
-
-    const {
-        none,
-        network,
-        extendedSpecific,
-        extendedGeneric,
-    } = filteringModeDetails;
-
-    const matches = [];
-    const excludeMatches = [];
-    if ( extendedSpecific.has('all-urls') || extendedGeneric.has('all-urls') ) {
-        excludeMatches.push(...ut.matchesFromHostnames(none));
-        excludeMatches.push(...ut.matchesFromHostnames(network));
-        matches.push(...ut.matchesFromHostnames(hostnameMatches));
-    } else if ( extendedSpecific.size !== 0 || extendedGeneric.size !== 0 ) {
-        matches.push(
-            ...ut.matchesFromHostnames(
-                ut.intersectHostnameIters(
-                    [ ...extendedSpecific, ...extendedGeneric ],
-                    hostnameMatches
-                )
-            )
-        );
-    }
-
-    if ( matches.length === 0 ) { return; }
-
-    const registered = before.get('css-declarative');
-    before.delete('css-declarative'); // Important!
 
     // register
-    if ( registered === undefined ) {
-        context.toAdd.push({
-            id: 'css-declarative',
-            js,
-            allFrames: true,
-            matches,
-            excludeMatches,
-            runAt: 'document_start',
-        });
-        return;
-    }
-
-    // update
-    const directive = { id: 'css-declarative' };
-    if ( arrayEq(registered.js, js, false) === false ) {
-        directive.js = js;
-    }
-    if ( arrayEq(registered.matches, matches) === false ) {
-        directive.matches = matches;
-    }
-    if ( arrayEq(registered.excludeMatches, excludeMatches) === false ) {
-        directive.excludeMatches = excludeMatches;
-    }
-    if ( directive.js || directive.matches || directive.excludeMatches ) {
-        context.toUpdate.push(directive);
-    }
+    context.toAdd.push(directive);
 }
 
 /******************************************************************************/
 
 function registerScriptlet(context, scriptletDetails) {
-    const { before, filteringModeDetails, rulesetsDetails } = context;
+    const { filteringModeDetails, rulesetsDetails } = context;
 
     const hasBroadHostPermission =
-        filteringModeDetails.extendedSpecific.has('all-urls') ||
-        filteringModeDetails.extendedGeneric.has('all-urls');
+        filteringModeDetails.optimal.has('all-urls') ||
+        filteringModeDetails.complete.has('all-urls');
 
     const permissionRevokedMatches = [
         ...ut.matchesFromHostnames(filteringModeDetails.none),
-        ...ut.matchesFromHostnames(filteringModeDetails.network),
+        ...ut.matchesFromHostnames(filteringModeDetails.basic),
     ];
     const permissionGrantedHostnames = [
-        ...filteringModeDetails.extendedSpecific,
-        ...filteringModeDetails.extendedGeneric,
+        ...filteringModeDetails.optimal,
+        ...filteringModeDetails.complete,
     ];
 
     for ( const rulesetId of rulesetsDetails.map(v => v.id) ) {
-        const scriptletList = scriptletDetails.get(rulesetId);
-        if ( scriptletList === undefined ) { continue; }
-
-        for ( const [ token, scriptletHostnames ] of scriptletList ) {
-            const id = `${rulesetId}.${token}`;
-            const registered = before.get(id);
+        const worlds = scriptletDetails.get(rulesetId);
+        if ( worlds === undefined ) { continue; }
+        for ( const world of Object.keys(worlds) ) {
+            const id = `${rulesetId}.${world.toLowerCase()}`;
 
             const matches = [];
             const excludeMatches = [];
+            const hostnames = worlds[world];
+            let targetHostnames = [];
             if ( hasBroadHostPermission ) {
                 excludeMatches.push(...permissionRevokedMatches);
-                matches.push(...ut.matchesFromHostnames(scriptletHostnames));
+                targetHostnames = hostnames;
             } else if ( permissionGrantedHostnames.length !== 0 ) {
-                matches.push(
-                    ...ut.matchesFromHostnames(
-                        ut.intersectHostnameIters(
-                            permissionGrantedHostnames,
-                            scriptletHostnames
-                        )
-                    )
-                );
+                if ( hostnames.includes('*') ) {
+                    targetHostnames = permissionGrantedHostnames;
+                } else {
+                    targetHostnames = ut.intersectHostnameIters(
+                        hostnames,
+                        permissionGrantedHostnames
+                    );
+                }
             }
-            if ( matches.length === 0 ) { continue; }
+            if ( targetHostnames.length === 0 ) { continue; }
+            matches.push(...ut.matchesFromHostnames(targetHostnames));
+            normalizeMatches(matches);
 
-            before.delete(id); // Important!
-
-            // register
-            if ( registered === undefined ) {
-                context.toAdd.push({
-                    id,
-                    js: [ `/rulesets/scripting/scriptlet/${id}.js` ],
-                    allFrames: true,
-                    matches,
-                    excludeMatches,
-                    runAt: 'document_start',
-                    world: 'MAIN',
-                });
-                continue;
-            }
-
-            // update
-            const directive = { id };
-            if ( arrayEq(registered.matches, matches) === false ) {
-                directive.matches = matches;
-            }
-            if ( arrayEq(registered.excludeMatches, excludeMatches) === false ) {
+            const directive = {
+                id,
+                js: [ `/rulesets/scripting/scriptlet/${world.toLowerCase()}/${rulesetId}.js` ],
+                matches,
+                allFrames: true,
+                matchOriginAsFallback: true,
+                runAt: 'document_start',
+                world,
+            };
+            if ( excludeMatches.length !== 0 ) {
                 directive.excludeMatches = excludeMatches;
             }
-            if ( directive.matches || directive.excludeMatches ) {
-                context.toUpdate.push(directive);
-            }
+
+            // register
+            context.toAdd.push(directive);
         }
     }
 }
 
 /******************************************************************************/
 
-function registerScriptletEntity(context) {
-    const { before, filteringModeDetails, rulesetsDetails } = context;
+// Issue: Safari appears to completely ignore excludeMatches
+// https://github.com/radiolondra/ExcludeMatches-Test
 
-    const js = [];
-    for ( const details of rulesetsDetails ) {
-        const { scriptlets }  = details;
-        if ( scriptlets instanceof Object === false ) { continue; }
-        if ( Array.isArray(scriptlets.entityBasedTokens) === false ) { continue; }
-        if ( scriptlets.entityBasedTokens.length === 0 ) { continue; }
-        for ( const token of scriptlets.entityBasedTokens ) {
-            js.push(`/rulesets/scripting/scriptlet-entity/${details.id}.${token}.js`);
-        }
-    }
-
-    if ( js.length === 0 ) { return; }
-
-    const matches = [];
-    const excludeMatches = [];
-    if ( filteringModeDetails.extendedGeneric.has('all-urls') ) {
-        excludeMatches.push(...ut.matchesFromHostnames(filteringModeDetails.none));
-        excludeMatches.push(...ut.matchesFromHostnames(filteringModeDetails.network));
-        excludeMatches.push(...ut.matchesFromHostnames(filteringModeDetails.extendedSpecific));
-        matches.push('<all_urls>');
-    } else {
-        matches.push(
-            ...ut.matchesFromHostnames(filteringModeDetails.extendedGeneric)
-        );
-    }
-
-    if ( matches.length === 0 ) { return; }
-
-    const registered = before.get('scriptlet.entity');
-    before.delete('scriptlet.entity'); // Important!
-
-    // register
-    if ( registered === undefined ) {
-        context.toAdd.push({
-            id: 'scriptlet.entity',
-            js,
-            allFrames: true,
-            matches,
-            excludeMatches,
-            runAt: 'document_start',
-            world: 'MAIN',
-        });
-        return;
-    }
-
-    // update
-    const directive = { id: 'scriptlet.entity' };
-    if ( arrayEq(registered.js, js, false) === false ) {
-        directive.js = js;
-    }
-    if ( arrayEq(registered.matches, matches) === false ) {
-        directive.matches = matches;
-    }
-    if ( arrayEq(registered.excludeMatches, excludeMatches) === false ) {
-        directive.excludeMatches = excludeMatches;
-    }
-    if ( directive.js || directive.matches || directive.excludeMatches ) {
-        context.toUpdate.push(directive);
-    }
-}
-
-/******************************************************************************/
-
-function registerSpecific(context, specificDetails) {
-    const { filteringModeDetails } = context;
-
-    let toRegisterMap;
-    if (
-        filteringModeDetails.extendedSpecific.has('all-urls') ||
-        filteringModeDetails.extendedGeneric.has('all-urls')
-    ) {
-        toRegisterMap = registerSpecificAll(context, specificDetails);
-    } else {
-        toRegisterMap = registerSpecificSome(context, specificDetails);
-    }
-
-    for ( const [ fname, hostnames ] of toRegisterMap ) {
-        toRegisterableScript(context, fname, hostnames);
-    }
-}
-
-function registerSpecificSome(context, specificDetails) {
-    const { filteringModeDetails, rulesetsDetails } = context;
-    const toRegisterMap = new Map();
-
-    const targetHostnames = [
-        ...filteringModeDetails.extendedSpecific,
-        ...filteringModeDetails.extendedGeneric,
-    ];
-
-    const checkMatches = (hostnamesToFidsMap, hn) => {
-        let fids = hostnamesToFidsMap.get(hn);
-        if ( fids === undefined ) { return; }
-        if ( typeof fids === 'number' ) { fids = [ fids ]; }
-        for ( const fid of fids ) {
-            const fname = ut.fnameFromFileId(fid);
-            let existing = toRegisterMap.get(fname);
-            if ( existing ) {
-                if ( existing[0] === '*' ) { continue; }
-                existing.push(hn);
-            } else {
-                toRegisterMap.set(fname, existing = [ hn ]);
-            }
-            if ( hn !== '*' ) { continue; }
-            existing.length = 0;
-            existing.push('*');
-            break;
-        }
-    };
-
-    for ( const rulesetDetails of rulesetsDetails ) {
-        const hostnamesToFidsMap = specificDetails.get(rulesetDetails.id);
-        if ( hostnamesToFidsMap === undefined ) { continue; }
-        for ( let hn of targetHostnames ) {
-            while ( hn ) {
-                checkMatches(hostnamesToFidsMap, hn);
-                hn = ut.toBroaderHostname(hn);
-            }
-        }
-    }
-
-    return toRegisterMap;
-}
-
-function registerSpecificAll(context, specificDetails) {
-    const { filteringModeDetails, rulesetsDetails } = context;
-    const toRegisterMap = new Map();
-
-    const excludeSet = new Set([
-        ...filteringModeDetails.network,
-        ...filteringModeDetails.none,
-    ]);
-
-    for ( const rulesetDetails of rulesetsDetails ) {
-        const hostnamesToFidsMap = specificDetails.get(rulesetDetails.id);
-        if ( hostnamesToFidsMap === undefined ) { continue; }
-        for ( let [ hn, fids ] of hostnamesToFidsMap ) {
-            if ( excludeSet.has(hn) ) { continue; }
-            if ( ut.isDescendantHostnameOfIter(hn, excludeSet) ) { continue; }
-            if ( typeof fids === 'number' ) { fids = [ fids ]; }
-            for ( const fid of fids ) {
-                const fname = ut.fnameFromFileId(fid);
-                let existing = toRegisterMap.get(fname);
-                if ( existing ) {
-                    if ( existing[0] === '*' ) { continue; }
-                    existing.push(hn);
-                } else {
-                    toRegisterMap.set(fname, existing = [ hn ]);
-                }
-                if ( hn !== '*' ) { continue; }
-                existing.length = 0;
-                existing.push('*');
-                break;
-            }
-        }
-    }
-
-    return toRegisterMap;
-}
-
-const toRegisterableScript = (context, fname, hostnames) => {
-    if ( context.before.has(fname) ) {
-        return toUpdatableScript(context, fname, hostnames);
-    }
-    const matches = hostnames
-        ? ut.matchesFromHostnames(hostnames)
-        : [ '<all_urls>' ];
-    const excludeMatches = matches.length === 1 && matches[0] === '<all_urls>'
-        ? ut.matchesFromHostnames(context.filteringModeDetails.none)
-        : [];
-    const directive = {
-        id: fname,
-        allFrames: true,
-        matches,
-        excludeMatches,
-        js: [ `/rulesets/scripting/specific/${fname.slice(-1)}/${fname.slice(0,-1)}.js` ],
-        runAt: 'document_start',
-    };
-    context.toAdd.push(directive);
-};
-
-const toUpdatableScript = (context, fname, hostnames) => {
-    const registered = context.before.get(fname);
-    context.before.delete(fname); // Important!
-    const directive = { id: fname };
-    const matches = hostnames
-        ? ut.matchesFromHostnames(hostnames)
-        : [ '<all_urls>' ];
-    if ( arrayEq(registered.matches, matches) === false ) {
-        directive.matches = matches;
-    }
-    const excludeMatches = matches.length === 1 && matches[0] === '<all_urls>'
-        ? ut.matchesFromHostnames(context.filteringModeDetails.none)
-        : [];
-    if ( arrayEq(registered.excludeMatches, excludeMatches) === false ) {
-        directive.excludeMatches = excludeMatches;
-    }
-    if ( directive.matches || directive.excludeMatches ) {
-        context.toUpdate.push(directive);
-    }
-};
-
-/******************************************************************************/
-
-function registerSpecificEntity(context) {
-    const { before, filteringModeDetails, rulesetsDetails } = context;
-
-    const js = [];
-    for ( const details of rulesetsDetails ) {
-        if ( details.css.specific instanceof Object === false ) { continue; }
-        if ( details.css.specific.entityBased === 0 ) { continue; }
-        js.push(`/rulesets/scripting/specific-entity/${details.id}.js`);
-    }
-
-    if ( js.length === 0 ) { return; }
-
-    const matches = [];
-    const excludeMatches = [];
-    if ( filteringModeDetails.extendedGeneric.has('all-urls') ) {
-        excludeMatches.push(...ut.matchesFromHostnames(filteringModeDetails.none));
-        excludeMatches.push(...ut.matchesFromHostnames(filteringModeDetails.network));
-        excludeMatches.push(...ut.matchesFromHostnames(filteringModeDetails.extendedSpecific));
-        matches.push('<all_urls>');
-    } else {
-        matches.push(
-            ...ut.matchesFromHostnames(filteringModeDetails.extendedGeneric)
-        );
-    }
-
-    if ( matches.length === 0 ) { return; }
-
-    js.push('/js/scripting/css-specific.entity.js');
-
-    const registered = before.get('css-specific.entity');
-    before.delete('css-specific.entity'); // Important!
-
-    // register
-    if ( registered === undefined ) {
-        context.toAdd.push({
-            id: 'css-specific.entity',
-            js,
-            allFrames: true,
-            matches,
-            excludeMatches,
-            runAt: 'document_start',
-        });
-        return;
-    }
-
-    // update
-    const directive = { id: 'css-specific.entity' };
-    if ( arrayEq(registered.js, js, false) === false ) {
-        directive.js = js;
-    }
-    if ( arrayEq(registered.matches, matches) === false ) {
-        directive.matches = matches;
-    }
-    if ( arrayEq(registered.excludeMatches, excludeMatches) === false ) {
-        directive.excludeMatches = excludeMatches;
-    }
-    if ( directive.js || directive.matches || directive.excludeMatches ) {
-        context.toUpdate.push(directive);
-    }
-}
-
-/******************************************************************************/
-
-async function registerInjectables(origins) {
-    void origins;
-
+export async function registerContentScripts() {
     if ( browser.scripting === undefined ) { return false; }
+    registerContentScripts.pendingOp =
+        registerContentScripts.pendingOp.then(( ) => registerContentScripts.register());
+    return registerContentScripts.pendingOp;
+}
+registerContentScripts.pendingOp = Promise.resolve();
 
+registerContentScripts.register = async function register() {
     const [
         filteringModeDetails,
         rulesetsDetails,
-        declarativeDetails,
-        proceduralDetails,
         scriptletDetails,
-        specificDetails,
         genericDetails,
-        registered,
     ] = await Promise.all([
         getFilteringModeDetails(),
-        getEnabledRulesetsDetails(),
-        getDeclarativeDetails(),
-        getProceduralDetails(),
+        getEnabledRulesetsDetails(true),
         getScriptletDetails(),
-        getSpecificDetails(),
         getGenericDetails(),
-        browser.scripting.getRegisteredContentScripts(),
     ]);
-    const before = new Map(
-        normalizeRegisteredContentScripts(registered).map(
-            entry => [ entry.id, entry ]
-        )
-    );
-    const toAdd = [], toUpdate = [], toRemove = [];
-    const promises = [];
+    const toAdd = [];
     const context = {
         filteringModeDetails,
         rulesetsDetails,
-        before,
         toAdd,
-        toUpdate,
-        toRemove,
     };
 
-    registerDeclarative(context, declarativeDetails);
-    registerProcedural(context, proceduralDetails);
-    registerScriptlet(context, scriptletDetails);
-    registerScriptletEntity(context);
-    registerSpecific(context, specificDetails);
-    registerSpecificEntity(context);
-    registerGeneric(context, genericDetails);
+    await Promise.all([
+        registerScriptlet(context, scriptletDetails),
+        registerCosmetic(context),
+        registerGeneric(context, genericDetails),
+        registerCustomFilters(context),
+        registerPreventPopup(context),
+        registerToolbarIconToggler(context),
+				registerAdNauseam(context), // ADN
+    ]);
 
-    toRemove.push(...Array.from(before.keys()));
-
-    if ( toRemove.length !== 0 ) {
-        console.info(`Unregistered ${toRemove} content (css/js)`);
-        promises.push(
-            browser.scripting.unregisterContentScripts({ ids: toRemove })
-                .catch(reason => { console.info(reason); })
-        );
+    ubolLog(`Unregistered all content (css/js)`);
+    try {
+        await browser.scripting.unregisterContentScripts();
+    } catch(reason) {
+        ubolErr(`unregisterContentScripts/${reason}`);
     }
+
     if ( toAdd.length !== 0 ) {
-        console.info(`Registered ${toAdd.map(v => v.id)} content (css/js)`);
-        promises.push(
-            browser.scripting.registerContentScripts(toAdd)
-                .catch(reason => { console.info(reason); })
-        );
+        ubolLog(`Registered ${toAdd.map(v => v.id)} content (css/js)`);
+        try {
+            await browser.scripting.registerContentScripts(toAdd);
+        } catch(reason) {
+            ubolErr(`registerContentScripts/${reason}`);
+        }
     }
-    if ( toUpdate.length !== 0 ) {
-        console.info(`Updated ${toUpdate.map(v => v.id)} content (css/js)`);
-        promises.push(
-            browser.scripting.updateContentScripts(toUpdate)
-                .catch(reason => { console.info(reason); })
-        );
-    }
-    if ( promises.length === 0 ) { return; }
 
-    return Promise.all(promises);
+    await Promise.all([
+        resetCSSCache(),
+        registerJob('pruneCSSCache', Date.now() + 15 * 60 * 1000),
+    ]);
+
+    return true;
+};
+
+/******************************************************************************/
+// ADN register AdNauseam scripting
+
+async function registerAdNauseam(context) {
+  const { filteringModeDetails } = context;
+
+  const { none, basic, optimal, complete } = filteringModeDetails;
+
+  // Only run on optimal/complete modes (has broad permissions)
+  const matches = [
+    ...ut.matchesFromHostnames(optimal),
+    ...ut.matchesFromHostnames(complete),
+  ];
+
+  if (matches.length === 0) {
+    adnLog('[ADN] No matches, skipping registration');
+    return;
+  }
+
+  normalizeMatches(matches);
+
+  const directive = {
+    id: 'adn-parser',
+    js: ['/js/adn/parser.js'],
+    matches,
+    allFrames: true,
+    runAt: 'document_idle',
+  };
+
+  const excludeMatches = [];
+  if (none.has('all-urls') === false) {
+    excludeMatches.push(...ut.matchesFromHostnames(none));
+  }
+  if (basic.has('all-urls') === false) {
+    excludeMatches.push(...ut.matchesFromHostnames(basic));
+  }
+  if (excludeMatches.length !== 0) {
+    directive.excludeMatches = excludeMatches;
+  }
+
+  context.toAdd.push(directive);
+  adnLog('[ADN] Registering parser');
 }
 
 /******************************************************************************/
 
-export {
-    registerInjectables
-};
+export async function getRegisteredContentScripts() {
+    const scripts = await browser.scripting.getRegisteredContentScripts();
+    return scripts.map(a => a.id);
+}
+
+/******************************************************************************/
+
+export async function pruneCSSCache() {
+    registerJob('pruneCSSCache', Date.now() + 15 * 60 * 1000);
+    const MAX_CACHE_ENTRY_LOW = 256;
+    const MAX_CACHE_ENTRY_HIGH = MAX_CACHE_ENTRY_LOW +
+        Math.max(Math.round(MAX_CACHE_ENTRY_LOW / 8), 8);
+    const keys = await sessionKeys() || [];
+    const cacheKeys = keys.filter(a => a.startsWith('cache.css.'));
+    if ( cacheKeys.length < MAX_CACHE_ENTRY_HIGH ) { return; }
+    const entries = await Promise.all(cacheKeys.map(async a => {
+        const entry = await sessionRead(a) || {};
+        entry.key = a;
+        return entry;
+    }));
+    entries.sort((a, b) => b.t - a.t);
+    sessionRemove(entries.slice(MAX_CACHE_ENTRY_LOW).map(a => a.key));
+}
+
+/******************************************************************************/

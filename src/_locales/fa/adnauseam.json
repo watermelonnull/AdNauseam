@@ -1,6 +1,6 @@
 {
   "adnAboutPageName": {
-    "message": "AdNauseam — About",
+    "message": "درباره - ادنازیم",
     "description": "English: Firstrun.html page title"
   },
   "aboutSupport": {
@@ -8,7 +8,7 @@
     "description": "English: links.html Support"
   },
   "aboutBuiltOn": {
-    "message": "ساخته شده بر",
+    "message": "ساخته شده بر پایه",
     "description": "English: links.html Built on"
   },
   "aboutFaq": {
@@ -28,479 +28,527 @@
     "description": "English: Firstrun.html -> Click Ads"
   },
   "adnFirstRunBlockingMalware": {
-    "message": "بلوک بدافزارها",
+    "message": "مسدود سازی بدافزارها",
     "description": "English: Firstrun.html -> Block Malware"
   },
   "adnAboutResetDataConfirm": {
-    "message": "All your settings will be removed, ads in your vault will be deleted, and AdNauseam will restart.\n\nReset AdNauseam to factory settings?",
+    "message": "تمامی تنظیمات تان حذف خواهد شد، تبلیغات های داخل صندوق تان حذف خواهد شد و ادنازیم شروع مجدد خواهد شد.\n\nآیا ادنازیم را به تنظیمات کارخانه برگردد؟",
     "description": "Message asking user to confirm reset"
   },
   "adnFirstRunHideAllAdsDescription": {
-    "message": "Hide Ads in your selected <span>filter lists</span>",
+    "message": "تبلیغات در <span> لیست های فیلتر <\/span> انتخابی مخفی کن",
     "description": "English: Firstrun.html -> Hide Ads in your selected filter lists"
   },
   "adnFirstRunClickingAdsDescription": {
-    "message": "Register visits on Ads found via your <span>filter lists</span>",
+    "message": "مراجعه های تبلیغات پیدا شده در  <span> لیست های فیلتر <\/span>  را ثبت کن",
     "description": "English: Firstrun.html -> Register visits on Ads found via your filter lists"
   },
   "adnFirstRunBlockingMalwareDescription": {
-    "message": "Block trackers and other malware (<span>customize</span>)",
+    "message": "دنبال کننده ها و سایر بد افزار ها را مسدود کن (<span> شخصی سازی <\/span>)",
     "description": "English: Firstrun.html -> Block trackers and other malware (customize)"
   },
   "adnNotificationReactivate": {
-    "message": "Reactivate",
+    "message": "فعال سازی مجدد",
     "description": "English: Notifications -> Reactivate"
   },
   "adnNotificationDisable": {
-    "message": "Disable",
+    "message": "غیرفعال سازی",
     "description": "English: Notifications -> Disable"
   },
   "adnNotificationActivateHiding": {
-    "message": "Activate Ad hiding",
+    "message": "فعال سازی پنهان کردن تبلیغات",
     "description": "English: Notifications -> Activate Ad hiding"
   },
   "adnNotificationActivateClicking": {
-    "message": "Activate Ad clicking",
+    "message": "فعال سازی کلیک بر روی تبلیغات",
     "description": "English: Notifications -> Activate Ad clicking"
   },
   "adnNotificationActivateBlocking": {
-    "message": "Activate malware blocking",
+    "message": "فعال سازی مسدود کردن بدافزار",
     "description": "English: Notifications -> Activate malware blocking"
   },
   "adnNotificationActivateEasyList": {
-    "message": "Activate the EasyList filter",
+    "message": "فعال سازی لیست آسان فیلتر",
     "description": "English: Notifications -> Activate the EasyList filter"
   },
   "adnNotificationActivateAdNauseamList": {
-    "message": "Activate the AdNauseam filter",
+    "message": "فعلل سازی فیلتر ادنازیم",
     "description": "English: Notifications -> Activate the AdNauseam filter"
   },
   "adnNotificationDisableAdBlocker": {
-    "message": "Your ad blocker and AdNauseam may conflict!",
+    "message": "مسدود کننده تبلیغات شما و ادنازیم ممکن است اختلال ایجاد کنند!",
     "description": "English: Notifications -> Your ad blocker and AdNauseam may conflict!"
   },
   "adnNotificationDisableUBlock": {
-    "message": "uBlock and AdNauseam may conflict!",
+    "message": "یوبلاک و ادنازیم ممکن است اختلال ایجاد کنند!",
     "description": "English: Notifications -> uBlock and AdNauseam may conflict!"
   },
   "adnNotificationOperaSetting": {
-    "message": "Please allow AdNauseam to access search page results",
+    "message": "لطفا به ادنازیم اجازه دسترسی به صفحه نتایج جستجو را بدهید",
     "description": "English: Notifications -> Please allow AdNauseam to access search page results"
   },
   "adnNotificationBrowserSetting": {
-    "message": "The 'Content Blocking' settings in your browser may interfere with AdNauseam!",
+    "message": "تنظیمات 'مسدودی متن' در مرورگر شما ممکن است در ادنازیم اختلال ایجاد کند!",
     "description": "English: Notifications -> The 'Content Blocking' settings in your browser may interfere with AdNauseam!"
   },
   "adnNotificationPrivacyMode": {
-    "message": "You have allowed adnauseam to have access to your online activities while private browsing.",
+    "message": "شما اجازه دادید ادنازیم به فعالیت آنلاین شما هنگام مرور خصوصی دسترسی داشته باشد.",
     "description": "English: Notifications -> You have allowed adnauseam to have access to your online activities while private browsing."
   },
   "adnNotificationDNTAllowed": {
-    "message": "This page respects <b>Do Not Track</b>, Ads are allowed.",
+    "message": "این صفحه <b> دنبال نکن <\/b> احترام می‌گذارد، تبلیغات مجاز است.",
     "description": "English: Notifications -> This page respects Do Not Track, Ads are allowed."
   },
   "adnNotificationDNTHidingNotClicking": {
-    "message": "This page respects <b>Do Not Track</b>, hiding not clicking.",
+    "message": "این صفحه به <b> دنبال نکن <\/b> احترام می‌گذارد، پنهان می کند، کلیک نمی کند.",
     "description": "English: Notifications -> This page respects Do Not Track, hiding not clicking."
   },
   "adnNotificationDNTClickingNotHiding": {
-    "message": "This page respects <b>Do Not Track</b>, clicking not hiding",
+    "message": "این صفحه به <b> دنبال نکن <\/b> احترام می‌گذارد، کلیک می کند، پنهان نمی کند",
     "description": "English: Notifications -> This page respects Do Not Track, clicking not hiding."
   },
   "adnNotificationDNTJustSoYouKnow": {
-    "message": "This page respects <b>Do Not Track</b>, just so you know.",
+    "message": "این صفحه به <b> دنبال نکن <\/b> احترام می‌گذارد، خیالتان راحت.",
     "description": "English: Notifications -> This page respects Do Not Track, just so you know."
   },
   "adnNotificationShowAdsDebug": {
-    "message": "The Advanced Setting \"Show Ads Debug\" is turned on",
+    "message": "تنظیمات پیشرفته \"نمایش و دیباگ\" روشن است",
     "description": "English: Notifications -> The Advanced Setting \"Show Ads Debug\" is turned on"
   },
+  "adnNewerVersionAvailableNotification": {
+    "message": "ورژن جدید ادنازیم قابل دریافت است",
+    "description": "English: Notifications -> A newer version of AdNauseam is available"
+  },
   "adnTarget": {
-    "message": "TARGET",
+    "message": "هدف",
     "description": "English: Vault.html -> inspected Ad -> TARGET"
   },
   "adnFoundOn": {
-    "message": "FOUND ON",
+    "message": "پیدا شده در",
     "description": "English: Vault.html -> inspected Ad -> FOUND ON"
   },
   "adnNotYetVisited": {
-    "message": "Not Yet Visited",
+    "message": "هنوز مراجعه نشده",
     "description": "English: Not Yet Visited"
   },
   "adnAllowedByDNT": {
-    "message": "Allowed via Do Not Track policy",
+    "message": "طبق سیاست دنبال نکن مجاز است",
     "description": "English: Not Yet Visited"
   },
   "adnFirstRunSwitchMeOn": {
-    "message": "Switch me on",
+    "message": "من را فعال کن",
     "description": "English: Firstrun.html -> Switch me on"
   },
   "adnFirstRunThatsIt": {
-    "message": "That's it? ok…",
+    "message": "آیا همینه؟ باشه …",
     "description": "English: Firstrun.html -> That's it? ok…"
   },
   "adnFirstRunBetterButStill": {
-    "message": "Better, but still…",
+    "message": "بهتر، اما همچنان …",
     "description": "English: Firstrun.html -> Better, but still…"
   },
   "adnFirstRunLetsGo": {
-    "message": "Let's go!",
+    "message": "بزن بریم!",
     "description": "English: Firstrun.html -> Let's go!"
   },
   "goToAdNauseamWebsite": {
-    "message": "Go to AdNauseam website",
+    "message": "برو به سایت ادنازیم",
     "description": "English: Menu icon title -> Go to AdNauseam website"
   },
   "adnPausedOnPage": {
-    "message": "AdNauseam is paused on this page",
-    "description": "English: Menu->display when paused on page/site"
+    "message": "ادنازیم در این صفحه موقتا غیرفعال است",
+    "description": "English: Menu->display when paused on page\/site"
   },
   "adnNotHiding": {
-    "message": "AdNauseam is not currently hiding Ads",
+    "message": "ادنازیم در حال حاضر تبلیغات ها را پنهان نمی کند",
     "description": "English: Menu->display when not hiding Ads"
   },
   "adnVaultName": {
-    "message": "AdNauseam — AdVault",
+    "message": "ادنازیم - صندوق تبلیغات",
     "description": "English: AdNauseam — Ad Vault"
   },
   "myStatistics": {
-    "message": "My Statistics",
+    "message": "آمار من",
     "description": "appears in ADN vault, above ad slider"
   },
   "topAdnetworks": {
-    "message": "Top Ad Networks",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "شبکه های برتر تبلیغات",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "topSites": {
-    "message": "Top Sites",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "سایت های برتر",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypes": {
-    "message": "Ad Types",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "انواع تبلیغات",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesImageAds": {
-    "message": "Image Ads",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "عکس های تبلیغاتی",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesTextAds": {
-    "message": "Text Ads",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "متن های تبلیغاتی",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adnShowingRecentAds": {
-    "message": "No Ads collected on this page (showing recent)",
+    "message": "هیچ تبلیغاتی در این صفحه جمع‌آوری نمی شود (در حال نمایش اخیر)",
     "description": "shown in menu when only 'recent' Ads are shown"
   },
   "adnThisPageStrictBlocked": {
-    "message": "{{domain}} is currently strict-blocked.",
+    "message": "{{domain}} در حال حاضر سختگیرانه مسدود است.",
     "description": "shown in menu when the current page is strict-blocked"
   },
   "adnStrictBlockListDescription": {
-    "message": "The strict-block list serves to help the users to strict-block specific domains or pages more easily.",
+    "message": "لیست مسدود سازی سختگیرانه کمک می کند تا کاربران سایت های مشخص را در صفحات به سادگی سختگیرانه مسدود کنند.",
     "description": "Description on the strict-block list tab, which is found on the dashboard"
   },
   "adnExportedAdsFilename": {
-    "message": "AdNauseam_Export_{{datetime}}.json",
+    "message": "ادنازیم_استخراج_شده_در_{{datetime}}.json",
     "description": "English: AdNauseam file export"
   },
   "adnImportAlertFormat": {
-    "message": "The file doesn't contain any Ads, please choose another file.",
+    "message": "تبلیغاتی در این فایل وجود ندارد، لطفا فایل دیگری انتخاب کنید.",
     "description": "appears in ADN vault, after import"
   },
   "adnImportAlert": {
-    "message": "{{count}} new Ads were imported",
+    "message": "{{count}} تبلیغات جدید وارد شد",
     "description": "appears in ADN vault, after import"
   },
   "adnClearConfirm": {
-    "message": "This action will permanently remove ALL of your Ads",
+    "message": "این کار تمام تبلیغات هایتان را برای همیشه حذف می کند",
     "description": "appears in ADN settings"
   },
   "adnPurgeConfirm": {
-    "message": "This action will permanently remove all ads with load image error. Make sure your internet is connected, otherwise all your ads will be deleted.",
+    "message": "این کار تمامی تبلیغات هایی را که عکس قابل بارگیری نیست، برای همیشه حذف می کند. فکر خوبی است اگر قبل از اینکار از صندوق تان نسخه پشتیبان ایجاد کنید، و مطمئن شوید به اینترنت وصل هستید.",
     "description": "appears in ADN settings"
   },
   "adnAdClickingStatusPending": {
-    "message": "Pending",
+    "message": "در حال انتظار",
     "description": "Menu & AdVault: Pending"
   },
   "adnAdClickingStatusVisited": {
-    "message": "Visited",
+    "message": "نمایش داده شده",
     "description": "Menu & AdVault: Visited"
   },
   "adnAdClickingStatusFailed": {
-    "message": "Failed",
+    "message": "ناموفق",
     "description": "Menu & AdVault: Failed"
   },
   "adnAdClickingStatusSkippedDNT": {
-    "message": "SKIPPED: DNT Allowed",
+    "message": "رد شد: دنبال نکن مجاز است",
     "description": "Menu & AdVault: SKIPPED: DNT Allowed"
   },
   "adnAdClickingStatusSkippedUser": {
-    "message": "SKIPPED: Clicked by user",
+    "message": "رد شد: توسط کاربر کلیک شد",
     "description": "Menu & AdVault: SKIPPED: Clicked by User"
   },
   "adnAdClickingStatusSkippedFrequency": {
-    "message": "SKIPPED: Click Frequency",
+    "message": "رد شد: تعداد کلیک در ثانیه",
     "description": "Menu & AdVault: SKIPPED: Click Frequency"
   },
   "adnAdClickingStatusSkippedDisabled": {
-    "message": "SKIPPED: Clicking Disabled",
+    "message": "رد شد: کلیک کردن غیر فعال است",
     "description": "Menu & AdVault: SKIPPED: Clicking disabled"
   },
   "adnMenuViewLog": {
-    "message": "View Log",
+    "message": "نمایش گزارش",
     "description": "appears in ADN popup menu"
   },
   "adnMenuAdsClicked": {
-    "message": "clicked {{number}}",
+    "message": "{{number}} بار کلیک شد",
     "description": "appears in ADN popup menu and vault"
   },
   "adnMenuAdsDetected": {
-    "message": "{{count}} Ads detected",
+    "message": "{{count}} عدد تبلیغات پیدا شد",
     "description": "appears in ADN popup menu"
   },
   "adnMenuViewVault": {
-    "message": "View Ad Vault",
+    "message": "نمایش صندوق تبلیغات",
     "description": "appears in ADN popup menu"
   },
   "adnMenuResume": {
-    "message": "Resume",
+    "message": "ادامه",
     "description": "appears in ADN popup menu three state button"
   },
   "adnMenuDisable": {
-    "message": "Disable",
+    "message": "غیر فعال",
     "description": "Disabled Adnauseam -> appears in ADN popup menu three state button"
   },
   "adnMenuActive": {
-    "message": "Active",
+    "message": "فعال",
     "description": "Make Adnauseam Active -> appears in ADN popup menu three state button"
   },
   "adnMenuStrict": {
-    "message": "Strict",
+    "message": "سختگیرانه",
     "description": "Activate Strict-Block -> appears in ADN popup menu three state button"
   },
   "adnMenuDisableScopeDomain": {
-    "message": "on {{domain}}",
+    "message": "در {{domain}}",
     "description": "Disable AdNaueam Block On this Domain -> Popup option that appears inside ADN menu"
   },
   "adnMenuDisableScopePage": {
-    "message": "on this page",
+    "message": "در این صفحه",
     "description": "Disable AdNaueam Block On This Page -> Popup option that appears inside ADN menu"
   },
   "adnMenuSettings": {
-    "message": "Settings",
+    "message": "تنظیمات",
     "description": "appears in ADN popup menu"
   },
   "adnMenuExportOptions": {
-    "message": "Export Options",
+    "message": "تنظیمات استخراج",
     "description": "appears in Menu - Export Dialog box"
   },
   "adnMenuExportAdsOnly": {
-    "message": "Ads Only",
+    "message": "فقط تبلیغات",
     "description": "appears in Menu - Export Dialog box"
   },
   "adnMenuExportSettingsOnly": {
-    "message": "Settings Only",
+    "message": "فقط تنظیمات",
     "description": "appears in Menu - Export Dialog box"
   },
   "adnMenuExportSettingsAndAds": {
-    "message": "Settings and Ads",
+    "message": "تنظیمات و تبلیغات",
     "description": "appears in Menu - Export Dialog box"
   },
   "adnMenuImportAds": {
-    "message": "Import Ads",
+    "message": "وارد کردن تبلیغات",
     "description": "appears in ADN popup menu"
   },
   "adnMenuDisableAllLogging": {
-    "message": "Disable all logging",
+    "message": "غیرفعال سازی ثبت تمامی گزارش ها",
     "description": "appears in ADN popup menu"
   },
   "adnMenuDisableOutgoingReferrer": {
-    "message": "Disable outgoing referrer",
+    "message": "غیرفعال سازی معرف های خارج شونده",
     "description": "appears in ADN popup menu"
   },
   "adnMenuClearAds": {
-    "message": "Clear Ads with browser history",
+    "message": "پاک سازی تبلیغات با تاریخچه مرورگر",
     "description": "appears in ADN popup menu"
   },
   "adnMenuHideBadge": {
-    "message": "Hide Ad count on icon",
+    "message": "پنهان سازی تعداد تبلیغات در آیکن",
     "description": "appears in ADN popup menu"
   },
   "adnMenuClearAdsNow": {
-    "message": "Clear Ads",
+    "message": "پاک سازی تبلیغات",
     "description": "appears in ADN popup menu"
   },
   "adnLogNoLog": {
-    "message": "No log available",
+    "message": "هیچ گزارشی یافت نشد",
     "description": "appears in ADN log page"
   },
   "adnLogViewFullLog": {
-    "message": "View full log",
+    "message": "نمایش کامل گزارش",
     "description": "appears in ADN log page"
   },
   "adnVaultSince": {
-    "message": "Since {{datetime}}",
+    "message": "از {{datetime}}",
     "description": "appears on vault page"
   },
   "adnVaultExport": {
-    "message": "Export",
+    "message": "صادرات",
     "description": "appears on vault page"
   },
   "adnVaultImport": {
-    "message": "Import",
+    "message": "واردات",
     "description": "appears on vault page"
   },
   "adnVaultClear": {
-    "message": "Clear",
+    "message": "پاک سازی",
     "description": "appears on vault page"
   },
   "adnPurgeDeadAds": {
-    "message": "Purge Dead Ads",
+    "message": "حذف تبلیغات مرده",
     "description": "appears on vault page"
   },
+  "adnShowDeadAds": {
+    "message": "نمایش تبلیغات مرده",
+    "description": "appears on vault page"
+  },
+  "adnHideDeadAds": {
+    "message": "پنهان سازی تبلیغات مرده",
+    "description": "appears on vault page"
+  },
+  "adnCaptureVault": {
+    "message": "ضبط",
+    "description": "appears on vault page in dev mode"
+  },
   "adnVaultFound": {
-    "message": "{{total}} ads collected",
+    "message": "{{total}} عدد تبلیغ جمع آوری شد",
     "description": "appears on vault page"
   },
   "adnVaultShowing": {
-    "message": "showing",
+    "message": "نمایش",
     "description": "appears on vault page"
   },
   "adnVaultDeleteThisAd": {
-    "message": "delete this Ad",
+    "message": "حذف این تبلیغ",
     "description": "appears on vault page"
   },
   "adnVaultTotalEstimated": {
-    "message": "total estimated",
+    "message": "تخمین کل",
     "description": "appears on vault page"
   },
   "adnVaultAdsCost": {
-    "message": "cost",
+    "message": "هزینه",
     "description": "appears on vault page"
   },
   "hidingAdsPrompt": {
-    "message": "Hide Ads identified by your chosen filter lists",
+    "message": "تبلیغات مشخص شده توسط لیست های فیلتر انتخابی تان را پنهان کن",
     "description": "English: Hide Ads identified by your chosen filter lists"
   },
   "clickingAdsPrompt": {
-    "message": "Click Ads identified by your chosen filter lists",
+    "message": "تبلیغات مشخص شده توسط لیست های فیلتر انتخابی تان را کلیک کن",
     "description": "English: Click Ads identified by your chosen filter lists"
   },
   "blockingMalwarePrompt": {
-    "message": "Block trackers and other malware",
+    "message": "دنبال کننده ها و سایر بدافزار ها را مسدود کن",
     "description": "English: lock trackers and other malware"
   },
   "parseTextAdsPrompt": {
-    "message": "Capture text-only Ads when possible",
+    "message": "تبلیغات متنی را در صورت امکان ضبط کن",
     "description": "English: Capture text-only Ads when possible"
   },
   "settingsIconBadgePrompt": {
-    "message": "Display the number of Ads on the icon",
+    "message": "تعداد تبلیغات را در آیکن نمایش بده",
     "description": "English: Show the number of found Ads on the icon"
   },
   "settingsExtraPrivacyPrompt": {
-    "message": "Extra Privacy",
+    "message": "حریم خصوصی بیشتر",
     "description": "English: Interface"
   },
   "settingsInterfacePrompt": {
-    "message": "Interface",
+    "message": "رابط کاربری",
     "description": "English: Interface"
   },
   "noIncomingCookiesPrompt": {
-    "message": "Ignore cookies returned with clicks",
+    "message": "کوکی های برگشتی توسط کلیک ها را در نظر نگیر",
     "description": "English: Ignore cookies returned with clicks"
   },
   "noOutgoingCookiesPrompt": {
-    "message": "Don't send cookies on visits",
+    "message": "کوکی ها را هنگام مراجعه ارسال نکن",
     "description": "English: Don't send cookies on visits"
   },
   "noOutgoingUserAgentPrompt": {
-    "message": "Hide user-agent header on visits",
+    "message": "اطلاعات مرورگر کاربر را هنگام مراجعه مخفی کن",
     "description": "English: Hide user-agent header on visits"
   },
   "noOutgoingRefererPrompt": {
-    "message": "Hide referring page on visits",
+    "message": "صفحه ارجاع دهنده را هنگام مراجعه پنهان کن",
     "description": "English: Hide referring page on visits"
   },
   "ClickingFrequencyRarely": {
-    "message": "Rarely",
+    "message": "به ندرت",
     "description": "English: Click Frequency - Rarely"
   },
   "ClickingFrequencySometimes": {
-    "message": "Sometimes",
+    "message": "گاهی اوقات",
     "description": "English: Click Frequency - Sometimes"
   },
   "ClickingFrequencyAlways": {
-    "message": "Always",
+    "message": "همیشه",
     "description": "English: Click Frequency - Always"
   },
   "respectDNTPrompt": {
-    "message": "Make exceptions for non-tracking Ads",
+    "message": "برای تبلیغات بدون دنبال کننده استثنا قائل شو",
     "description": "English: Make exceptions for non-tracking Ads"
   },
   "disableHidingForDNTPrompt": {
-    "message": "Don't hide non-tracking Ads",
+    "message": "تبلیغات بدون دنبال کننده را پنهان نکن",
     "description": "English: Don't hide non-tracking Ads"
   },
   "disableClickingForDNTPrompt": {
-    "message": "Don't click non-tracking Ads",
+    "message": "نمی خوام کلیک کنم روی هیچ تبلیغات ردگیری",
     "description": "English: Don't click non-tracking Ads"
   },
   "extName": {
-    "message": "AdNauseam",
+    "message": "ادنازیم",
     "description": "extension name"
   },
   "extShortDesc": {
-    "message": "Fight back against advertising surveillance",
+    "message": "بر علیه نظارت بر تبلیغات مقابله کن",
     "description": "for the chrome web store: must be 132 characters or less"
   },
   "3pGroupEssentials": {
-    "message": "Essentials",
+    "message": "ملزومات",
     "description": "English: Essentials"
   },
   "3pGroupOther": {
-    "message": "Other",
+    "message": "دیگر",
     "description": "English: Other"
   },
   "3pGroupMalware": {
-    "message": "Malware",
+    "message": "بد افزار",
     "description": "English: Malware"
   },
   "3pGroupRegions": {
-    "message": "Languages",
+    "message": "Languages زبان",
     "description": "English: Languages"
   },
   "3pPageUpdate": {
-    "message": "Update",
+    "message": "به روز رسانی",
+    "description": "English: update"
+  },
+  "adnUpdateButton": {
+    "message": "به روز رسانی",
     "description": "English: update"
   },
   "whitelistPageName": {
-    "message": "Trusted sites",
+    "message": "سایت های معتمد",
     "description": "appears as tab name in dashboard"
   },
   "strictBlockListPageName": {
-    "message": "Strict-Block List",
+    "message": "لیست مسدود سازی سختگیرانه",
     "description": "appears as tab name in dashboard"
   },
   "eventLoggingPrompt": {
-    "message": "Activate debugging mode",
+    "message": "حالت دیباگ",
     "description": "prompt for toggle"
   },
   "disableWarnings": {
-    "message": "Disable warnings",
+    "message": "هشدار ها را غیر فعال کن",
     "description": "English:Disable warnings"
   },
+  "blurCollectedAds": {
+    "message": "تبلیغات جمع‌آوری شده را مات کن",
+    "description": "English: Blur Collected ads"
+  },
+  "hideDeadAds": {
+    "message": "تبلیغات مرده را پنهان کن",
+    "description": "English: Hide Dead ads"
+  },
   "showAdsDebugPrompt": {
-    "message": "Show ads for ad-collection debugging",
+    "message": "تبلیغات را برای دیباگ جمع‌آوری تبلیغات نمایش بده",
     "description": "English: Show ads for ad-collection debugging"
   },
   "removeAdsInPrivate": {
-    "message": "Remove ads collected in private mode",
+    "message": "تبلیغات جمع‌آوری شده در حالت خصوصی راحذف کن",
     "description": "English:Remove ads collected in private mode - settings page"
   },
   "settingsStrictBlockingMode": {
-    "message": "Activate Strict-Blocking Mode",
+    "message": "حالت مسدود سازی سختگیرانه را فعال کن",
     "description": "English: Activate Strict-Blocking Mode"
+  },
+  "adnRefreshButton": {
+    "message": "بازنشانی",
+    "description": "English: refresh page from menu notification button"
+  },
+  "adnRefreshNotification": {
+    "message": "تغییرات را در صفحه فعلی اعمال کن",
+    "description": "English: refresh page from menu notification"
+  },
+  "supportS6P3S1": {
+    "message": "مطمئن شوید این اختلال <b>فقط مربوط به ادنازیم<\/b> است.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P3S2": {
+    "message": "من دقیقا همین صفحه را در <a url='https:\/\/github.com\/gorhill\/uBlock'>#uBO#<\/a> امتحان کرده ام و مطئمن هستم این اختلال  <b>فقط مربوط به ادنازیم<\/b> است.",
+    "description": "A checkbox in the filter issue reporter section"
+  },
+  "supportS6Select1Option7": {
+    "message": "عدم جمع‌آوری تبلیغات",
+    "description": "Ads are present on page but none are collected"
   }
 }

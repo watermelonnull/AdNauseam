@@ -6,13 +6,15 @@ echo    # (optional) move to a new line
 if [[ $REPLY =~ ^[Yy]$ ]]
 then  
   VERSION=$1
+  BRANCH=${2:-master}
+  echo "Merging to AdNauseam $VERSION on branch $BRANCH"
   if [[ -z $(git status -s) ]]
   then
     echo "Merging to uBlock $VERSION"
     git fetch --all --tags --prune
     git checkout tags/$VERSION
     git checkout -b upstream$VERSION
-    git checkout master
+    git checkout "$BRANCH"
     git checkout -b merge$VERSION
     git merge upstream$VERSION
   else

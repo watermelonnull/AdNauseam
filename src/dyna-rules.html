@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark" />
 <title>uBlock — Dynamic filtering rules</title>
 <link rel="stylesheet" href="css/fonts/stylesheet.css">
 <link rel="stylesheet" href="lib/codemirror/lib/codemirror.css">
@@ -21,7 +22,7 @@
 
 <div class="body">
     <div id="cloudWidget" class="hide" data-cloud-entry="myRulesPane"></div>
-    <p class="vverbose"><span data-i18n="rulesHint"></span> <a class="fa-icon info" href="https://github.com/gorhill/uBlock/wiki/Dynamic-filtering:-rule-syntax" target="_blank">info-circle</a></p>
+    <p class="vverbose"><span data-i18n="rulesHint"></span></p>
     <div id="diff">
         <div class="tools">
             <div class="ruleActions">
@@ -41,7 +42,7 @@
 <div id="ruleFilter">
     <span><span class="fa-icon">filter</span>&nbsp;<input type="search" size="16"></span>&emsp;<span data-i18n="rulesSort"></span>&nbsp;<select><option value="0" selected data-i18n="rulesSortByType"><option value="1" data-i18n="rulesSortBySource"><option value="2" data-i18n="rulesSortByDestination"></select>&emsp;<span id="diffCollapse" class="fa-icon">double-angle-up</span>
 </div>
-<div class="codeMirrorContainer codeMirrorMergeContainer"></div>
+<div class="codeMirrorContainer codeMirrorMergeContainer cm-theme-override"></div>
 
 <div id="templates" style="display: none;">
     <input class="hidden" id="importFilePicker" type="file" accept="text/plain">
@@ -54,13 +55,13 @@
 <script src="lib/codemirror/addon/selection/active-line.js"></script>
 <script src="lib/hsluv/hsluv-0.1.0.min.js"></script>
 
-<script src="js/fa-icons.js"></script>
+<script src="js/fa-icons.js" type="module"></script>
 <script src="js/vapi.js"></script>
 <script src="js/vapi-common.js"></script>
 <script src="js/vapi-client.js"></script>
-<script src="js/udom.js"></script>
+<script src="js/theme.js" type="module"></script>
 <script src="js/i18n.js" type="module"></script>
-<script src="js/dashboard-common.js"></script>
+<script src="js/dashboard-common.js" type="module"></script>
 <script src="js/cloud-ui.js" type="module"></script>
 <script src="js/dyna-rules.js" type="module"></script>
 

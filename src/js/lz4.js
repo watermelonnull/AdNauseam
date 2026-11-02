@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2018-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -21,10 +21,6 @@
 
 /* global lz4BlockCodec */
 
-'use strict';
-
-/******************************************************************************/
-
 import µb from './background.js';
 
 /*******************************************************************************
@@ -38,33 +34,21 @@ import µb from './background.js';
 
 /******************************************************************************/
 
-let lz4CodecInstance;
-let pendingInitialization;
+let promisedInstance;
 let textEncoder, textDecoder;
 let ttlCount = 0;
-let ttlTimer;
 let ttlDelay = 60000;
 
 const init = function() {
-    ttlDelay = µb.hiddenSettings.autoUpdateAssetFetchPeriod * 1000 + 15000;
-    if ( lz4CodecInstance === null ) {
-        return Promise.resolve(null);
-    }
-    if ( lz4CodecInstance !== undefined ) {
-        return Promise.resolve(lz4CodecInstance);
-    }
-    if ( pendingInitialization === undefined ) {
+    ttlDelay = µb.hiddenSettings.autoUpdateAssetFetchPeriod * 2 * 1000;
+    if ( promisedInstance === undefined ) {
         let flavor;
         if ( µb.hiddenSettings.disableWebAssembly === true ) {
             flavor = 'js';
         }
-        pendingInitialization = lz4BlockCodec.createInstance(flavor)
-            .then(instance => {
-                lz4CodecInstance = instance;
-                pendingInitialization = undefined;
-            });
+        promisedInstance = lz4BlockCodec.createInstance(flavor);
     }
-    return pendingInitialization;
+    return promisedInstance;
 };
 
 // We can't shrink memory usage of lz4 codec instances, and in the
@@ -81,24 +65,21 @@ const destroy = function() {
     //        lz4CodecInstance.bytesInUse() >>> 10
     //    );
     //}
-    lz4CodecInstance = undefined;
+    promisedInstance = undefined;
     textEncoder = textDecoder = undefined;
     ttlCount = 0;
-    ttlTimer = undefined;
 };
+
+const ttlTimer = vAPI.defer.create(destroy);
 
 const ttlManage = function(count) {
-    if ( ttlTimer !== undefined ) {
-        clearTimeout(ttlTimer);
-        ttlTimer = undefined;
-    }
+    ttlTimer.off();
     ttlCount += count;
     if ( ttlCount > 0 ) { return; }
-    if ( lz4CodecInstance === null ) { return; }
-    ttlTimer = vAPI.setTimeout(destroy, ttlDelay);
+    ttlTimer.on(ttlDelay);
 };
 
-const encodeValue = function(dataIn) {
+const encodeValue = function(lz4CodecInstance, dataIn) {
     if ( !lz4CodecInstance ) { return; }
     //let t0 = window.performance.now();
     if ( textEncoder === undefined ) {
@@ -126,7 +107,7 @@ const encodeValue = function(dataIn) {
     return outputArray;
 };
 
-const decodeValue = function(inputArray) {
+const decodeValue = function(lz4CodecInstance, inputArray) {
     if ( !lz4CodecInstance ) { return; }
     //let t0 = window.performance.now();
     if (
@@ -166,8 +147,8 @@ const lz4Codec = {
             return dataIn;
         }
         ttlManage(1);
-        await init();
-        let dataOut = encodeValue(dataIn);
+        const lz4CodecInstance = await init();
+        let dataOut = encodeValue(lz4CodecInstance, dataIn);
         ttlManage(-1);
         if ( serialize instanceof Function ) {
             dataOut = await serialize(dataOut);
@@ -187,8 +168,8 @@ const lz4Codec = {
             return dataIn;
         }
         ttlManage(1);
-        await init();
-        const dataOut = decodeValue(dataIn);
+        const lz4CodecInstance = await init();
+        const dataOut = decodeValue(lz4CodecInstance, dataIn);
         ttlManage(-1);
         return dataOut || dataIn;
     },

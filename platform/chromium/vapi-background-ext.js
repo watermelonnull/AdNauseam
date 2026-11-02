@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2017-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,10 +19,6 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-// For background page
-
-'use strict';
-
 /******************************************************************************/
 
 // https://github.com/uBlockOrigin/uBlock-issues/issues/1659
@@ -30,6 +26,8 @@
 //   so we synthetize these missing events when this happens.
 // https://github.com/uBlockOrigin/uAssets/issues/10323
 //   Also mind whether the new tab is launched from an external application.
+// https://github.com/uBlockOrigin/uBlock-issues/issues/2227
+//   Revert commit related to issue above.
 
 vAPI.Tabs = class extends vAPI.Tabs {
     constructor() {
@@ -70,8 +68,7 @@ vAPI.Tabs = class extends vAPI.Tabs {
         const isClientRedirect =
             Array.isArray(details.transitionQualifiers) &&
             details.transitionQualifiers.includes('client_redirect');
-        const isStartPage = details.transitionType === 'start_page';
-        if ( isClientRedirect === false && isStartPage === false ) { return; }
+        if ( isClientRedirect === false ) { return; }
         this.onCreatedNavigationTargetHandler({
             tabId: details.tabId,
             sourceTabId: details.tabId,
@@ -85,81 +82,52 @@ vAPI.Tabs = class extends vAPI.Tabs {
 
 {
     const extToTypeMap = new Map([
-        ['eot','font'],['otf','font'],['svg','font'],['ttf','font'],['woff','font'],['woff2','font'],
+        ['eot','font'],['otf','font'],['ttf','font'],['woff','font'],['woff2','font'],
         ['mp3','media'],['mp4','media'],['webm','media'],
-        ['gif','image'],['ico','image'],['jpeg','image'],['jpg','image'],['png','image'],['webp','image']
+        ['gif','image'],['ico','image'],['jpeg','image'],['jpg','image'],['png','image'],['svg','image'],['webp','image']
     ]);
-
-    const headerValue = (headers, name) => {
-        let i = headers.length;
-        while ( i-- ) {
-            if ( headers[i].name.toLowerCase() === name ) {
-                return headers[i].value.trim();
-            }
-        }
-        return '';
-    };
 
     const parsedURL = new URL('https://www.example.org/');
 
-    // Extend base class to normalize as per platform.
+    // Extend base class to normalize as per platform
 
     vAPI.Net = class extends vAPI.Net {
-        constructor() {
-            super();
-            this.suspendedTabIds = new Set();
-        }
-
         normalizeDetails(details) {
             // Chromium 63+ supports the `initiator` property, which contains
-            // the URL of the origin from which the network request was made.
-            if (
-                typeof details.initiator === 'string' &&
-                details.initiator !== 'null'
-            ) {
+            // the URL of the origin from which the network request was made
+            if ( details.initiator && details.initiator !== 'null' ) {
                 details.documentUrl = details.initiator;
             }
-
-            let type = details.type;
-
+            const type = details.type;
             if ( type === 'imageset' ) {
                 details.type = 'image';
                 return;
             }
-
-            // The rest of the function code is to normalize type
             if ( type !== 'other' ) { return; }
-
-            // Try to map known "extension" part of URL to request type.
-            parsedURL.href = details.url;
-            const path = parsedURL.pathname,
-                  pos = path.indexOf('.', path.length - 6);
-            if ( pos !== -1 && (type = extToTypeMap.get(path.slice(pos + 1))) ) {
-                details.type = type;
+            // Try to map known "extension" part of URL to request type
+            if ( details.responseHeaders === undefined ) {
+                parsedURL.href = details.url;
+                const path = parsedURL.pathname;
+                const pos = path.indexOf('.', path.length - 6);
+                if ( pos !== -1 ) {
+                    details.type = extToTypeMap.get(path.slice(pos + 1)) || type;
+                }
                 return;
             }
-
-            // Try to extract type from response headers if present.
-            if ( details.responseHeaders ) {
-                type = headerValue(details.responseHeaders, 'content-type');
-                if ( type.startsWith('font/') ) {
-                    details.type = 'font';
-                    return;
-                }
-                if ( type.startsWith('image/') ) {
-                    details.type = 'image';
-                    return;
-                }
-                if ( type.startsWith('audio/') || type.startsWith('video/') ) {
-                    details.type = 'media';
-                    return;
-                }
+            // Try to extract type from response headers
+            const ctype = this.headerValue(details.responseHeaders, 'content-type');
+            if ( ctype.startsWith('font/') ) {
+                details.type = 'font';
+            } else if ( ctype.startsWith('image/') ) {
+                details.type = 'image';
+            } else if ( ctype.startsWith('audio/') || ctype.startsWith('video/') ) {
+                details.type = 'media';
             }
         }
 
         // https://www.reddit.com/r/uBlockOrigin/comments/9vcrk3/
         //   Some types can be mapped from 'other', thus include 'other' if and
-        //   only if the caller is interested in at least one of those types.
+        //   only if the caller is interested in at least one of those types
         denormalizeTypes(types) {
             if ( types.length === 0 ) {
                 return Array.from(this.validTypes);
@@ -184,20 +152,21 @@ vAPI.Tabs = class extends vAPI.Tabs {
         // https://github.com/uBlockOrigin/uBlock-issues/issues/2063
         //   Do not interfere with root document
         suspendOneRequest(details) {
-            this.suspendedTabIds.add(details.tabId);
+            this.onBeforeSuspendableRequest(details);
             if ( details.type === 'main_frame' ) { return; }
-            return {
-                redirectUrl: vAPI.getURL(`web_accessible_resources/empty?secret=${vAPI.warSecret()}`)
-            };
+            return { cancel: true };
         }
 
         unsuspendAllRequests(discard = false) {
-            if ( discard !== true ) {
-                for ( const tabId of this.suspendedTabIds ) {
-                    vAPI.tabs.reload(tabId);
-                }
+            if ( discard === true ) { return; }
+            const toReload = [];
+            for ( const tabId of this.unprocessedTabs.keys() ) {
+                toReload.push(tabId);
             }
-            this.suspendedTabIds.clear();
+            this.removeUnprocessedRequest();
+            for ( const tabId of toReload ) {
+                vAPI.tabs.reload(tabId);
+            }
         }
     };
 }
@@ -235,6 +204,47 @@ vAPI.prefetching = (( ) => {
             );
             listening = true;
         }
+    };
+})();
+
+/******************************************************************************/
+
+vAPI.scriptletsInjector = (( ) => {
+    const parts = [
+        '(',
+        function(details) {
+            if ( self.uBO_scriptletsInjected !== undefined ) { return; }
+            const doc = document;
+            const { location } = doc;
+            if ( location === null ) { return; }
+            const { hostname } = location;
+            if ( hostname !== '' && details.hostname !== hostname ) { return; }
+            let script;
+            try {
+                script = doc.createElement('script');
+                script.appendChild(doc.createTextNode(details.scriptlets));
+                (doc.head || doc.documentElement).appendChild(script);
+                self.uBO_scriptletsInjected = details.filters;
+            } catch {
+            }
+            if ( script ) {
+                script.remove();
+                script.textContent = '';
+            }
+            return 0;
+        }.toString(),
+        ')(',
+            'json-slot',
+        ');',
+    ];
+    const jsonSlot = parts.indexOf('json-slot');
+    return (hostname, details) => {
+        parts[jsonSlot] = JSON.stringify({
+            hostname,
+            scriptlets: details.mainWorld,
+            filters: details.filters,
+        });
+        return parts.join('');
     };
 })();
 

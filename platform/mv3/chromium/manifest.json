@@ -1,0 +1,97 @@
+{
+  "action": {
+    "default_icon": {
+      "16": "img/icon_16.png",
+      "32": "img/icon_32.png",
+      "64": "img/icon_64.png"
+    },
+    "default_popup": "popup.html"
+  },
+  "author": "Daniel C. Howe",
+  "background": {
+      "service_worker": "/js/background.js",
+      "type": "module"
+   },
+  "commands": {
+    "enter-zapper-mode": {
+      "description": "__MSG_zapperTipEnter__"
+    },
+    "enter-picker-mode": {
+      "description": "__MSG_pickerTipEnter__"
+    }
+  },
+  "declarative_net_request": {
+    "rule_resources": [
+    ]
+  },
+  "default_locale": "en",
+  "description": "__MSG_extShortDesc__",
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "incognito": "split",
+  "icons": {
+    "16": "img/icon_16.png",
+    "32": "img/icon_32.png",
+    "64": "img/icon_64.png",
+    "128": "img/icon_128.png"
+  },
+  "manifest_version": 3,
+  "minimum_chrome_version": "122.0",
+  "name": "__MSG_extName__",
+  "options_page": "dashboard.html",
+  "permissions": [
+    "activeTab",
+    "alarms",
+    "declarativeNetRequest",
+    "offscreen",
+    "scripting",
+    "storage",
+    "unlimitedStorage",
+    "userScripts"
+  ],
+  "short_name": "AdNauseam",
+  "storage": {
+    "managed_schema": "managed_storage.json"
+  },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqnR3323JZ7mnOAXR1J8qCN53z14jXhWCONfYPhVHijW407LDZGuW0nrAzLIqb4lr11aRbcqPpbcMde0H2pu+uE56ZURj3UQOPwuLMrXLUdShJi9ugg3cxs1PdJKkXvr7RrEBEAvwnzdE98tdiuxavR1g370+M29W/ieFhjzzhM7Y4BthLuyZrcA2/suN/y2ELp0WMQjgD3Bbw7DSia7dlcGp+VhwAWb15+ZI+M0KKPqWMuhU6VFtr+ra7QOjbVzDDlqgg96oVl7fefvr0R4RLFGopZWj97m26vbEHh6Ipgi6g1UV6GDu2OjEI76rqm08TuVEBT3HjHX6FDhQbo9NswIDAQAB",
+  "version": "0.1.1",
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "/strictblock.html"
+      ],
+      "matches": [
+        "<all_urls>"
+      ],
+      "use_dynamic_url": true
+    },
+    {
+      "resources": [
+        "/zapper-ui.html"
+      ],
+      "matches": [
+        "<all_urls>"
+      ],
+      "use_dynamic_url": true
+    },
+    {
+      "resources": [
+        "/picker-ui.html"
+      ],
+      "matches": [
+        "<all_urls>"
+      ],
+      "use_dynamic_url": true
+    },
+    {
+      "resources": [
+        "/unpicker-ui.html"
+      ],
+      "matches": [
+        "<all_urls>"
+      ],
+      "use_dynamic_url": true
+    }
+  ]
+}

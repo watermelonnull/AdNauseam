@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    AdNauseam Lite - a comprehensive, MV3-compliant content blocker
     Copyright (C) 2014-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,255 +19,114 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-'use strict';
+import { browser, i18n, sendMessage } from './ext.js';
+import { dom, qs$ } from './dom.js';
+import { hashFromIterable } from './dashboard.js';
+import { renderFilterLists } from './filter-lists.js';
 
 /******************************************************************************/
 
-import { browser, sendMessage } from './ext.js';
-import { i18n$ } from './i18n.js';
-import { dom, qs$, qsa$ } from './dom.js';
-import { simpleStorage } from './storage.js';
-
-/******************************************************************************/
-
-const rulesetMap = new Map();
-let cachedRulesetData = {};
-let hideUnusedSet = new Set([ 'regions' ]);
-
-/******************************************************************************/
-
-function renderNumber(value) {
-    return value.toLocaleString();
-}
-
-/******************************************************************************/
-
-function rulesetStats(rulesetId) {
-    const hasOmnipotence = cachedRulesetData.defaultFilteringMode > 1;
-    const rulesetDetails = rulesetMap.get(rulesetId);
-    if ( rulesetDetails === undefined ) { return; }
-    const { rules, filters } = rulesetDetails;
-    let ruleCount = rules.plain + rules.regex;
-    if ( hasOmnipotence ) {
-        ruleCount += rules.removeparam + rules.redirect + rules.csp;
+function renderAdminRules() {
+    const { disabledFeatures: forbid = [] } = self.cachedRulesetData;
+    if ( forbid.length === 0 ) { return; }
+    dom.body.dataset.forbid = forbid.join(' ');
+    if ( forbid.includes('dashboard') ) {
+        dom.body.dataset.pane = 'about';
     }
-    const filterCount = filters.accepted;
-    return { ruleCount, filterCount };
 }
 
 /******************************************************************************/
 
-function renderFilterLists(soft = false) {
-    const { enabledRulesets, rulesetDetails } = cachedRulesetData;
-    const listGroupTemplate = qs$('#templates .groupEntry');
-    const listEntryTemplate = qs$('#templates .listEntry');
-    const listStatsTemplate = i18n$('perRulesetStats');
-    const groupNames = new Map([ [ 'user', '' ] ]);
-
-    const liFromListEntry = function(ruleset, li, hideUnused) {
-        if ( !li ) {
-            li = listEntryTemplate.cloneNode(true);
-        }
-        const on = enabledRulesets.includes(ruleset.id);
-        li.classList.toggle('checked', on);
-        if ( dom.attr(li, 'data-listkey') !== ruleset.id ) {
-            dom.attr(li, 'data-listkey', ruleset.id);
-            qs$('input[type="checkbox"]', li).checked = on;
-            qs$('.listname', li).textContent = ruleset.name || ruleset.id;
-            dom.cl.remove(li, 'toRemove');
-            if ( ruleset.homeURL ) {
-                dom.cl.add(li, 'support');
-                const elem = qs$('a.support', li);
-                dom.attr(elem, 'href', ruleset.homeURL);
-            } else {
-                dom.cl.remove(li, 'support');
-            }
-            if ( ruleset.instructionURL ) {
-                dom.cl.add(li, 'mustread');
-                dom.attr(qs$('a.mustread', li), 'href', ruleset.instructionURL);
-            } else {
-                dom.cl.remove(li, 'mustread');
-            }
-            dom.cl.toggle(li, 'isDefault', ruleset.isDefault === true);
-            dom.cl.toggle(li, 'unused', hideUnused && !on);
-        }
-        // https://github.com/gorhill/uBlock/issues/1429
-        if ( soft !== true ) {
-            qs$('input[type="checkbox"]', li).checked = on;
-        }
-        const stats = rulesetStats(ruleset.id);
-        li.title = listStatsTemplate
-            .replace('{{ruleCount}}', renderNumber(stats.ruleCount))
-            .replace('{{filterCount}}', renderNumber(stats.filterCount));
-        dom.attr(
-            qs$('.input.checkbox', li),
-            'disabled',
-            stats.ruleCount === 0 ? '' : null
-        );
-        dom.cl.remove(li, 'discard');
-        return li;
-    };
-
-    const listEntryCountFromGroup = function(groupRulesets) {
-        if ( Array.isArray(groupRulesets) === false ) { return ''; }
-        let count = 0,
-            total = 0;
-        for ( const ruleset of groupRulesets ) {
-            if ( enabledRulesets.includes(ruleset.id) ) {
-                count += 1;
-            }
-            total += 1;
-        }
-        return total !== 0 ?
-            `(${count.toLocaleString()}/${total.toLocaleString()})` :
-            '';
-    };
-
-    const liFromListGroup = function(groupKey, groupRulesets) {
-        let liGroup = qs$(`#lists > .groupEntry[data-groupkey="${groupKey}"]`);
-        if ( liGroup === null ) {
-            liGroup = listGroupTemplate.cloneNode(true);
-            let groupName = groupNames.get(groupKey);
-            if ( groupName === undefined ) {
-                groupName = i18n$('3pGroup' + groupKey.charAt(0).toUpperCase() + groupKey.slice(1));
-                groupNames.set(groupKey, groupName);
-            }
-            if ( groupName !== '' ) {
-                qs$('.geName', liGroup).textContent = groupName;
-            }
-        }
-        if ( qs$('.geName:empty', liGroup) === null ) {
-            qs$('.geCount', liGroup).textContent = listEntryCountFromGroup(groupRulesets);
-        }
-        const hideUnused = mustHideUnusedLists(groupKey);
-        liGroup.classList.toggle('hideUnused', hideUnused);
-        const ulGroup = qs$('.listEntries', liGroup);
-        if ( !groupRulesets ) { return liGroup; }
-        groupRulesets.sort(function(a, b) {
-            return (a.name || '').localeCompare(b.name || '');
-        });
-        for ( let i = 0; i < groupRulesets.length; i++ ) {
-            const liEntry = liFromListEntry(
-                groupRulesets[i],
-                ulGroup.children[i],
-                hideUnused
-            );
-            if ( liEntry.parentElement === null ) {
-                ulGroup.appendChild(liEntry);
-            }
-        }
-        return liGroup;
-    };
-
-    // Incremental rendering: this will allow us to easily discard unused
-    // DOM list entries.
-    dom.cl.add(
-        qsa$('#lists .listEntries .listEntry[data-listkey]'),
-        'discard'
-    );
-
-    // Visually split the filter lists in three groups
-    const ulLists = qs$('#lists');
-    const groups = new Map([
-        [
-            'default',
-            rulesetDetails.filter(ruleset =>
-                ruleset.id === 'default' 
-            ),
-        ],
-        [
-            'misc',
-            rulesetDetails.filter(ruleset =>
-                ruleset.id !== 'default' && typeof ruleset.lang !== 'string' 
-            ),
-        ],
-        [
-            'regions',
-            rulesetDetails.filter(ruleset =>
-                typeof ruleset.lang === 'string' 
-            ),
-        ],
-    ]);
-
-    dom.cl.toggle(dom.body, 'hideUnused', mustHideUnusedLists('*'));
-
-    for ( const [ groupKey, groupRulesets ] of groups ) {
-        let liGroup = liFromListGroup(groupKey, groupRulesets);
-        liGroup.setAttribute('data-groupkey', groupKey);
-        if ( liGroup.parentElement === null ) {
-            ulLists.appendChild(liGroup);
-        }
-    }
-
-    dom.remove(qsa$('#lists .listEntries .listEntry.discard'));
-
-    renderWidgets();
-}
-
-/******************************************************************************/
-
-const renderWidgets = function() {
-    if ( cachedRulesetData.firstRun ) {
+function renderWidgets() {
+    const data = self.cachedRulesetData;
+    if ( data.firstRun ) {
         dom.cl.add(dom.body, 'firstRun');
     }
 
-    const defaultLevel = cachedRulesetData.defaultFilteringMode;
-    qs$(`.filteringModeCard input[type="radio"][value="${defaultLevel}"]`).checked = true;
+    renderDefaultMode();
 
-    qs$('#autoReload input[type="checkbox"').checked = cachedRulesetData.autoReload;
+    qs$('#autoReload input[type="checkbox"]').checked = data.autoReload;
 
-    // Compute total counts
-    let filterCount = 0;
-    let ruleCount = 0;
-    for ( const liEntry of qsa$('#lists .listEntry[data-listkey]') ) {
-        if ( qs$('input[type="checkbox"]:checked', liEntry)  === null ) { continue; }
-        const stats = rulesetStats(liEntry.dataset.listkey);
-        if ( stats === undefined ) { continue; }
-        ruleCount += stats.ruleCount;
-        filterCount += stats.filterCount;
+    {
+        const input = qs$('#showBlockedCount input[type="checkbox"]');
+        if ( data.canShowBlockedCount ) {
+            input.checked = data.showBlockedCount;
+        } else {
+            input.checked = false;
+            dom.attr(input, 'disabled', '');
+        }
     }
-    qs$('#listsOfBlockedHostsPrompt').textContent = i18n$('perRulesetStats')
-        .replace('{{ruleCount}}', ruleCount.toLocaleString())
-        .replace('{{filterCount}}', filterCount.toLocaleString());
-};
+
+    {
+        const input = qs$('#strictBlockMode input[type="checkbox"]');
+        const canStrictBlock = data.hasOmnipotence;
+        input.checked = canStrictBlock && data.strictBlockMode;
+        dom.attr(input, 'disabled', canStrictBlock ? null : '');
+    }
+
+    {
+        const input = qs$('#popupBlockMode input[type="checkbox"]');
+        input.checked = data.popupBlockMode;
+    }
+
+    {
+        const state = Boolean(data.developerMode) &&
+            data.disabledFeatures?.includes('develop') !== true;
+        dom.body.dataset.develop = `${state}`;
+        dom.prop('#developerMode input[type="checkbox"]', 'checked', state);
+    }
+}
+
+/******************************************************************************/
+
+function renderDefaultMode() {
+    if ( qs$('.filteringModeCard') === null ) { return; } // adn: filtering-mode UI removed from AdNauseam dashboard
+    const defaultLevel = self.cachedRulesetData.defaultFilteringMode;
+    if ( defaultLevel !== 0 ) {
+        qs$(`.filteringModeCard input[type="radio"][value="${defaultLevel}"]`).checked = true;
+    } else {
+        dom.prop('.filteringModeCard input[type="radio"]', 'checked', false);
+    }
+}
 
 /******************************************************************************/
 
 async function onFilteringModeChange(ev) {
     const input = ev.target;
     const newLevel = parseInt(input.value, 10);
-    let granted = false;
+    const data = self.cachedRulesetData;
 
     switch ( newLevel ) {
-    case 1: { // Revoke broad permissions
-        granted = await browser.permissions.remove({
-            origins: [ '<all_urls>' ]
+    case 1: {
+        const actualLevel = await sendMessage({
+            what: 'setDefaultFilteringMode',
+            level: newLevel,
         });
+        data.defaultFilteringMode = actualLevel;
         break;
     }
     case 2:
-    case 3: { // Request broad permissions
-        granted = await browser.permissions.request({
-            origins: [ '<all_urls>' ]
+    case 3: {
+        const granted = await browser.permissions.request({
+            origins: [ '<all_urls>' ],
         });
+        if ( granted ) {
+            const actualLevel = await sendMessage({
+                what: 'setDefaultFilteringMode',
+                level: newLevel,
+            });
+            data.defaultFilteringMode = actualLevel;
+            data.hasOmnipotence = true;
+        }
         break;
     }
     default:
         break;
     }
-    if ( granted ) {
-        const actualLevel = await sendMessage({
-            what: 'setDefaultFilteringMode',
-            level: newLevel,
-        });
-        cachedRulesetData.defaultFilteringMode = actualLevel;
-    }
-    renderFilterLists(true);
     renderWidgets();
 }
 
-dom.on(
-    qs$('#defaultFilteringMode'),
+dom.on('#defaultFilteringMode',
     'change',
     '.filteringModeCard input[type="radio"]',
     ev => { onFilteringModeChange(ev); }
@@ -275,116 +134,237 @@ dom.on(
 
 /******************************************************************************/
 
-dom.on(qs$('#autoReload input[type="checkbox"'), 'change', ev => {
+async function backupSettings() {
+    const api = await import('./backup-restore.js');
+    const data = await api.backupToObject(self.cachedRulesetData);
+    if ( data instanceof Object === false ) { return; }
+    const json = JSON.stringify(data, null, 2)  + '\n';
+    const a = document.createElement('a');
+    a.href = `data:text/plain;charset=utf-8,${encodeURIComponent(json)}`;
+    dom.attr(a, 'download', 'my-ubol-settings.json');
+    dom.attr(a, 'type', 'application/json');
+    a.click();
+}
+
+async function restoreSettings() {
+    const promise = new Promise(resolve => {
+        const input = qs$('section[data-pane="settings"] input[type="file"]');
+        input.onchange = ev => {
+            dom.cl.add(dom.body, 'busy');
+            input.onchange = null;
+            const file = ev.target.files[0];
+            if ( file === undefined || file.name === '' ) { return resolve(); }
+            const fr = new FileReader();
+            fr.onload = ( ) => {
+                fr.onload = null;
+                if ( typeof fr.result !== 'string' ) { return resolve(); }
+                let data;
+                try {
+                    data = JSON.parse(fr.result);
+                } catch {
+                }
+                if ( data instanceof Object === false ) { return resolve(); }
+                import('./backup-restore.js').then(api => {
+                    resolve(api.restoreFromObject(data));
+                });
+            };
+            fr.readAsText(file);
+        };
+        input.oncancel = ( ) => {
+            resolve();
+        };
+        // Reset to empty string, this will ensure a change event is properly
+        // triggered if the user pick a file, even if it's the same as the last
+        // one picked.
+        input.value = '';
+        input.click();
+    });
+    await promise;
+    dom.cl.remove(dom.body, 'busy');
+}
+
+async function resetSettings() {
+    const response = self.confirm(i18n.getMessage('resetToDefaultConfirm'));
+    if ( response !== true ) { return; }
+    dom.cl.add(dom.body, 'busy');
+    const api = await import('./backup-restore.js');
+    await api.restoreFromObject({});
+    dom.cl.remove(dom.body, 'busy');
+}
+
+/******************************************************************************/
+
+dom.on('#autoReload input[type="checkbox"]', 'change', ev => {
     sendMessage({
         what: 'setAutoReload',
         state: ev.target.checked,
     });
 });
 
-/******************************************************************************/
-
-async function applyEnabledRulesets() {
-    const enabledRulesets = [];
-    for ( const liEntry of qsa$('#lists .listEntry[data-listkey]') ) {
-        if ( qs$('input[type="checkbox"]:checked', liEntry) === null ) { continue; }
-        enabledRulesets.push(liEntry.dataset.listkey);
-    }
-
-    await sendMessage({
-        what: 'applyRulesets',
-        enabledRulesets,
+dom.on('#showBlockedCount input[type="checkbox"]', 'change', ev => {
+    sendMessage({
+        what: 'setShowBlockedCount',
+        state: ev.target.checked,
     });
+});
 
-    renderWidgets();
-}
+dom.on('#strictBlockMode input[type="checkbox"]', 'change', ev => {
+    sendMessage({
+        what: 'setStrictBlockMode',
+        state: ev.target.checked,
+    });
+});
 
-dom.on(qs$('#lists'), 'change', '.listEntry input[type="checkbox"]', ( ) => {
-    applyEnabledRulesets();
+dom.on('#popupBlockMode input[type="checkbox"]', 'change', ev => {
+    sendMessage({
+        what: 'setPopupBlockMode',
+        state: ev.target.checked,
+    });
+});
+
+dom.on('#developerMode input[type="checkbox"]', 'change', ev => {
+    const state = ev.target.checked;
+    sendMessage({ what: 'setDeveloperMode', state });
+    dom.body.dataset.develop = `${state}`;
+});
+
+// adn: "Debug mode" toggles ADN console logging (adnSettings.eventLogging)
+sendMessage({ what: 'getAdnSettings' }).then(settings => {
+    if ( !settings ) { return; }
+    qs$('#eventLogging input[type="checkbox"]').checked = settings.eventLogging === true;
+});
+
+dom.on('#eventLogging input[type="checkbox"]', 'change', ev => {
+    sendMessage({
+        what: 'setAdnSettings',
+        settings: { eventLogging: ev.target.checked },
+    });
+});
+// adn end
+
+dom.on('section[data-pane="settings"] button:has([data-i18n="backupButton"])', 'click', ( ) => {
+    backupSettings();
+});
+
+dom.on('section[data-pane="settings"] button:has([data-i18n="restoreButton"])', 'click', ( ) => {
+    restoreSettings();
+});
+
+dom.on('section[data-pane="settings"] button:has([data-i18n="resetToDefaultButton"])', 'click', ( ) => {
+    resetSettings();
 });
 
 /******************************************************************************/
 
-// Collapsing of unused lists.
-
-function mustHideUnusedLists(which) {
-    const hideAll = hideUnusedSet.has('*');
-    if ( which === '*' ) { return hideAll; }
-    return hideUnusedSet.has(which) !== hideAll;
+function listen() {
+    const bc = new self.BroadcastChannel('uBOL');
+    bc.onmessage = listen.onmessage;
 }
 
-function toggleHideUnusedLists(which) {
-    const doesHideAll = hideUnusedSet.has('*');
-    let groupSelector;
-    let mustHide;
-    if ( which === '*' ) {
-        mustHide = doesHideAll === false;
-        groupSelector = '';
-        hideUnusedSet.clear();
-        if ( mustHide ) {
-            hideUnusedSet.add(which);
+listen.onmessage = ev => {
+    const message = ev.data;
+    if ( message instanceof Object === false ) { return; }
+    const local = self.cachedRulesetData;
+    let render = false;
+    let renderLists = false;
+
+    if ( message.hasOmnipotence !== undefined ) {
+        if ( message.hasOmnipotence !== local.hasOmnipotence ) {
+            local.hasOmnipotence = message.hasOmnipotence;
+            render = true;
         }
-        document.body.classList.toggle('hideUnused', mustHide);
-        dom.cl.toggle(qsa$('.groupEntry[data-groupkey]'), 'hideUnused', mustHide);
-    } else {
-        const doesHide = hideUnusedSet.has(which);
-        if ( doesHide ) {
-            hideUnusedSet.delete(which);
-        } else {
-            hideUnusedSet.add(which);
+    }
+
+    if ( message.defaultFilteringMode !== undefined ) {
+        if ( message.defaultFilteringMode !== local.defaultFilteringMode ) {
+            local.defaultFilteringMode = message.defaultFilteringMode;
+            render = true;
         }
-        mustHide = doesHide === doesHideAll;
-        groupSelector = `.groupEntry[data-groupkey="${which}"]`;
-        dom.cl.toggle(qsa$(groupSelector), 'hideUnused', mustHide);
     }
 
-    for ( const elem of qsa$(`#lists ${groupSelector} .listEntry[data-listkey] input[type="checkbox"]:not(:checked)`) ) {
-        dom.cl.toggle(
-            elem.closest('.listEntry[data-listkey]'),
-            'unused',
-            mustHide
-        );
+    if ( message.autoReload !== undefined ) {
+        if ( message.autoReload !== local.autoReload ) {
+            local.autoReload = message.autoReload;
+            render = true;
+        }
     }
 
-    simpleStorage.setItem(
-        'hideUnusedFilterLists',
-        Array.from(hideUnusedSet)
-    );
-}
-
-dom.on(
-    qs$('#lists'),
-    'click',
-    '.groupEntry[data-groupkey] > .geDetails',
-    ev => {
-        toggleHideUnusedLists(
-            dom.attr(ev.target.closest('[data-groupkey]'), 'data-groupkey')
-        );
+    if ( message.showBlockedCount !== undefined ) {
+        if ( message.showBlockedCount !== local.showBlockedCount ) {
+            local.showBlockedCount = message.showBlockedCount;
+            render = true;
+        }
     }
-);
 
-// Initialize from saved state.
-simpleStorage.getItem('hideUnusedFilterLists').then(value => {
-    if ( Array.isArray(value) ) {
-        hideUnusedSet = new Set(value);
+    if ( message.strictBlockMode !== undefined ) {
+        if ( message.strictBlockMode !== local.strictBlockMode ) {
+            local.strictBlockMode = message.strictBlockMode;
+            render = true;
+        }
     }
-});
+
+    if ( message.popupBlockMode !== undefined ) {
+        if ( message.popupBlockMode !== local.popupBlockMode ) {
+            local.popupBlockMode = message.popupBlockMode;
+            render = true;
+        }
+    }
+
+    if ( message.developerMode !== undefined ) {
+        if ( message.developerMode !== local.developerMode ) {
+            local.developerMode = message.developerMode;
+            render = true;
+        }
+    }
+
+    if ( message.adminRulesets !== undefined ) {
+        if ( hashFromIterable(message.adminRulesets) !== hashFromIterable(local.adminRulesets) ) {
+            local.adminRulesets = message.adminRulesets;
+            renderLists = true;
+        }
+    }
+
+    if ( message.enabledRulesets !== undefined ) {
+        local.enabledRulesets = message.enabledRulesets;
+        renderLists = true;
+    }
+
+    if ( render ) {
+        renderWidgets();
+    }
+    if ( renderLists ) {
+        renderFilterLists(true);
+    }
+};
 
 /******************************************************************************/
+
+self.cachedRulesetData = {};
 
 sendMessage({
     what: 'getOptionsPageData',
 }).then(data => {
     if ( !data ) { return; }
-    cachedRulesetData = data;
-    rulesetMap.clear();
-    cachedRulesetData.rulesetDetails.forEach(rule => rulesetMap.set(rule.id, rule));
-    try {
-        renderFilterLists();
-    } catch(ex) {
+    self.cachedRulesetData = data;
+    const supports = []
+    if ( data.supportsUserScripts ) {
+        supports.push('user-scripts');
     }
+    if ( data.supportsCompiledFilters ) {
+        supports.push('compiled-filters');
+    }
+    dom.body.dataset.supports = supports.join(' ');
+    try {
+        renderAdminRules();
+        renderWidgets();
+    } catch(reason) {
+        console.error(reason);
+    } finally {
+        dom.cl.remove(dom.body, 'loading');
+    }
+    listen();
 }).catch(reason => {
-    console.trace(reason);
+    console.error(reason);
 });
 
 /******************************************************************************/

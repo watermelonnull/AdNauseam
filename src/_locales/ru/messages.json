@@ -1,6 +1,6 @@
 {
   "extName": {
-    "message": "uBlock₀",
+    "message": "uBlock Origin",
     "description": "extension name."
   },
   "extShortDesc": {
@@ -180,7 +180,7 @@
     "description": "Tooltip for the no-remote-fonts per-site switch"
   },
   "popupTipNoScripting1": {
-    "message": "Кликните, чтобы отключить JavaScript на этом сайте",
+    "message": "Нажмите, чтобы отключить JavaScript на этом сайте",
     "description": "Tooltip for the no-scripting per-site switch"
   },
   "popupTipNoScripting2": {
@@ -220,7 +220,7 @@
     "description": "Tooltip when hovering the top-most cell of the global-rules column."
   },
   "popupTipLocalRules": {
-    "message": "Локальные правила: этот столбец предназначен для правил, применяемых только к текущему сайту.\nЛокальные правила переопределяют глобальные.",
+    "message": "Локальные правила: этот столбец предназначен для правил, применяемых только к текущему сайту.",
     "description": "Tooltip when hovering the top-most cell of the local-rules column."
   },
   "popupTipSaveRules": {
@@ -275,13 +275,13 @@
     "message": "Версия",
     "description": "Example of use: Version 1.26.4"
   },
-  "popup3pScriptFilterTip": {
-    "message": "↑: Подчеркивать строки, которые содержат 3rd-party скрипты",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party scripts' cell"
+  "popup3pScriptFilter": {
+    "message": "скрипт",
+    "description": "Appears as an option to filter out firewall rows"
   },
-  "popup3pFrameFilterTip": {
-    "message": "↑: Подчеркивать строки, которые содержат 3rd-party фреймы",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party frames' cell"
+  "popup3pFrameFilter": {
+    "message": "фрейм",
+    "description": "Appears as an option to filter out firewall rows"
   },
   "pickerCreate": {
     "message": "Создать",
@@ -392,7 +392,7 @@
     "description": "The default state for the per-site no-scripting switch"
   },
   "settingsNoCSPReportsPrompt": {
-    "message": "Блокировать CSP отчеты",
+    "message": "Блокировать CSP-отчёты",
     "description": "background information: https://github.com/gorhill/uBlock/issues/3150"
   },
   "settingsUncloakCnamePrompt": {
@@ -469,35 +469,43 @@
   },
   "3pGroupDefault": {
     "message": "Встроенные",
-    "description": "Header for the uBlock filters section in 'Filter lists pane'"
+    "description": "Filter lists section name"
   },
   "3pGroupAds": {
     "message": "Реклама",
-    "description": "English: Ads"
+    "description": "Filter lists section name"
   },
   "3pGroupPrivacy": {
     "message": "Приватность",
-    "description": "English: Privacy"
+    "description": "Filter lists section name"
   },
   "3pGroupMalware": {
-    "message": "Вредоносные домены",
-    "description": "English: Malware domains"
+    "message": "Защита от вредоносных сайтов, безопасность",
+    "description": "Filter lists section name"
+  },
+  "3pGroupSocial": {
+    "message": "Виджеты соцсетей",
+    "description": "Filter lists section name"
+  },
+  "3pGroupCookies": {
+    "message": "Уведомления о файлах куки",
+    "description": "Filter lists section name"
   },
   "3pGroupAnnoyances": {
     "message": "Раздражающие элементы",
-    "description": "The header identifying the filter lists in the category 'annoyances'"
+    "description": "Filter lists section name"
   },
   "3pGroupMultipurpose": {
     "message": "Многоцелевые",
-    "description": "English: Multipurpose"
+    "description": "Filter lists section name"
   },
   "3pGroupRegions": {
     "message": "Регионы, языки",
-    "description": "English: Regions, languages"
+    "description": "Filter lists section name"
   },
   "3pGroupCustom": {
     "message": "Пользовательские",
-    "description": "English: Custom"
+    "description": "Filter lists section name"
   },
   "3pImport": {
     "message": "Импортировать...",
@@ -527,17 +535,25 @@
     "message": "В результате ошибки сети обновление не произошло.",
     "description": "used as a tooltip for error icon beside a list"
   },
-  "1pFormatHint": {
-    "message": "Одно правило на строку. Правилом может быть имя сайта, или EasyList-совместимый фильтр. Строки, начинающиеся с <code>!</code>, будут проигнорированы.",
-    "description": "Short information about how to create custom filters"
+  "1pTrustWarning": {
+    "message": "Не добавляйте фильтры из ненадёжных источников.",
+    "description": "Warning against copy-pasting filters from random sources"
+  },
+  "1pEnableMyFiltersLabel": {
+    "message": "Включить мои пользовательские фильтры",
+    "description": "Label for the checkbox use to enable/disable 'My filters' list"
+  },
+  "1pTrustMyFiltersLabel": {
+    "message": "Разрешить пользовательские фильтры, требующие доверия",
+    "description": "Label for the checkbox use to trust the content of 'My filters' list"
   },
   "1pImport": {
-    "message": "Импортировать и добавить",
-    "description": "English: Import and append"
+    "message": "Импортировать и добавить…",
+    "description": "Button in the 'My filters' pane"
   },
   "1pExport": {
-    "message": "Экспортировать",
-    "description": "English: Export"
+    "message": "Экспортировать…",
+    "description": "Button in the 'My filters' pane"
   },
   "1pExportFilename": {
     "message": "my-ublock-static-filters_{{datetime}}.txt",
@@ -580,8 +596,8 @@
     "description": ""
   },
   "rulesExport": {
-    "message": "Экспорт в файл...",
-    "description": ""
+    "message": "Экспортировать в файл…",
+    "description": "Button in the 'My rules' pane"
   },
   "rulesDefaultFileName": {
     "message": "my-ublock-dynamic-rules_{{datetime}}.txt",
@@ -616,12 +632,12 @@
     "description": "A concise description of the 'Trusted sites' pane."
   },
   "whitelistImport": {
-    "message": "Импортировать и добавить",
-    "description": "English: Import and append"
+    "message": "Импортировать и добавить…",
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExport": {
-    "message": "Экспортировать",
-    "description": "English: Export"
+    "message": "Экспортировать…",
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExportFilename": {
     "message": "my-ublock-trusted-sites_{{datetime}}.txt",
@@ -881,14 +897,14 @@
   },
   "supportOpenButton": {
     "message": "Открыть",
-    "description": "Text for button which open an external webpage in Support pane"
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportReportSpecificButton": {
-    "message": "Создать новый отчет",
-    "description": "Text for button which open an external webpage in Support pane"
+    "message": "Создать новый отчёт в GitHub",
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportFindSpecificButton": {
-    "message": "Найти похожие отчеты",
+    "message": "Найти похожие отчёты в GitHub",
     "description": "A clickable link in the filter issue reporter section"
   },
   "supportS1H": {
@@ -912,7 +928,7 @@
     "description": "Header of 'Filter issues' section in Support pane"
   },
   "supportS3P1": {
-    "message": "Сообщайте о проблемах фильтрации на конкретных сайтах в раздел трекера <span data-url=\"https://github.com/uBlockOrigin/uAssets/issues?q=is%3Aissue\"><code>uBlockOrigin/uAssets</code></span>. <u>Требуется GitHub аккаунт.</u>",
+    "message": "Сообщайте о проблемах фильтрации на конкретных сайтах в раздел трекера <span data-url=\"https://github.com/uBlockOrigin/uAssets/issues?q=is%3Aissue\"><code>uBlockOrigin/uAssets</code></span>. <u>Требуется аккаунт GitHub.</u>",
     "description": "First paragraph of 'Filter issues' section in Support pane"
   },
   "supportS3P2": {
@@ -936,19 +952,23 @@
     "description": "Header of 'Troubleshooting Information' section in Support pane"
   },
   "supportS5P1": {
-    "message": "Ниже - техническая информация, которая может быть полезной волонтерам, помогающим вам решить проблему.",
+    "message": "Ниже представлена техническая информация, которая может быть полезна волонтерам, помогающим вам решить проблему.",
     "description": "First paragraph of 'Troubleshooting Information' section in Support pane"
-  },
-  "supportS5P2": {
-    "message": "<b>Важно:</b> Предположительно конфиденциальная информация редактируется по умолчанию. Отредактированная информация может усложнить диагностику проблемы.",
-    "description": "Second paragraph of 'Troubleshooting Information' section in Support pane"
   },
   "supportS6H": {
     "message": "Сообщить о проблемном фильтре",
     "description": "Header of 'Report a filter issue' section in Support pane"
   },
   "supportS6P1S1": {
-    "message": "Чтобы не обременять волонтеров дублированными отчетами, пожалуйста, убедитесь, что о данной проблеме еще не сообщали",
+    "message": "Чтобы не обременять добровольцев повторяющимися отчётами, пожалуйста, убедитесь, что об этой проблеме ещё не сообщали. <b>Примечание:</b> щелчок по кнопке приведёт к отправке адреса посещенной страницы GitHub'у.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S1": {
+    "message": "Списки фильтров обновляются ежедневно. Убедитесь, что ваша проблема не была решена в свежих списках фильтров.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S2": {
+    "message": "Удостоверьтесь, что проблема воспроизводится даже после обновления проблемной страницы.",
     "description": "A paragraph in the filter issue reporter section"
   },
   "supportS6URL": {
@@ -987,17 +1007,13 @@
     "message": "Открываются нежелательные вкладки или окна",
     "description": "An entry in the widget used to select the type of issue"
   },
+  "supportS6Select1Option7": {
+    "message": "Вредоносное ПО, фишинг",
+    "description": "An entry in the widget used to select the type of issue"
+  },
   "supportS6Checkbox1": {
     "message": "Пометить веб-страницу как “NSFW” (<a href=\"https://wikipedia.org/wiki/Not_safe_for_work\">“Not Safe For Work”</a>)",
     "description": "A checkbox to use for NSFW sites"
-  },
-  "supportRedact": {
-    "message": "Редактировать",
-    "description": "Text for 'Redact' button"
-  },
-  "supportUnredact": {
-    "message": "Отменить редактирование",
-    "description": "Text for 'Unredact' button"
   },
   "aboutPrivacyPolicy": {
     "message": "Политика конфиденциальности",
@@ -1070,10 +1086,6 @@
   "errorCantConnectTo": {
     "message": "Ошибка сети: {{msg}}",
     "description": "English: Network error: {{msg}}"
-  },
-  "subscriberConfirm": {
-    "message": "Добавить следующий адрес к пользовательским спискам фильтров?\n\nЗаголовок: \"{{title}}\"\nURL: {{url}}",
-    "description": "No longer used"
   },
   "subscribeButton": {
     "message": "Подписаться",
@@ -1163,6 +1175,26 @@
     "message": "Продолжить",
     "description": "Button text to navigate to the blocked page"
   },
+  "docblockedRedirectPrompt": {
+    "message": "Заблокированная страница собирается перенаправить вас на другой сайт. Если вы решите продолжить, вы перейдете непосредственно на: {{url}}",
+    "description": "Text warning about an incoming redirect"
+  },
+  "docblockedReasonLabel": {
+    "message": "Причина:",
+    "description": "The label which prepend the actual reason why a page was blocked"
+  },
+  "docblockedReasonMalicious": {
+    "message": "Вредоносная активность",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonTracker": {
+    "message": "Трекер",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonDisreputable": {
+    "message": "Сомнительное содержание",
+    "description": "An actual reason why a page was blocked"
+  },
   "cloudPush": {
     "message": "Экспорт в облачное хранилище",
     "description": "tooltip"
@@ -1215,6 +1247,10 @@
     "message": "Временно разрешить большие медиа-элементы",
     "description": "A context menu entry, present when large media elements have been blocked on the current site"
   },
+  "contextMenuViewSource": {
+    "message": "Показать исходный код...",
+    "description": "A context menu entry, to view the source code of the target resource"
+  },
   "shortcutCapturePlaceholder": {
     "message": "Введите сочетание",
     "description": "Placeholder string for input field used to capture a keyboard shortcut"
@@ -1234,6 +1270,10 @@
   "toggleCosmeticFiltering": {
     "message": "Вкл/Выкл косметическую фильтрацию",
     "description": "Label for keyboard shortcut used to toggle cosmetic filtering"
+  },
+  "toggleJavascript": {
+    "message": "Вкл/Выкл JavaScript",
+    "description": "Label for keyboard shortcut used to toggle no-scripting switch"
   },
   "relaxBlockingMode": {
     "message": "Ослабленный режим блокировки",
@@ -1258,6 +1298,14 @@
   "clickToLoad": {
     "message": "Нажмите, чтобы загрузить",
     "description": "Message used in frame placeholders"
+  },
+  "linterMainReport": {
+    "message": "Ошибки: {{count}}",
+    "description": "Summary of number of errors as reported by the linter "
+  },
+  "unprocessedRequestTooltip": {
+    "message": "Не удалось выполнить фильтрацию при запуске браузера.\nПерезагрузите страницу, чтобы обеспечить фильтрацию.",
+    "description": "A warning which will appear in the popup panel if needed"
   },
   "dummy": {
     "message": "Эта запись должна быть последней",

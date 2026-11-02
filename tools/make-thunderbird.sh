@@ -11,8 +11,8 @@ DES="$BLDIR"/uBlock0.thunderbird
 rm -rf $DES
 mkdir -p $DES
 
-echo "*** uBlock0.thunderbird: Copying common files"
-bash ./tools/copy-common-files.sh  $DES
+echo "*** uBlock0.thunderbird: copying common files"
+bash ./tools/copy-common-files.sh $DES
 
 echo "*** uBlock0.firefox: Copying firefox-specific files"
 cp platform/firefox/*.js $DES/js/

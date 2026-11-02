@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2014-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,31 +19,42 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-/* globals WebAssembly */
+/* globals process */
 
-'use strict';
-
-/******************************************************************************/
-
-import { createRequire } from 'module';
-
-import { readFileSync } from 'fs';
-import { dirname, resolve } from 'path';
-import { domainToASCII, fileURLToPath } from 'url';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-import publicSuffixList from './lib/publicsuffixlist/publicsuffixlist.js';
-
-import snfe from './js/static-net-filtering.js';
-import { FilteringContext } from './js/filtering-context.js';
-import { LineIterator } from './js/text-utils.js';
-import { StaticFilteringParser } from './js/static-filtering-parser.js';
+import * as s14e from './js/s14e-serializer.js';
+import * as sfp from './js/static-filtering-parser.js';
 
 import {
     CompiledListReader,
     CompiledListWriter,
 } from './js/static-filtering-io.js';
+import {
+    TextDecoder,
+    TextEncoder,
+} from 'util';
+import {
+    dirname,
+    resolve
+} from 'path';
+import {
+    domainToASCII,
+    fileURLToPath
+} from 'url';
+
+import { FilteringContext } from './js/filtering-context.js';
+import { LineIterator } from './js/text-utils.js';
+import { createRequire } from 'module';
+import publicSuffixList from './lib/publicsuffixlist/publicsuffixlist.js';
+import { readFileSync } from 'fs';
+import snfe from './js/static-net-filtering.js';
+
+/******************************************************************************/
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// https://stackoverflow.com/questions/69187442/const-utf8encoder-new-textencoder-in-node-js
+globalThis.TextDecoder = TextDecoder;
+globalThis.TextEncoder = TextEncoder;
 
 /******************************************************************************/
 
@@ -110,6 +121,7 @@ function pslInit(raw) {
 /******************************************************************************/
 
 function compileList({ name, raw }, compiler, writer, options = {}) {
+    if ( typeof raw !== 'string' || raw === '' ) { return; }
     const lineIter = new LineIterator(raw);
     const events = Array.isArray(options.events) ? options.events : undefined;
 
@@ -117,7 +129,9 @@ function compileList({ name, raw }, compiler, writer, options = {}) {
         writer.properties.set('name', name);
     }
 
-    const { parser } = compiler;
+    const parser = new sfp.AstFilterParser({
+        maxTokenLength: snfe.MAX_TOKEN_LENGTH,
+    });
 
     while ( lineIter.eot() === false ) {
         let line = lineIter.next();
@@ -125,13 +139,10 @@ function compileList({ name, raw }, compiler, writer, options = {}) {
             if ( lineIter.peek(4) !== '    ' ) { break; }
             line = line.slice(0, -2).trim() + lineIter.next().trim();
         }
-        parser.analyze(line);
-        if ( parser.shouldIgnore() ) { continue; }
-        if ( parser.category !== parser.CATStaticNetFilter ) { continue; }
-        if ( parser.patternHasUnicode() && parser.toASCII() === false ) {
-            continue;
-        }
-        if ( compiler.compile(writer) ) { continue; }
+        parser.parse(line);
+        if ( parser.isFilter() === false ) { continue; }
+        if ( parser.isNetworkFilter() === false ) { continue; }
+        if ( compiler.compile(parser, writer) ) { continue; }
         if ( compiler.error !== undefined && events !== undefined ) {
             options.events.push({
                 type: 'error',
@@ -164,7 +175,7 @@ async function useLists(lists, options = {}) {
         if ( typeof compiled !== 'string' || compiled === '' ) {
             const writer = new CompiledListWriter();
             if ( compiler === null ) {
-                compiler = snfe.createCompiler(new StaticFilteringParser());
+                compiler = snfe.createCompiler();
             }
             compiled = compileList(list, compiler, writer, options);
         }
@@ -174,13 +185,12 @@ async function useLists(lists, options = {}) {
     // Populate filtering engine with resolved filter lists
     const promises = [];
     for ( const list of lists ) {
-        const promise = list instanceof Promise ? list : Promise.resolve(list);
-        promises.push(promise.then(list => consumeList(list)));
+        promises.push(Promise.resolve(list).then(list => consumeList(list)));
     }
 
     useLists.promise = Promise.all(promises);
     await useLists.promise;
-    useLists.promise = null; // eslint-disable-line require-atomic-updates
+    useLists.promise = null;
 
     // Commit changes
     snfe.freeze();
@@ -219,6 +229,7 @@ class StaticNetFilteringEngine {
     }
 
     filterQuery(details) {
+        fctx.redirectURL = undefined;
         const directives = snfe.filterQuery(fctx.fromDetails(details));
         if ( directives === undefined ) { return; }
         return { redirectURL: fctx.redirectURL, directives };
@@ -240,12 +251,14 @@ class StaticNetFilteringEngine {
         return compileList(...args);
     }
 
-    serialize() {
-        return snfe.serialize();
+    async serialize() {
+        const data = snfe.serialize();
+        return s14e.serialize(data, { compress: true });
     }
 
-    deserialize(serialized) {
-        return snfe.unserialize(serialized);
+    async deserialize(serialized) {
+        const data = s14e.deserialize(serialized);
+        return snfe.unserialize(data);
     }
 
     static async create({ noPSL = false } = {}) {
@@ -272,7 +285,7 @@ class StaticNetFilteringEngine {
 // module.exports. Once all included files are written like ES modules, using
 // export statements, this should no longer be necessary.
 if ( typeof module !== 'undefined' && typeof exports !== 'undefined' ) {
-    module.exports = exports;
+    module.exports = exports; // eslint-disable-line no-undef
 }
 
 export {

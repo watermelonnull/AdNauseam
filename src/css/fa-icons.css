@@ -38,9 +38,19 @@
     }
 .fa-icon.fa-icon-hflipped > svg {
     transform: scale(-1, 1);
+    transform-origin: 50%;
     }
 .fa-icon.fa-icon-vflipped > svg {
     transform: scale(1, -1);
+    transform-origin: 50%;
+    }
+.fa-icon.fa-icon-rotright > svg {
+    transform: rotate(90deg);
+    transform-origin: 50%;
+    }
+.fa-icon.fa-icon-rotleft > svg {
+    transform: rotate(-90deg);
+    transform-origin: 50%;
     }
 
 .fa-icon > svg {
@@ -79,15 +89,20 @@
 .fa-icon > .fa-icon_sun-o {
     width: calc(1em * 1708 / 1792);
     }
+.fa-icon > .fa-icon_book,
 .fa-icon > .fa-icon_download-alt,
 .fa-icon > .fa-icon_font,
 .fa-icon > .fa-icon_search,
 .fa-icon > .fa-icon_spinner,
 .fa-icon > .fa-icon_unlink,
 .fa-icon > .fa-icon_upload-alt,
+.fa-icon > .fa-icon_volume-up,
 .fa-icon > .fa-icon_zoom-in,
 .fa-icon > .fa-icon_zoom-out {
     width: calc(1em * 1664 / 1792);
+    }
+.fa-icon > .fa-icon_terminal {
+    width: calc(1em * 1651 / 1792);
     }
 .fa-icon > .fa-icon_magic {
     width: calc(1em * 1637 / 1792);

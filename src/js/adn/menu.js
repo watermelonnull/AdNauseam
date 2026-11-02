@@ -1,7 +1,7 @@
 /*******************************************************************************
 
     AdNauseam - Fight back against advertising surveillance.
-    Copyright (C) 2014-2021 Daniel C. Howe
+    Copyright (C) 2014-2024 Daniel C. Howe
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,13 +19,16 @@
     Home: https://github.com/dhowe/AdNauseam
 */
 
-/* global vAPI, uDom, $ */
+/* global vAPI, $ */
+
 'use strict';
 
 import { i18n$ } from '../i18n.js';
 import { renderNotifications, ReloadTab, addNotification } from './notifications.js';
 import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from './adn-utils.js';
-
+import { dom } from '../dom.js';
+import uDom from './uDom.js';
+import { broadcast, onBroadcast } from '../broadcast.js';
 
 (function () {
 
@@ -34,6 +37,11 @@ import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from '.
   var ad_list_height;
   var initialButtonState = 'active';
   var updatedButtonState = '';
+  var colorBlindMode = false
+
+  // store values for setCounter
+  var total = 0
+  var clicked = 0
 
   // on adnRefresh event, update initialButtonState to updatedButtonState
   window.addEventListener('adnRefresh', function (e) {
@@ -51,8 +59,9 @@ import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from '.
     }
   }, 10)
 
-  vAPI.broadcastListener.add(request => {
-
+  onBroadcast(request => {
+    console.log('[MENU] onBroadcast received:', request.what);
+    
     switch (request.what) {
 
       case 'adAttempt':
@@ -60,6 +69,7 @@ import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from '.
         break;
 
       case 'adDetected':
+        console.log('[MENU] adDetected received, re-rendering');
         // for now, just re-render
         renderPage(request);
         adjustBlockHeight();
@@ -75,11 +85,11 @@ import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from '.
         break;
       // disable warnings option #1910
       case 'hideNotifications':
-        uDom('#notifications').addClass("hide");
+        dom.cl.add('#notifications', "hide");
         adjustBlockHeight();
         break;
       case 'showNotifications':
-        uDom('#notifications').removeClass("hide");
+        dom.cl.remove('#notifications', "hide");
         adjustBlockHeight();
         break;
     }
@@ -91,6 +101,10 @@ import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from '.
     page = json && json.pageUrl;
     settings = json && json.prefs;
     recent = json && json.recent
+    total = json && json.total
+    clicked = json && json.clicked
+
+    console.log("[ADN] renderPage settings", settings)
 
     if (page) {
       // disable pause & resume buttons for options, vault, about/chrome
@@ -108,7 +122,7 @@ import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from '.
 
     if (typeof json !== 'undefined' && json !== null) {
       ads = json.data;
-      setCounts(ads, json.total, json.recent);
+      setCounts(ads, json.total, json.recent, json.clicked);
     } else {
       console.warn("[ADN] json null, cant make ad list")
     }
@@ -131,10 +145,18 @@ import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from '.
         'adnauseam', {
         what: 'getNotifications'
       }).then((data) => {
+        // https://github.com/dhowe/AdNauseam/issues/2455
+        if (data.blurCollectedAds) {
+          // add class to #ad-list-items
+          uDom('#ad-list-items').addClass('blur');
+        } else {
+          uDom('#ad-list-items').removeClass('blur');
+        }
         currentNotifications = data.notifications
         renderNotifications(data.notifications)
         adjustBlockHeight(data.disableWarnings)
-        initialButtonState = getIsDisabled() ? 'disabled' : getIsStrictBlocked() ? 'strict' : 'active';
+        initialButtonState = getIsDisabled() ? 'disable' : getIsStrictBlocked() ? 'strict' : 'active';
+        updateLabels(initialButtonState)
         // set button state
         if (getIsDisabled()) {
           // disabled 
@@ -153,11 +175,12 @@ import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from '.
     });
   }
 
-  const setCounts = function (ads, total, recent) {
-    const numVisits = recent ? 0 : (visitedCount(ads) || 0);
-    uDom('#vault-count').text(total || 0);
+  const setCounts = function (_ads, _total, _recent, _clicked) {
+    // console.log("[ADN] setCounts", ads, total, recent)
+    const numVisits = recent ? 0 : (visitedCount(_ads) || 0);
+    uDom('#vault-count').text(`${_clicked || 0} / ${_total || 0}`);
     uDom('#visited').text(i18n$("adnMenuAdsClicked").replace("{{number}}", numVisits || 0));
-    uDom('#found').text(i18n$("adnMenuAdsDetected").replace("{{count}}", (ads && !recent) ? ads.length : 0));
+    uDom('#found').text(i18n$("adnMenuAdsDetected").replace("{{count}}", (ads && !_recent) ? _ads.length : 0));
     setCost(numVisits);
     adjustStatCSS();
   }
@@ -198,6 +221,8 @@ import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from '.
   const updateAd = function (ad) { // update class, title, counts
     // console.log(ad);
     if (verify(ad)) {
+      clicked += 1
+      setCounts(ads, total, recent, clicked);
 
       const $ad = updateAdClasses(ad);
 
@@ -280,6 +305,7 @@ import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from '.
     let $img;
     let $a;
     let $span;
+    let $span_container;
     let $status;
 
     const $li = uDom(document.createElement('li'))
@@ -293,6 +319,9 @@ import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from '.
     $span = uDom(document.createElement('span')).addClass('thumb');
     $span.appendTo($a);
 
+    $span_container = uDom(document.createElement('span')).addClass('thumb-container');
+    $span_container.appendTo($span);
+
     appendAdStatus(ad, $a);
 
     let img_src = (ad.contentData.src || ad.contentData);
@@ -301,8 +330,7 @@ import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from '.
 
     $img = uDom(document.createElement('img'))
       .attr('src', img_src)
-      .addClass(cl)
-      .on('click', "this.onerror=null; this.width=50; this.height=45; this.src='img/placeholder.svg'");
+      .addClass(cl);
 
     $img.on("error", function () {
       $img.css({
@@ -314,7 +342,7 @@ import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from '.
       $img.off("error");
     });
 
-    $img.appendTo($span);
+    $img.appendTo($span_container);
 
     uDom(document.createElement('span'))
       .addClass('title')
@@ -343,7 +371,9 @@ import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from '.
       }
     } else if (status != "SkippedDisabled") {
       if (ad.clickedByUser) status = "SkippedUser";
-      else status = "Skipped" + (ad.dntAllowed ? "DNT" : "Frequency");
+      else if (ad.dntAllowed) status = "SkippedDNT";
+      else if (ad.domainExcluded) status = "SkippedDomain";
+      else status = "SkippedFrequency";
     }
     return status;
   }
@@ -414,12 +444,14 @@ import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from '.
 
   const getPopupData = function (tabId) {
     const onPopupData = function (response) {
-      cachePopupData(response);
+      console.log("response", response)
+      let _popupData = cachePopupData(response);
       vAPI.messaging.send(
         'adnauseam', {
         what: 'adsForPage',
-        tabId: popupData.tabId
+        tabId: _popupData.tabId
       }).then(details => {
+        console.log("details", details)
         renderPage(details);
       })
     };
@@ -459,6 +491,13 @@ import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from '.
     popupData = {};
     scopeToSrcHostnameMap['.'] = '';
     hostnameToSortableTokenMap = {};
+    
+    // implement colorBlind style
+    colorBlindMode = data.colorBlindFriendly || false;
+    document.documentElement.classList.toggle(
+      'colorBlind',
+      data.colorBlindFriendly === true
+    );
 
     if (typeof data !== 'object') {
       return popupData;
@@ -601,13 +640,15 @@ import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from '.
   }
 
   const hideRefreshNotification = function () {
-    document.querySelector('#RefreshTab').classList.add('hide');
+    let refreshTab = document.querySelector('#RefreshTab')
+    if (refreshTab) refreshTab.classList.add('hide')
     adjustBlockHeight();
   }
 
   // on change state of toggle button
   const onChangeState = function (evt) {
     updatedButtonState = this.value;
+    updateLabels(this.value)
     switch (this.value) {
       case 'strict':
         onClickStrict();
@@ -615,10 +656,11 @@ import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from '.
           updateRefreshNotification(currentNotifications)
         } else {
           hideRefreshNotification()
-        }
+        }        
         break;
       case 'active':
         toggleStrictAlert(popupData.pageURL, false)
+        uDom("#on_domain").prop('checked', true);
         toggleEnabled(evt, true)
         if (initialButtonState === 'strict') {
           updateRefreshNotification(currentNotifications)
@@ -638,15 +680,35 @@ import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from '.
     }
   }
 
+  const updateLabels = function (val) {
+    switch (val) {
+      case 'strict':
+          uDom("#active-lbl").text('activate')
+          uDom("#disable-lbl  .btn_radio_label-text").text('disable')
+        break;
+        case 'active':
+          uDom("#active-lbl").text('active')
+          uDom("#disable-lbl  .btn_radio_label-text").text('disable')
+        break;
+      case 'disable':
+          uDom("#active-lbl").text('activate')
+          uDom("#disable-lbl  .btn_radio_label-text").text('disabled')
+        break;
+    }
+  }
+
   // when changing "page" and "domain" scope from the popup menu on the "disable button" 
   const onChangeDisabledScope = function (evt) {
+    // check if url is domain home
+    let url = new URL(popupData.pageURL)
+    // let isDomainHome = url.pathname === '/' || url.pathname === '/index.html' || url.pathname === '/index.php'
     var scope = uDom(".disable_type_radio:checked") ? uDom(".disable_type_radio:checked").val() : ''
     // first remove previous whichever previous scope from whitelist 
     vAPI.messaging.send(
       'adnauseam', {
       what: 'toggleEnabled',
       url: popupData.pageURL,
-      scope: scope,
+      scope: scope == '' ? 'page' : '', // remove the inverted scope
       state: true,
       tabId: popupData.tabId
     }).then(() => {
@@ -675,11 +737,13 @@ import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from '.
       return;
     }
     uDom('#main').toggleClass('disabled', !state)
+    let url = new URL(popupData.pageURL)
+    let isDomainHome = url.pathname === '/' || url.pathname === '/index.html' || url.pathname === '/index.php'
     vAPI.messaging.send(
       'adnauseam', {
       what: 'toggleEnabled',
       url: popupData.pageURL,
-      scope: evt.altKey || evt.metaKey ? 'page' : '',
+      scope: '',
       state: state,
       tabId: popupData.tabId
     });
@@ -696,6 +760,7 @@ import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from '.
   }
 
   const closePopup = function () {
+    uDom("#disable").removeClass("popup_open")
     uDom(".popup_arrow").removeClass("open")
     uDom(".inner-popup_wrapper").addClass("hidden")
     document.removeEventListener('click', onAnyClickAfterOpen)
@@ -704,6 +769,7 @@ import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from '.
   }
 
   const openPopup = function () {
+    uDom("#disable").addClass("popup_open")
     uDom(".popup_arrow").addClass("open")
     uDom(".inner-popup_wrapper").removeClass("hidden");
     document.addEventListener('click', onAnyClickAfterOpen)
@@ -769,13 +835,9 @@ import { setCost, targetDomain, decodeEntities, isNonLatin, isCyrillic } from '.
 
   (function () {
 
-    let tabId = null;
+    const selfURL = new URL(self.location.href);
+    const tabId = parseInt(selfURL.searchParams.get('tabId'), 10) || null;
 
-    // Extract the tab id of the page this popup is for
-    const matches = window.location.search.match(/[\?&]tabId=([^&]+)/);
-    if (matches && matches.length === 2) {
-      tabId = matches[1];
-    }
     getPopupData(tabId);
 
     // add click events

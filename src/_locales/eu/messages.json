@@ -40,7 +40,7 @@
     "description": "appears as tab name in dashboard"
   },
   "whitelistPageName": {
-    "message": "Zerrenda zuria",
+    "message": "Konfidantzazko webguneak",
     "description": "appears as tab name in dashboard"
   },
   "shortcutsPageName": {
@@ -56,7 +56,7 @@
     "description": "appears as tab name in dashboard"
   },
   "supportPageName": {
-    "message": "Laguntza",
+    "message": "Soportea",
     "description": "appears as tab name in dashboard"
   },
   "assetViewerPageName": {
@@ -220,7 +220,7 @@
     "description": "Tooltip when hovering the top-most cell of the global-rules column."
   },
   "popupTipLocalRules": {
-    "message": "Tokiko arauak: Zutabe hau soilik uneko gunean aplikatuko diren arauentzat da. Tokiko arauek arau orokorrak gainidazten dituzte.",
+    "message": "Tokiko arauak: Zutabe hau soilik uneko gunean aplikatuko diren arauentzat da.",
     "description": "Tooltip when hovering the top-most cell of the local-rules column."
   },
   "popupTipSaveRules": {
@@ -275,13 +275,13 @@
     "message": "Bertsioa",
     "description": "Example of use: Version 1.26.4"
   },
-  "popup3pScriptFilterTip": {
-    "message": "↑: Garrantzia eman hirugarrenen scriptak dituzten lerroei",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party scripts' cell"
+  "popup3pScriptFilter": {
+    "message": "scripta",
+    "description": "Appears as an option to filter out firewall rows"
   },
-  "popup3pFrameFilterTip": {
-    "message": "↑: Garrantzia eman hirugarrenen markoak dituzten lerroei",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party frames' cell"
+  "popup3pFrameFilter": {
+    "message": "markoa",
+    "description": "Appears as an option to filter out firewall rows"
   },
   "pickerCreate": {
     "message": "Sortu",
@@ -469,35 +469,43 @@
   },
   "3pGroupDefault": {
     "message": "Barnekoa",
-    "description": "Header for the uBlock filters section in 'Filter lists pane'"
+    "description": "Filter lists section name"
   },
   "3pGroupAds": {
     "message": "Iragarkiak",
-    "description": "English: Ads"
+    "description": "Filter lists section name"
   },
   "3pGroupPrivacy": {
     "message": "Pribatutasuna",
-    "description": "English: Privacy"
+    "description": "Filter lists section name"
   },
   "3pGroupMalware": {
-    "message": "Malware domeinuak",
-    "description": "English: Malware domains"
+    "message": "Malwarearen aurkako babesa, segurtasuna",
+    "description": "Filter lists section name"
+  },
+  "3pGroupSocial": {
+    "message": "Widgets Sozialak",
+    "description": "Filter lists section name"
+  },
+  "3pGroupCookies": {
+    "message": "Cookie oharrak",
+    "description": "Filter lists section name"
   },
   "3pGroupAnnoyances": {
     "message": "Eragozpenak",
-    "description": "The header identifying the filter lists in the category 'annoyances'"
+    "description": "Filter lists section name"
   },
   "3pGroupMultipurpose": {
     "message": "Helburu anitzekoak",
-    "description": "English: Multipurpose"
+    "description": "Filter lists section name"
   },
   "3pGroupRegions": {
     "message": "Eskualdeak, hizkuntzak",
-    "description": "English: Regions, languages"
+    "description": "Filter lists section name"
   },
   "3pGroupCustom": {
     "message": "Pertsonala",
-    "description": "English: Custom"
+    "description": "Filter lists section name"
   },
   "3pImport": {
     "message": "Inportatu...",
@@ -527,17 +535,25 @@
     "message": "Sare errore batek baliabidea eguneratzea eragotzi du.",
     "description": "used as a tooltip for error icon beside a list"
   },
-  "1pFormatHint": {
-    "message": "Iragazki bat lerroko. Iragazkia hostalari izen soila izan daiteke, edo Adblock Plusekin bateragarria den iragazki bat. Hasieran <code>!</code> duten lerroak ezikusiko dira.",
-    "description": "Short information about how to create custom filters"
+  "1pTrustWarning": {
+    "message": "Ez gehitu jatorri ezezaguneko iragazkirik",
+    "description": "Warning against copy-pasting filters from random sources"
+  },
+  "1pEnableMyFiltersLabel": {
+    "message": "Aktibatu nire filtro pertsonalitsatuak",
+    "description": "Label for the checkbox use to enable/disable 'My filters' list"
+  },
+  "1pTrustMyFiltersLabel": {
+    "message": "Konfiantza behar duten iragazki pertsonalizatuak baimendu",
+    "description": "Label for the checkbox use to trust the content of 'My filters' list"
   },
   "1pImport": {
     "message": "Inportatu eta gehitu",
-    "description": "English: Import and append"
+    "description": "Button in the 'My filters' pane"
   },
   "1pExport": {
     "message": "Esportatu",
-    "description": "English: Export"
+    "description": "Button in the 'My filters' pane"
   },
   "1pExportFilename": {
     "message": "nire-ublock-iragazki-estatikoak_{{datetime}}.txt",
@@ -581,7 +597,7 @@
   },
   "rulesExport": {
     "message": "Esportatu fitxategira",
-    "description": ""
+    "description": "Button in the 'My rules' pane"
   },
   "rulesDefaultFileName": {
     "message": "nire-ublock-arau-dinamikoak_{{datetime}}.txt",
@@ -617,11 +633,11 @@
   },
   "whitelistImport": {
     "message": "Inportatu eta gehitu",
-    "description": "English: Import and append"
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExport": {
     "message": "Esportatu",
-    "description": "English: Export"
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExportFilename": {
     "message": "nire-ublock-zerrendazuria_{{datetime}}.txt",
@@ -881,11 +897,11 @@
   },
   "supportOpenButton": {
     "message": "Ireki",
-    "description": "Text for button which open an external webpage in Support pane"
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportReportSpecificButton": {
     "message": "Txosten berri bat sortu",
-    "description": "Text for button which open an external webpage in Support pane"
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportFindSpecificButton": {
     "message": "Antzeko txostenak aurkitu",
@@ -939,16 +955,20 @@
     "message": "Jarraian, boluntarioek arazo bat konpontzen laguntzen saiatzen direnean baliagarria izan daitekeen informazio teknikoa aurkituko duzu.",
     "description": "First paragraph of 'Troubleshooting Information' section in Support pane"
   },
-  "supportS5P2": {
-    "message": "<b>Garrantzitsua:</b> Pribatua edo sentikorra izan daitekeen informazioa modu lehenetsian idazten da. Idatzitako informazioak arazo bat konpontzea zaildu dezake.",
-    "description": "Second paragraph of 'Troubleshooting Information' section in Support pane"
-  },
   "supportS6H": {
     "message": "Iragazkiko arazo baten berri eman",
     "description": "Header of 'Report a filter issue' section in Support pane"
   },
   "supportS6P1S1": {
     "message": "Txosten bikoiztuak dituzten boluntarioak ez gainkargatzeko, mesedez egiaztatu arazoa ez dela jakinarazi.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S1": {
+    "message": "Iragazki-zerrendak egunero eguneratzen dira. Begiratu zure kasua azken iragazki-zerrendetako baten konpondu den.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S2": {
+    "message": "Egiaztatu zure kasua arazoak eman dizkizun webgunea berriz kargatu ostean oraindik ere gertatzen den.",
     "description": "A paragraph in the filter issue reporter section"
   },
   "supportS6URL": {
@@ -987,17 +1007,13 @@
     "message": "Ireki nahi ez diren erlaitzak edo leihoak",
     "description": "An entry in the widget used to select the type of issue"
   },
+  "supportS6Select1Option7": {
+    "message": "Software kaltegarrietara eta phishing-era darama",
+    "description": "An entry in the widget used to select the type of issue"
+  },
   "supportS6Checkbox1": {
     "message": "Web orria «NSFW» moduan jarri (<a href=\"https://wikipedia.org/wiki/Not_safe_for_work\">“Not Safe For Work” </a>)",
     "description": "A checkbox to use for NSFW sites"
-  },
-  "supportRedact": {
-    "message": "Erredaktatu",
-    "description": "Text for 'Redact' button"
-  },
-  "supportUnredact": {
-    "message": "Desegin erredakzioa",
-    "description": "Text for 'Unredact' button"
   },
   "aboutPrivacyPolicy": {
     "message": "Pribatutasun politika",
@@ -1070,10 +1086,6 @@
   "errorCantConnectTo": {
     "message": "Sare-errorea: {{msg}}",
     "description": "English: Network error: {{msg}}"
-  },
-  "subscriberConfirm": {
-    "message": "uBlock₀: Gehitu honako URL hauek zure iragazki pertsonalizatuen zerrendara?\n\nIzenburua: \"{{title}}\"\nURLa: {{url}}",
-    "description": "No longer used"
   },
   "subscribeButton": {
     "message": "Harpidetu",
@@ -1163,6 +1175,26 @@
     "message": "Aurrera",
     "description": "Button text to navigate to the blocked page"
   },
+  "docblockedRedirectPrompt": {
+    "message": "Blokeatutako orrialdeak beste helbide batera berbideratu nahi zaitu. Jarraitu nahi baduzu, zuzenean helbide honetara joango zara: {{url}}",
+    "description": "Text warning about an incoming redirect"
+  },
+  "docblockedReasonLabel": {
+    "message": "Arrazoia:",
+    "description": "The label which prepend the actual reason why a page was blocked"
+  },
+  "docblockedReasonMalicious": {
+    "message": "Gaiztoa",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonTracker": {
+    "message": "Jarraitzailea",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonDisreputable": {
+    "message": "Ospe txarrekoa",
+    "description": "An actual reason why a page was blocked"
+  },
   "cloudPush": {
     "message": "Esportatu hodei biltegiratzera",
     "description": "tooltip"
@@ -1215,6 +1247,10 @@
     "message": "Une batez baimendu multimedia elementu handiak",
     "description": "A context menu entry, present when large media elements have been blocked on the current site"
   },
+  "contextMenuViewSource": {
+    "message": "Ikusi iturburu kodea…",
+    "description": "A context menu entry, to view the source code of the target resource"
+  },
   "shortcutCapturePlaceholder": {
     "message": "Idatzi lasterbide bat",
     "description": "Placeholder string for input field used to capture a keyboard shortcut"
@@ -1234,6 +1270,10 @@
   "toggleCosmeticFiltering": {
     "message": "Iragazte kosmetikoa txandakatu",
     "description": "Label for keyboard shortcut used to toggle cosmetic filtering"
+  },
+  "toggleJavascript": {
+    "message": "JavaScripta aktibatu/desaktibatu",
+    "description": "Label for keyboard shortcut used to toggle no-scripting switch"
   },
   "relaxBlockingMode": {
     "message": "Baretu blokeatze-modua",
@@ -1258,6 +1298,14 @@
   "clickToLoad": {
     "message": "Sakatu kargatzeko",
     "description": "Message used in frame placeholders"
+  },
+  "linterMainReport": {
+    "message": "Erroreak: {{count}}",
+    "description": "Summary of number of errors as reported by the linter "
+  },
+  "unprocessedRequestTooltip": {
+    "message": "Iragazkia ezin izan da kargatu nabigatzailea irekitzeak. Kargatu berriz orria iragazkiak ondo funtzionatzen duela ziurtatzeko.",
+    "description": "A warning which will appear in the popup panel if needed"
   },
   "dummy": {
     "message": "This entry must be the last one",

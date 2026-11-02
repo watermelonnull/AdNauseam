@@ -8,7 +8,7 @@
     "description": "English: links.html Support"
   },
   "aboutBuiltOn": {
-    "message": "Built on",
+    "message": "Készítési időpont",
     "description": "English: links.html Built on"
   },
   "aboutFaq": {
@@ -36,15 +36,15 @@
     "description": "Message asking user to confirm reset"
   },
   "adnFirstRunHideAllAdsDescription": {
-    "message": "Hide Ads in your selected <span>filter lists</span>",
+    "message": "Hirdetések elrejtése a kiválasztott <span>szűrőlistákban<\/span>",
     "description": "English: Firstrun.html -> Hide Ads in your selected filter lists"
   },
   "adnFirstRunClickingAdsDescription": {
-    "message": "Regisztrálja a látogatásokat a <span>szűrőlistával</span> talált reklámokon",
+    "message": "Regisztrálja a látogatásokat a <span>szűrőlistával<\/span> talált reklámokon",
     "description": "English: Firstrun.html -> Register visits on Ads found via your filter lists"
   },
   "adnFirstRunBlockingMalwareDescription": {
-    "message": "Követők és más kártevők blokkolása (<span>személyre szabás</span>)",
+    "message": "Követők és más kártevők blokkolása (<span>személyre szabás<\/span>)",
     "description": "English: Firstrun.html -> Block trackers and other malware (customize)"
   },
   "adnNotificationReactivate": {
@@ -60,7 +60,7 @@
     "description": "English: Notifications -> Activate Ad hiding"
   },
   "adnNotificationActivateClicking": {
-    "message": "Activate Ad clicking",
+    "message": "Hirdetéskattintás aktiválása",
     "description": "English: Notifications -> Activate Ad clicking"
   },
   "adnNotificationActivateBlocking": {
@@ -84,7 +84,7 @@
     "description": "English: Notifications -> uBlock and AdNauseam may conflict!"
   },
   "adnNotificationOperaSetting": {
-    "message": "Please allow AdNauseam to access search page results",
+    "message": "Kérjük, engedélyezd az AdNauseam számára, hogy hozzáférjen a keresési oldal eredményeihez",
     "description": "English: Notifications -> Please allow AdNauseam to access search page results"
   },
   "adnNotificationBrowserSetting": {
@@ -92,28 +92,32 @@
     "description": "English: Notifications -> The 'Content Blocking' settings in your browser may interfere with AdNauseam!"
   },
   "adnNotificationPrivacyMode": {
-    "message": "You have allowed adnauseam to have access to your online activities while private browsing.",
+    "message": "Engedélyezted, hogy az adnauseam hozzáférjen az online tevékenységeidhez a privát böngészés során.",
     "description": "English: Notifications -> You have allowed adnauseam to have access to your online activities while private browsing."
   },
   "adnNotificationDNTAllowed": {
-    "message": "Ez az oldal tiszteletben tartja, <b>Nem Követi</b>, hirdetések engedélyezettek.",
+    "message": "Ez az oldal tiszteletben tartja, <b>Nem Követi<\/b>, hirdetések engedélyezettek.",
     "description": "English: Notifications -> This page respects Do Not Track, Ads are allowed."
   },
   "adnNotificationDNTHidingNotClicking": {
-    "message": "This page respects <b>Do Not Track</b>, hiding not clicking.",
+    "message": "Ez az oldal tiszteletben tartja a <b>Do Not Track<\/b> beállítást, elrejt nem kattint.",
     "description": "English: Notifications -> This page respects Do Not Track, hiding not clicking."
   },
   "adnNotificationDNTClickingNotHiding": {
-    "message": "This page respects <b>Do Not Track</b>, clicking not hiding",
+    "message": "Ez az oldal tiszteletben tartja a <b>Do Not Track<\/b> beállítást, kattint nem elrejt.",
     "description": "English: Notifications -> This page respects Do Not Track, clicking not hiding."
   },
   "adnNotificationDNTJustSoYouKnow": {
-    "message": "This page respects <b>Do Not Track</b>, just so you know.",
+    "message": "Ez az oldal tiszteletben tartja a <b>Do Not Track<\/b> beállítást, csak hogy tudd.",
     "description": "English: Notifications -> This page respects Do Not Track, just so you know."
   },
   "adnNotificationShowAdsDebug": {
-    "message": "The Advanced Setting \"Show Ads Debug\" is turned on",
+    "message": "A \"Hirdetések hibakeresésének megjelenítése\" speciális beállítás be van kapcsolva.",
     "description": "English: Notifications -> The Advanced Setting \"Show Ads Debug\" is turned on"
+  },
+  "adnNewerVersionAvailableNotification": {
+    "message": "Elérhető az AdNauseam új verziója",
+    "description": "English: Notifications -> A newer version of AdNauseam is available"
   },
   "adnTarget": {
     "message": "CÉL",
@@ -128,7 +132,7 @@
     "description": "English: Not Yet Visited"
   },
   "adnAllowedByDNT": {
-    "message": "Allowed via Do Not Track policy",
+    "message": "Engedélyezve a Do Not Track irányelv által",
     "description": "English: Not Yet Visited"
   },
   "adnFirstRunSwitchMeOn": {
@@ -153,7 +157,7 @@
   },
   "adnPausedOnPage": {
     "message": "AdNauseam szünetel, ezen az oldalon",
-    "description": "English: Menu->display when paused on page/site"
+    "description": "English: Menu->display when paused on page\/site"
   },
   "adnNotHiding": {
     "message": "AdNauseam hirdetések jelenleg nem takar",
@@ -168,39 +172,39 @@
     "description": "appears in ADN vault, above ad slider"
   },
   "topAdnetworks": {
-    "message": "Top Ad Networks",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "Legnépszerűbb hirdetési hálózatok",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "topSites": {
-    "message": "Top Sites",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "Legnépszerűbb Oldalak",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypes": {
-    "message": "Ad Types",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "Hirdetés Típus",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesImageAds": {
     "message": "Képes hírdetések",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesTextAds": {
     "message": "Szöveges hirdetések",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adnShowingRecentAds": {
     "message": "Ezen az oldalon nem gyűjtött hirdetéseket (legfrissebbek mutatása)",
     "description": "shown in menu when only 'recent' Ads are shown"
   },
   "adnThisPageStrictBlocked": {
-    "message": "{{domain}} is currently strict-blocked.",
+    "message": "{{domain}} jelenleg szigorúan blokkolva van.",
     "description": "shown in menu when the current page is strict-blocked"
   },
   "adnStrictBlockListDescription": {
-    "message": "The strict-block list serves to help the users to strict-block specific domains or pages more easily.",
+    "message": "A szigorúan blokkolt listával a felhasználók könnyebben tudnak szigorúan blokkolni bizonyos domaineket vagy oldalakat.",
     "description": "Description on the strict-block list tab, which is found on the dashboard"
   },
   "adnExportedAdsFilename": {
-    "message": "AdNauseam_Export_{{datetime}}.json",
+    "message": "AdNauseam_Exportálás_{{datetime}}.json",
     "description": "English: AdNauseam file export"
   },
   "adnImportAlertFormat": {
@@ -216,7 +220,7 @@
     "description": "appears in ADN settings"
   },
   "adnPurgeConfirm": {
-    "message": "This action will permanently remove all ads with load image error. Make sure your internet is connected, otherwise all your ads will be deleted.",
+    "message": "This action will permanently remove all ads for which the image cannot be loaded. It is a good idea to backup your vault before purging, and also to make sure you have an active internet connection.",
     "description": "appears in ADN settings"
   },
   "adnAdClickingStatusPending": {
@@ -232,7 +236,7 @@
     "description": "Menu & AdVault: Failed"
   },
   "adnAdClickingStatusSkippedDNT": {
-    "message": "SKIPPED: DNT Allowed",
+    "message": "KIHAGYVA: DNT engedélyezve",
     "description": "Menu & AdVault: SKIPPED: DNT Allowed"
   },
   "adnAdClickingStatusSkippedUser": {
@@ -240,7 +244,7 @@
     "description": "Menu & AdVault: SKIPPED: Clicked by User"
   },
   "adnAdClickingStatusSkippedFrequency": {
-    "message": "SKIPPED: Click Frequency",
+    "message": "KIHAGYVA: Kattintás Gyakoriság",
     "description": "Menu & AdVault: SKIPPED: Click Frequency"
   },
   "adnAdClickingStatusSkippedDisabled": {
@@ -268,23 +272,23 @@
     "description": "appears in ADN popup menu three state button"
   },
   "adnMenuDisable": {
-    "message": "Disable",
+    "message": "Letiltás",
     "description": "Disabled Adnauseam -> appears in ADN popup menu three state button"
   },
   "adnMenuActive": {
-    "message": "Active",
+    "message": "Aktív",
     "description": "Make Adnauseam Active -> appears in ADN popup menu three state button"
   },
   "adnMenuStrict": {
-    "message": "Strict",
+    "message": "Szigorú",
     "description": "Activate Strict-Block -> appears in ADN popup menu three state button"
   },
   "adnMenuDisableScopeDomain": {
-    "message": "on {{domain}}",
+    "message": "itt: {{domain}}",
     "description": "Disable AdNaueam Block On this Domain -> Popup option that appears inside ADN menu"
   },
   "adnMenuDisableScopePage": {
-    "message": "on this page",
+    "message": "ezen a lapon",
     "description": "Disable AdNaueam Block On This Page -> Popup option that appears inside ADN menu"
   },
   "adnMenuSettings": {
@@ -300,11 +304,11 @@
     "description": "appears in Menu - Export Dialog box"
   },
   "adnMenuExportSettingsOnly": {
-    "message": "Settings Only",
+    "message": "Beállítások Csak",
     "description": "appears in Menu - Export Dialog box"
   },
   "adnMenuExportSettingsAndAds": {
-    "message": "Settings and Ads",
+    "message": "Beállítások és Hirdetések",
     "description": "appears in Menu - Export Dialog box"
   },
   "adnMenuImportAds": {
@@ -312,19 +316,19 @@
     "description": "appears in ADN popup menu"
   },
   "adnMenuDisableAllLogging": {
-    "message": "Disable all logging",
+    "message": "Minden naplózás kikapcsolása",
     "description": "appears in ADN popup menu"
   },
   "adnMenuDisableOutgoingReferrer": {
-    "message": "Disable outgoing referrer",
+    "message": "Kimenő hivatkozás letiltása",
     "description": "appears in ADN popup menu"
   },
   "adnMenuClearAds": {
-    "message": "Clear Ads with browser history",
+    "message": "Hirdetések Törlése a böngésző előzményeivel",
     "description": "appears in ADN popup menu"
   },
   "adnMenuHideBadge": {
-    "message": "Hide Ad count on icon",
+    "message": "Hirdetések számának elrejtése az ikonon",
     "description": "appears in ADN popup menu"
   },
   "adnMenuClearAdsNow": {
@@ -332,11 +336,11 @@
     "description": "appears in ADN popup menu"
   },
   "adnLogNoLog": {
-    "message": "No log available",
+    "message": "Nincs elérhető napló",
     "description": "appears in ADN log page"
   },
   "adnLogViewFullLog": {
-    "message": "View full log",
+    "message": "Teljes napló megtekintése",
     "description": "appears in ADN log page"
   },
   "adnVaultSince": {
@@ -356,8 +360,20 @@
     "description": "appears on vault page"
   },
   "adnPurgeDeadAds": {
-    "message": "Purge Dead Ads",
+    "message": "Törölje a Halott Hirdetéseket",
     "description": "appears on vault page"
+  },
+  "adnShowDeadAds": {
+    "message": "Show Dead Ads",
+    "description": "appears on vault page"
+  },
+  "adnHideDeadAds": {
+    "message": "Hide Dead Ads",
+    "description": "appears on vault page"
+  },
+  "adnCaptureVault": {
+    "message": "Capture",
+    "description": "appears on vault page in dev mode"
   },
   "adnVaultFound": {
     "message": "{{total}} összegyűjtött hirdetések",
@@ -380,11 +396,11 @@
     "description": "appears on vault page"
   },
   "hidingAdsPrompt": {
-    "message": "Hide Ads identified by your chosen filter lists",
+    "message": "A kiválasztott szűrőlisták által azonosított hirdetések elrejtése",
     "description": "English: Hide Ads identified by your chosen filter lists"
   },
   "clickingAdsPrompt": {
-    "message": "Click Ads identified by your chosen filter lists",
+    "message": "A kiválasztott szűrőlisták által azonosított hirdetések kattintása",
     "description": "English: Click Ads identified by your chosen filter lists"
   },
   "blockingMalwarePrompt": {
@@ -392,15 +408,15 @@
     "description": "English: lock trackers and other malware"
   },
   "parseTextAdsPrompt": {
-    "message": "Capture text-only Ads when possible",
+    "message": "Csak szöveges hirdetések rögzítése, ha lehetséges",
     "description": "English: Capture text-only Ads when possible"
   },
   "settingsIconBadgePrompt": {
-    "message": "Display the number of Ads on the icon",
+    "message": "Hirdetések számának megjelenítése az ikonon",
     "description": "English: Show the number of found Ads on the icon"
   },
   "settingsExtraPrivacyPrompt": {
-    "message": "Extra Privacy",
+    "message": "Extra Magánszféra",
     "description": "English: Interface"
   },
   "settingsInterfacePrompt": {
@@ -408,19 +424,19 @@
     "description": "English: Interface"
   },
   "noIncomingCookiesPrompt": {
-    "message": "Ignore cookies returned with clicks",
+    "message": "Kattintással visszaküldött sütik figyelmen kívül hagyása",
     "description": "English: Ignore cookies returned with clicks"
   },
   "noOutgoingCookiesPrompt": {
-    "message": "Don't send cookies on visits",
+    "message": "Ne küldjön sütiket a látogatások során",
     "description": "English: Don't send cookies on visits"
   },
   "noOutgoingUserAgentPrompt": {
-    "message": "Hide user-agent header on visits",
+    "message": "Felhasználó-ügynök fejléc elrejtése látogatáskor",
     "description": "English: Hide user-agent header on visits"
   },
   "noOutgoingRefererPrompt": {
-    "message": "Hide referring page on visits",
+    "message": "Hivatkozó oldal elrejtése a látogatásoknál",
     "description": "English: Hide referring page on visits"
   },
   "ClickingFrequencyRarely": {
@@ -436,7 +452,7 @@
     "description": "English: Click Frequency - Always"
   },
   "respectDNTPrompt": {
-    "message": "Make exceptions for non-tracking Ads",
+    "message": "Kivételek a nem nyomon követhető hirdetések esetében",
     "description": "English: Make exceptions for non-tracking Ads"
   },
   "disableHidingForDNTPrompt": {
@@ -444,7 +460,7 @@
     "description": "English: Don't hide non-tracking Ads"
   },
   "disableClickingForDNTPrompt": {
-    "message": "Don't click non-tracking Ads",
+    "message": "Ne kattintson a nem nyomon követhető hirdetésekre",
     "description": "English: Don't click non-tracking Ads"
   },
   "extName": {
@@ -452,11 +468,11 @@
     "description": "extension name"
   },
   "extShortDesc": {
-    "message": "Fight back against advertising surveillance",
+    "message": "Küzdelem a reklámfelügyelet ellen",
     "description": "for the chrome web store: must be 132 characters or less"
   },
   "3pGroupEssentials": {
-    "message": "Essentials",
+    "message": "Alapvetők",
     "description": "English: Essentials"
   },
   "3pGroupOther": {
@@ -475,32 +491,64 @@
     "message": "Frissítés",
     "description": "English: update"
   },
+  "adnUpdateButton": {
+    "message": "Frissítés",
+    "description": "English: update"
+  },
   "whitelistPageName": {
     "message": "Fehérlista",
     "description": "appears as tab name in dashboard"
   },
   "strictBlockListPageName": {
-    "message": "Strict-Block List",
+    "message": "Szigorú-blokk lista",
     "description": "appears as tab name in dashboard"
   },
   "eventLoggingPrompt": {
-    "message": "Hibakeresési mód aktiválása",
+    "message": "Debug mode",
     "description": "prompt for toggle"
   },
   "disableWarnings": {
-    "message": "Disable warnings",
+    "message": "Figyelmeztetések kikapcsolása",
     "description": "English:Disable warnings"
   },
+  "blurCollectedAds": {
+    "message": "Gyűjtött hirdetések elhomályosítása",
+    "description": "English: Blur Collected ads"
+  },
+  "hideDeadAds": {
+    "message": "Hide Dead ads",
+    "description": "English: Hide Dead ads"
+  },
   "showAdsDebugPrompt": {
-    "message": "Show ads for ad-collection debugging",
+    "message": "Hirdetések megjelenítése a hirdetésgyűjtési hibakereséséhez",
     "description": "English: Show ads for ad-collection debugging"
   },
   "removeAdsInPrivate": {
-    "message": "Remove ads collected in private mode",
+    "message": "Privát módban gyűjtött hirdetések eltávolítása",
     "description": "English:Remove ads collected in private mode - settings page"
   },
   "settingsStrictBlockingMode": {
-    "message": "Activate Strict-Blocking Mode",
+    "message": "Szigorúan blokkoló üzemmód aktiválása",
     "description": "English: Activate Strict-Blocking Mode"
+  },
+  "adnRefreshButton": {
+    "message": "Frissítés",
+    "description": "English: refresh page from menu notification button"
+  },
+  "adnRefreshNotification": {
+    "message": "Változások alkalmazása az aktuális oldalon",
+    "description": "English: refresh page from menu notification"
+  },
+  "supportS6P3S1": {
+    "message": "Bizonyosodj meg arról, hogy ez a jelenség <b>AdNauseam-specifikus<\/b>.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P3S2": {
+    "message": "<a url='https:\/\/github.com\/gorhill\/uBlock'>#uBO#<\/a>-n leteszteltem ugyanezt a weboldalt, és megerősítem, hogy a jelenség <b>AdNauseam-specifikus<\/b>.",
+    "description": "A checkbox in the filter issue reporter section"
+  },
+  "supportS6Select1Option7": {
+    "message": "Össze nem gyűjtött hirdetések",
+    "description": "Ads are present on page but none are collected"
   }
 }

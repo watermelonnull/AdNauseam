@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2014-2015 The uBlock Origin authors
     Copyright (C) 2014-present Raymond Hill
 
@@ -22,18 +22,123 @@
 
 // For background page or non-background pages
 
-/* global browser */
-
-'use strict';
-
-/******************************************************************************/
 /******************************************************************************/
 
 vAPI.T0 = Date.now();
 
+vAPI.setTimeout = vAPI.setTimeout || self.setTimeout.bind(self);
+
 /******************************************************************************/
 
-vAPI.setTimeout = vAPI.setTimeout || self.setTimeout.bind(self);
+vAPI.defer = {
+    create(callback) {
+        return new this.Client(callback);
+    },
+    once(delay, ...args) {
+        const delayInMs = vAPI.defer.normalizeDelay(delay);
+        return new Promise(resolve => {
+            vAPI.setTimeout(
+                (...args) => { resolve(...args); },
+                delayInMs,
+                ...args
+            );
+        });
+    },
+    Client: class {
+        constructor(callback) {
+            this.timer = null;
+            this.type = 0;
+            this.callback = callback;
+        }
+        on(delay, ...args) {
+            if ( this.timer !== null ) { return; }
+            const delayInMs = vAPI.defer.normalizeDelay(delay);
+            this.type = 0;
+            this.timer = vAPI.setTimeout(( ) => {
+                this.timer = null;
+                this.callback(...args);
+            }, delayInMs || 1);
+        }
+        offon(delay, ...args) {
+            this.off();
+            this.on(delay, ...args);
+        }
+        onvsync(delay, ...args) {
+            if ( this.timer !== null ) { return; }
+            const delayInMs = vAPI.defer.normalizeDelay(delay);
+            if ( delayInMs !== 0 ) {
+                this.type = 0;
+                this.timer = vAPI.setTimeout(( ) => {
+                    this.timer = null;
+                    this.onraf(...args);
+                }, delayInMs);
+            } else {
+                this.onraf(...args);
+            }
+        }
+        onidle(delay, options, ...args) {
+            if ( this.timer !== null ) { return; }
+            const delayInMs = vAPI.defer.normalizeDelay(delay);
+            if ( delayInMs !== 0 ) {
+                this.type = 0;
+                this.timer = vAPI.setTimeout(( ) => {
+                    this.timer = null;
+                    this.onric(options, ...args);
+                }, delayInMs);
+            } else {
+                this.onric(options, ...args);
+            }
+        }
+        off() {
+            if ( this.timer === null ) { return; }
+            switch ( this.type ) {
+            case 0:
+                self.clearTimeout(this.timer);
+                break;
+            case 1:
+                self.cancelAnimationFrame(this.timer);
+                break;
+            case 2:
+                self.cancelIdleCallback(this.timer);
+                break;
+            default:
+                break;
+            }
+            this.timer = null;
+        }
+        onraf(...args) {
+            if ( this.timer !== null ) { return; }
+            this.type = 1;
+            this.timer = requestAnimationFrame(( ) => {
+                this.timer = null;
+                this.callback(...args);
+            });
+        }
+        onric(options, ...args) {
+            if ( this.timer !== null ) { return; }
+            this.type = 2;
+            this.timer = self.requestIdleCallback(deadline => {
+                this.timer = null;
+                this.callback(deadline, ...args);
+            }, options);
+        }
+        ongoing() {
+            return this.timer !== null;
+        }
+    },
+    normalizeDelay(delay = 0) {
+        if ( typeof delay === 'object' ) {
+            if ( delay.sec !== undefined ) {
+                return delay.sec * 1000;
+            } else if ( delay.min !== undefined ) {
+                return delay.min * 60000;
+            } else if ( delay.hr !== undefined ) {
+                return delay.hr * 3600000;
+            }
+        }
+        return delay;
+    }
+};
 
 /******************************************************************************/
 
@@ -45,6 +150,9 @@ vAPI.webextFlavor = {
     }
 };
 
+// https://bugzilla.mozilla.org/show_bug.cgi?id=1858743
+//   Add support for native `:has()` for Firefox 121+
+
 (( ) => {
     const ua = navigator.userAgent;
     const flavor = vAPI.webextFlavor;
@@ -55,9 +163,12 @@ vAPI.webextFlavor = {
 
     // This is always true.
     soup.add('ublock').add('webext');
+    soup.add('ipaddress');
 
     // Whether this is a dev build.
-    if ( /^\d+\.\d+\.\d+\D/.test(browser.runtime.getManifest().version) ) {
+    const manifest = browser.runtime.getManifest();
+    const version = manifest.version_name || manifest.version;
+    if ( /^\d+\.\d+\.\d+\D/.test(version) ) {
         soup.add('devbuild');
     }
 
@@ -65,34 +176,36 @@ vAPI.webextFlavor = {
         soup.add('mobile');
     }
 
-    // Asynchronous
-    if (
-        browser instanceof Object &&
-        typeof browser.runtime.getBrowserInfo === 'function'
-    ) {
-        browser.runtime.getBrowserInfo().then(info => {
-            flavor.major = parseInt(info.version, 10) || flavor.major;
-            soup.add(info.vendor.toLowerCase())
-                .add(info.name.toLowerCase());
-            dispatch();
-        });
-        if ( browser.runtime.getURL('').startsWith('moz-extension://') ) {
-            soup.add('firefox')
-                .add('user_stylesheet')
-                .add('html_filtering');
-            flavor.major = 91;
-        }
-        return;
+    if ( CSS.supports('selector(a:has(b))') ) {
+        soup.add('native_css_has');
     }
 
-    // Synchronous -- order of tests is important
-    const match = /\bChrom(?:e|ium)\/([\d.]+)/.exec(ua);
-    if ( match !== null ) {
-        soup.add('chromium')
-            .add('user_stylesheet');
-        flavor.major = parseInt(match[1], 10) || 0;
-        if ( flavor.major >= 105 ) {
-            soup.add('native_css_has');
+    const extensionOrigin = browser.runtime.getURL('');
+
+    // Order of tests is important
+    flavor.isGecko = extensionOrigin.startsWith('moz-extension://');
+    if ( flavor.isGecko ) {
+        soup.add('firefox')
+            .add('html_filtering');
+        const match = /Firefox\/(\d+)/.exec(ua);
+        flavor.major = match && parseInt(match[1], 10) || 115;
+    } else {
+        const match = /\bChrom(?:e|ium)\/(\d+)/.exec(ua);
+        if ( match !== null ) {
+            soup.add('chromium');
+        }
+        flavor.major = match && parseInt(match[1], 10) || 120;
+        // Brave can't be told apart through the user agent string, which is
+        // identical to Chrome's. Both tests below are synchronous, whereas
+        // navigator.brave.isBrave() is promise-based -- the flavor must be
+        // settled before filter lists are compiled and cached. Either test
+        // alone would do, the second one is a fallback for the first.
+        // https://github.com/brave/brave-browser/wiki/Detecting-Brave-(for-Websites)
+        if (
+            navigator.brave instanceof Object ||
+            navigator.userAgentData?.brands?.some(a => a.brand === 'Brave')
+        ) {
+            soup.add('brave');
         }
     }
 

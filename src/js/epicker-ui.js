@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2014-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -21,14 +21,13 @@
 
 /* global CodeMirror */
 
-'use strict';
-
-/******************************************************************************/
-
 import './codemirror/ubo-static-filtering.js';
 
+import * as sfp from './static-filtering-parser.js';
+
+import { dom } from './dom.js';
 import { hostnameFromURI } from './uri-utils.js';
-import { StaticFilteringParser } from './static-filtering-parser.js';
+import punycode from '../lib/punycode.js';
 
 /******************************************************************************/
 /******************************************************************************/
@@ -47,32 +46,26 @@ const pickerRoot = document.documentElement;
 const dialog = $stor('aside');
 let staticFilteringParser;
 
-const svgRoot = $stor('svg');
+const svgRoot = $stor('svg#sea');
 const svgOcean = svgRoot.children[0];
 const svgIslands = svgRoot.children[1];
 const NoPaths = 'M0 0';
 
-const reCosmeticAnchor = /^#[$?]?#/;
+const reCosmeticAnchor = /^#(\$|\?|\$\?)?#/;
 
-const epickerId = (( ) => {
+{
     const url = new URL(self.location.href);
     if ( url.searchParams.has('zap') ) {
         pickerRoot.classList.add('zap');
     }
-    return url.searchParams.get('epid');
-})();
-if ( epickerId === null ) { return; }
+}
 
 const docURL = new URL(vAPI.getURL(''));
 
-let epickerConnectionId;
-let resultsetOpt;
-
-let netFilterCandidates = [];
-let cosmeticFilterCandidates = [];
-let computedCandidateSlot = 0;
-let computedCandidate = '';
 const computedSpecificityCandidates = new Map();
+let resultsetOpt;
+let cosmeticFilterCandidates = [];
+let computedCandidate = '';
 let needBody = false;
 
 /******************************************************************************/
@@ -90,13 +83,10 @@ const cmEditor = new CodeMirror(document.querySelector('.codeMirrorContainer'), 
 
 vAPI.messaging.send('dashboard', {
     what: 'getAutoCompleteDetails'
-}).then(response => {
+}).then(hints => {
     // For unknown reasons, `instanceof Object` does not work here in Firefox.
-    if ( typeof response !== 'object' ) { return; }
-    const mode = cmEditor.getMode();
-    if ( mode.setHints instanceof Function ) {
-        mode.setHints(response);
-    }
+    if ( hints instanceof Object === false ) { return; }
+    cmEditor.setOption('uboHints', hints);
 });
 
 /******************************************************************************/
@@ -112,14 +102,12 @@ const rawFilterFromTextarea = function() {
 const filterFromTextarea = function() {
     const filter = rawFilterFromTextarea();
     if ( filter === '' ) { return ''; }
-    const sfp = staticFilteringParser;
-    sfp.analyze(filter);
-    sfp.analyzeExtra();
-    if (
-        sfp.category !== sfp.CATStaticExtFilter &&
-        sfp.category !== sfp.CATStaticNetFilter ||
-        sfp.shouldDiscard()
-    ) {
+    const parser = staticFilteringParser;
+    parser.parse(filter);
+    if ( parser.isFilter() === false ) { return '!'; }
+    if ( parser.isExtendedFilter() ) {
+        if ( parser.isCosmeticFilter() === false ) { return '!'; }
+    } else if ( parser.isNetworkFilter() === false ) {
         return '!';
     }
     return filter;
@@ -151,7 +139,10 @@ const renderRange = function(id, value, invert = false) {
 const userFilterFromCandidate = function(filter) {
     if ( filter === '' || filter === '!' ) { return; }
 
-    const hn = hostnameFromURI(docURL.href);
+    let hn = hostnameFromURI(docURL.href);
+    if ( hn.startsWith('xn--') ) {
+        hn = punycode.toUnicode(hn);
+    }
 
     // Cosmetic filter?
     if ( reCosmeticAnchor.test(filter) ) {
@@ -188,7 +179,6 @@ const candidateFromFilterChoice = function(filterChoice) {
         elem.classList.remove('active');
     }
 
-    computedCandidateSlot = slot;
     computedCandidate = '';
 
     if ( filter === undefined ) { return ''; }
@@ -308,7 +298,7 @@ const cosmeticCandidatesFromFilterChoice = function(filterChoice) {
         candidates.push(paths);
     }
 
-    vAPI.MessagingConnection.sendTo(epickerConnectionId, {
+    pickerContentPort.postMessage({
         what: 'optimizeCandidates',
         candidates,
         slot,
@@ -336,12 +326,12 @@ const onSvgClicked = function(ev) {
     // If zap mode, highlight element under mouse, this makes the zapper usable
     // on touch screens.
     if ( pickerRoot.classList.contains('zap') ) {
-        vAPI.MessagingConnection.sendTo(epickerConnectionId, {
+        pickerContentPort.postMessage({
             what: 'zapElementAtPoint',
             mx: ev.clientX,
             my: ev.clientY,
             options: {
-                stay: ev.shiftKey || ev.type === 'touch',
+                stay: true,
                 highlight: ev.target !== svgIslands,
             },
         });
@@ -361,7 +351,7 @@ const onSvgClicked = function(ev) {
     if ( ev.type === 'touch' ) {
         pickerRoot.classList.add('show');
     }
-    vAPI.MessagingConnection.sendTo(epickerConnectionId, {
+    pickerContentPort.postMessage({
         what: 'filterElementAtPoint',
         mx: ev.clientX,
         my: ev.clientY,
@@ -396,7 +386,7 @@ const onSvgTouch = (( ) => {
         const stopY = ev.changedTouches[0].screenY;
         const angle = Math.abs(Math.atan2(stopY - startY, stopX - startX));
         const distance = Math.sqrt(
-            Math.pow(stopX - startX, 2),
+            Math.pow(stopX - startX, 2) +
             Math.pow(stopY - startY, 2)
         );
         // Interpret touch events as a tap if:
@@ -435,7 +425,7 @@ const onSvgTouch = (( ) => {
             pickerRoot.classList.contains('zap') &&
             svgIslands.getAttribute('d') !== NoPaths
         ) {
-            vAPI.MessagingConnection.sendTo(epickerConnectionId, {
+            pickerContentPort.postMessage({
                 what: 'unhighlight'
             });
             return;
@@ -466,7 +456,7 @@ const onCandidateChanged = function() {
     $id('resultsetModifiers').classList.toggle(
         'hide', text === '' || text !== computedCandidate
     );
-    vAPI.MessagingConnection.sendTo(epickerConnectionId, {
+    pickerContentPort.postMessage({
         what: 'dialogSetFilter',
         filter,
         compiled: reCosmeticAnchor.test(filter)
@@ -479,7 +469,7 @@ const onCandidateChanged = function() {
 
 const onPreviewClicked = function() {
     const state = pickerRoot.classList.toggle('preview');
-    vAPI.MessagingConnection.sendTo(epickerConnectionId, {
+    pickerContentPort.postMessage({
         what: 'togglePreview',
         state,
     });
@@ -499,7 +489,7 @@ const onCreateClicked = function() {
             killCache: reCosmeticAnchor.test(candidate) === false,
         });
     }
-    vAPI.MessagingConnection.sendTo(epickerConnectionId, {
+    pickerContentPort.postMessage({
         what: 'dialogCreate',
         filter: candidate,
         compiled: reCosmeticAnchor.test(candidate)
@@ -581,7 +571,7 @@ const onKeyPressed = function(ev) {
         (ev.key === 'Delete' || ev.key === 'Backspace') &&
         pickerRoot.classList.contains('zap')
     ) {
-        vAPI.MessagingConnection.sendTo(epickerConnectionId, {
+        pickerContentPort.postMessage({
             what: 'zapElementAtPoint',
             options: { stay: true },
         });
@@ -600,16 +590,34 @@ const onStartMoving = (( ) => {
     let isTouch = false;
     let mx0 = 0, my0 = 0;
     let mx1 = 0, my1 = 0;
-    let r0 = 0, b0 = 0;
-    let rMax = 0, bMax = 0;
+    let pw = 0, ph = 0;
+    let dw = 0, dh = 0;
+    let cx0 = 0, cy0 = 0;
     let timer;
+
+    const eatEvent = function(ev) {
+        ev.stopPropagation();
+        ev.preventDefault();
+    };
 
     const move = ( ) => {
         timer = undefined;
-        const r1 = Math.min(Math.max(r0 - mx1 + mx0, 2), rMax);
-        const b1 = Math.min(Math.max(b0 - my1 + my0, 2), bMax);
-        dialog.style.setProperty('right', `${r1}px`);
-        dialog.style.setProperty('bottom', `${b1}px`);
+        const cx1 = cx0 + mx1 - mx0;
+        const cy1 = cy0 + my1 - my0;
+        if ( cx1 < pw / 2 ) {
+            dialog.style.setProperty('left', `${Math.max(cx1-dw/2,2)}px`);
+            dialog.style.removeProperty('right');
+        } else {
+            dialog.style.removeProperty('left');
+            dialog.style.setProperty('right', `${Math.max(pw-cx1-dw/2,2)}px`);
+        }
+        if ( cy1 < ph / 2 ) {
+            dialog.style.setProperty('top', `${Math.max(cy1-dh/2,2)}px`);
+            dialog.style.removeProperty('bottom');
+        } else {
+            dialog.style.removeProperty('top');
+            dialog.style.setProperty('bottom', `${Math.max(ph-cy1-dh/2,2)}px`);
+        }
     };
 
     const moveAsync = ev => {
@@ -636,7 +644,7 @@ const onStartMoving = (( ) => {
         eatEvent(ev);
     };
 
-    return function(ev) {
+    return ev => {
         const target = dialog.querySelector('#move');
         if ( ev.target !== target ) { return; }
         if ( dialog.classList.contains('moving') ) { return; }
@@ -649,12 +657,13 @@ const onStartMoving = (( ) => {
             mx0 = ev.pageX;
             my0 = ev.pageY;
         }
-        const style = self.getComputedStyle(dialog);
-        r0 = parseInt(style.right, 10);
-        b0 = parseInt(style.bottom, 10);
         const rect = dialog.getBoundingClientRect();
-        rMax = pickerRoot.clientWidth - 2 - rect.width ;
-        bMax = pickerRoot.clientHeight - 2 - rect.height;
+        dw = rect.width;
+        dh = rect.height;
+        cx0 = rect.x + dw / 2;
+        cy0 = rect.y + dh / 2;
+        pw = pickerRoot.clientWidth;
+        ph = pickerRoot.clientHeight;
         dialog.classList.add('moving');
         if ( isTouch ) {
             self.addEventListener('touchmove', moveAsync, { capture: true });
@@ -676,7 +685,7 @@ const svgListening = (( ) => {
 
     const onTimer = ( ) => {
         timer = undefined;
-        vAPI.MessagingConnection.sendTo(epickerConnectionId, {
+        pickerContentPort.postMessage({
             what: 'highlightElementAtPoint',
             mx,
             my,
@@ -708,18 +717,10 @@ const svgListening = (( ) => {
 
 /******************************************************************************/
 
-const eatEvent = function(ev) {
-    ev.stopPropagation();
-    ev.preventDefault();
-};
-
-/******************************************************************************/
-
 // Create lists of candidate filters. This takes into account whether the
 // current mode is narrow or broad.
 
 const populateCandidates = function(candidates, selector) {
-    
     const root = dialog.querySelector(selector);
     const ul = root.querySelector('ul');
     while ( ul.firstChild !== null ) {
@@ -743,8 +744,6 @@ const showDialog = function(details) {
     pausePicker();
 
     const { netFilters, cosmeticFilters, filter } = details;
-
-    netFilterCandidates = netFilters;
 
     needBody  =
         cosmeticFilters.length !== 0 &&
@@ -795,15 +794,17 @@ const showDialog = function(details) {
 /******************************************************************************/
 
 const pausePicker = function() {
-    pickerRoot.classList.add('paused');
+    dom.cl.add(pickerRoot, 'paused');
+    dom.cl.remove(pickerRoot, 'minimized');
     svgListening(false);
 };
 
 /******************************************************************************/
 
 const unpausePicker = function() {
-    pickerRoot.classList.remove('paused', 'preview');
-    vAPI.MessagingConnection.sendTo(epickerConnectionId, {
+    dom.cl.remove(pickerRoot, 'paused', 'preview');
+    dom.cl.add(pickerRoot, 'minimized');
+    pickerContentPort.postMessage({
         what: 'togglePreview',
         state: false,
     });
@@ -814,12 +815,14 @@ const unpausePicker = function() {
 
 const startPicker = function() {
     self.addEventListener('keydown', onKeyPressed, true);
-    const svg = $stor('svg');
+    const svg = $stor('svg#sea');
     svg.addEventListener('click', onSvgClicked);
     svg.addEventListener('touchstart', onSvgTouch);
     svg.addEventListener('touchend', onSvgTouch);
 
     unpausePicker();
+
+    $id('quit').addEventListener('click', onQuitClicked);
 
     if ( pickerRoot.classList.contains('zap') ) { return; }
 
@@ -828,13 +831,20 @@ const startPicker = function() {
     $id('preview').addEventListener('click', onPreviewClicked);
     $id('create').addEventListener('click', onCreateClicked);
     $id('pick').addEventListener('click', onPickClicked);
-    $id('quit').addEventListener('click', onQuitClicked);
+    $id('minimize').addEventListener('click', ( ) => {
+        if ( dom.cl.has(pickerRoot, 'paused') === false ) {
+            pausePicker();
+            onCandidateChanged();
+        } else {
+            dom.cl.toggle(pickerRoot, 'minimized');
+        }
+    });
     $id('move').addEventListener('mousedown', onStartMoving);
     $id('move').addEventListener('touchstart', onStartMoving);
     $id('candidateFilters').addEventListener('click', onCandidateClicked);
     $stor('#resultsetDepth input').addEventListener('input', onDepthChanged);
     $stor('#resultsetSpecificity input').addEventListener('input', onSpecificityChanged);
-    staticFilteringParser = new StaticFilteringParser({
+    staticFilteringParser = new sfp.AstFilterParser({
         interactive: true,
         nativeCssHas: vAPI.webextFlavor.env.includes('native_css_has'),
     });
@@ -843,87 +853,66 @@ const startPicker = function() {
 /******************************************************************************/
 
 const quitPicker = function() {
-    vAPI.MessagingConnection.sendTo(epickerConnectionId, { what: 'quitPicker' });
-    vAPI.MessagingConnection.disconnectFrom(epickerConnectionId);
+    pickerContentPort.postMessage({ what: 'quitPicker' });
+    pickerContentPort.close();
+    pickerContentPort = undefined;
 };
 
 /******************************************************************************/
 
 const onPickerMessage = function(msg) {
     switch ( msg.what ) {
-        case 'candidatesOptimized':
-            onCandidatesOptimized(msg);
-            break;
-        case 'showDialog':
-            showDialog(msg);
-            break;
-        case 'resultsetDetails': {
-            resultsetOpt = msg.opt;
-            $id('resultsetCount').textContent = msg.count;
-            if ( msg.count !== 0 ) {
-                $id('create').removeAttribute('disabled');
-            } else {
-                $id('create').setAttribute('disabled', '');
-            }
-            break;
+    case 'candidatesOptimized':
+        onCandidatesOptimized(msg);
+        break;
+    case 'showDialog':
+        showDialog(msg);
+        break;
+    case 'resultsetDetails': {
+        resultsetOpt = msg.opt;
+        $id('resultsetCount').textContent = msg.count;
+        if ( msg.count !== 0 ) {
+            $id('create').removeAttribute('disabled');
+        } else {
+            $id('create').setAttribute('disabled', '');
         }
-        case 'svgPaths': {
-            let { ocean, islands } = msg;
-            ocean += islands;
-            svgOcean.setAttribute('d', ocean);
-            svgIslands.setAttribute('d', islands || NoPaths);
-            break;
-        }
-        default:
-            break;
+        break;
+    }
+    case 'svgPaths': {
+        let { ocean, islands } = msg;
+        ocean += islands;
+        svgOcean.setAttribute('d', ocean);
+        svgIslands.setAttribute('d', islands || NoPaths);
+        break;
+    }
+    default:
+        break;
     }
 };
 
 /******************************************************************************/
 
-const onConnectionMessage = function(msg) {
-    switch ( msg.what ) {
-        case 'connectionBroken':
-            break;
-        case 'connectionMessage':
-            onPickerMessage(msg.payload);
-            break;
-        case 'connectionAccepted':
-            epickerConnectionId = msg.id;
-            startPicker();
-            vAPI.MessagingConnection.sendTo(epickerConnectionId, {
-                what: 'start',
-            });
-            break;
-    }
-};
+// Wait for the content script to establish communication
 
-vAPI.MessagingConnection.connectTo(
-    `epickerDialog-${epickerId}`,
-    `epicker-${epickerId}`,
-    onConnectionMessage
-);
+let pickerContentPort;
+
+globalThis.addEventListener('message', ev => {
+    const msg = ev.data || {};
+    if ( msg.what !== 'epickerStart' ) { return; }
+    if ( Array.isArray(ev.ports) === false ) { return; }
+    if ( ev.ports.length === 0 ) { return; }
+    pickerContentPort = ev.ports[0];
+    pickerContentPort.onmessage = ev => {
+        const msg = ev.data || {};
+        onPickerMessage(msg);
+    };
+    pickerContentPort.onmessageerror = ( ) => {
+        quitPicker();
+    };
+    startPicker();
+    pickerContentPort.postMessage({ what: 'start' });
+}, { once: true });
 
 /******************************************************************************/
 
 })();
-
-
-
-
-
-
-
-
-/*******************************************************************************
-
-    DO NOT:
-    - Remove the following code
-    - Add code beyond the following code
-    Reason:
-    - https://github.com/gorhill/uBlock/pull/3721
-    - uBO never uses the return value from injected content scripts
-
-**/
-
-void 0;

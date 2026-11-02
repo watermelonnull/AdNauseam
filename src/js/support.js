@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2014-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,37 +19,36 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-/* global CodeMirror, uBlockDashboard, uDom */
+/* global CodeMirror, uBlockDashboard */
 
-'use strict';
+import { dom, qs$ } from './dom.js';
+import { onBroadcast } from './broadcast.js';
 
 /******************************************************************************/
 
-let supportData;
-
 const uselessKeys = [
-    'modifiedHiddenSettings.benchmarkDatasetURL',
-    'modifiedHiddenSettings.blockingProfiles',
-    'modifiedHiddenSettings.consoleLogLevel',
-    'modifiedHiddenSettings.uiPopupConfig',
-    'modifiedUserSettings.alwaysDetachLogger',
-    'modifiedUserSettings.firewallPaneMinimized',
-    'modifiedUserSettings.externalLists',
-    'modifiedUserSettings.importedLists',
-    'modifiedUserSettings.popupPanelSections',
-    'modifiedUserSettings.uiAccentCustom',
-    'modifiedUserSettings.uiAccentCustom0',
-    'modifiedUserSettings.uiTheme',
-    'modifiedUserSettings.dntDomains', // adn
+    'hiddenSettings.benchmarkDatasetURL',
+    'hiddenSettings.blockingProfiles',
+    'hiddenSettings.consoleLogLevel',
+    'hiddenSettings.uiPopupConfig',
+    'userSettings.alwaysDetachLogger',
+    'userSettings.firewallPaneMinimized',
+    'userSettings.externalLists',
+    'userSettings.importedLists',
+    'userSettings.popupPanelSections',
+    'userSettings.uiAccentCustom',
+    'userSettings.uiAccentCustom0',
+    'userSettings.uiTheme',
+    'userSettings.dntDomains', // adn
 ];
 
 const sensitiveValues = [
     'filterset (user)',
-    'modifiedUserSettings.popupPanelSections',
-    'modifiedHiddenSettings.userResourcesLocation',
+    'userSettings.popupPanelSections',
+    'hiddenSettings.userResourcesLocation',
     'trustedset.added',
     'untrustedset.added', // adn
-    'modifiedUserSettings.admap', // adn
+    'userSettings.admap', // adn
     'hostRuleset.added',
     'switchRuleset.added',
     'urlRuleset.added',
@@ -133,13 +132,40 @@ function configToMarkdown(collapse = false) {
 }
 
 function addDetailsToReportURL(id, collapse = false) {
-    const elem = uDom.nodeFromId(id);
-    const url = new URL(elem.getAttribute('data-url'));
+    const elem = qs$(`#${id}`);
+    const url = new URL(dom.attr(elem, 'data-url'));
     url.searchParams.set('configuration', configToMarkdown(collapse));
-    elem.setAttribute('data-url', url);
+    dom.attr(elem, 'data-url', url);
 }
 
-function showData() {
+function renderData(data, depth = 0) {
+    const indent = ' '.repeat(depth);
+    if ( Array.isArray(data) ) {
+        const out = [];
+        for ( const value of data ) {
+            out.push(renderData(value, depth));
+        }
+        return out.join('\n');
+    }
+    if ( typeof data !== 'object' || data === null ) {
+        return `${indent}${data}`;
+    }
+    const out = [];
+    for ( const [ name, value ] of Object.entries(data) ) {
+        if ( typeof value === 'object' && value !== null ) {
+            out.push(`${indent}${name}:`);
+            out.push(renderData(value, depth + 1));
+            continue;
+        }
+        out.push(`${indent}${name}: ${value}`);
+    }
+    return out.join('\n');
+}
+
+async function showSupportData() {
+    const supportData = await vAPI.messaging.send('dashboard', {
+        what: 'getSupportData',
+    });
     const shownData = JSON.parse(JSON.stringify(supportData));
     uselessKeys.forEach(prop => { removeKey(shownData, prop); });
     const redacted = true;
@@ -153,18 +179,7 @@ function showData() {
     if ( reportedPage !== null ) {
         shownData.popupPanel = reportedPage.popupPanel;
     }
-    const text = JSON.stringify(shownData, null, 2)
-        .split('\n')
-        .slice(1, -1)
-        .map(v => {
-            return v
-                .replace(/^( *?)  "/, '$1')
-                .replace(/^( *.*[^\\])(?:": "|": \{$|": \[$|": )/, '$1: ')
-                .replace(/(?:",?|\},?|\],?|,)$/, '');
-        })
-        .filter(v => v.trim() !== '')
-        .join('\n') + '\n';
-
+    const text = renderData(shownData);
     cmEditor.setValue(text);
     cmEditor.clearHistory();
 
@@ -183,46 +198,60 @@ const reportedPage = (( ) => {
         parsedURL.username = '';
         parsedURL.password = '';
         parsedURL.hash = '';
-        const select = document.querySelector('select[name="url"]');
-        select.options[0].textContent = parsedURL.href;
+        const select = qs$('select[name="url"]');
+        dom.text(select.options[0], parsedURL.href);
         if ( parsedURL.search !== '' ) {
-            const option = document.createElement('option');
+            const option = dom.create('option');
             parsedURL.search = '';
-            option.textContent = parsedURL.href;
+            dom.text(option, parsedURL.href);
             select.append(option);
         }
         if ( parsedURL.pathname !== '/' ) {
-            const option = document.createElement('option');
+            const option = dom.create('option');
             parsedURL.pathname = '';
-            option.textContent = parsedURL.href;
+            dom.text(option, parsedURL.href);
             select.append(option);
         }
-        document.body.classList.add('filterIssue');
+        const shouldUpdateLists = url.searchParams.get('shouldUpdateLists');
+        if ( shouldUpdateLists !== null ) {
+            dom.body.dataset.shouldUpdateLists = shouldUpdateLists;
+        }
+        // adn-specific, block create new report if adn-specific checkbox is not checked
+        dom.cl.add(dom.body, 'adn-unchecked');
+        // add event to checkbox to remove adn-unchecked class
+        dom.on('#isAdnSpecific', 'click', ev => {
+            // check if checkbox is checked
+            if ( ev.target.checked ) { dom.cl.remove(dom.body, 'adn-unchecked');
+            } else { dom.cl.add(dom.body, 'adn-unchecked'); }
+        });
+
+        dom.cl.add(dom.body, 'filterIssue');
         return {
             hostname: parsedURL.hostname.replace(/^(m|mobile|www)\./, ''),
             popupPanel: JSON.parse(url.searchParams.get('popupPanel')),
         };
-    } catch(ex) {
+    } catch {
     }
     return null;
 })();
 
 function reportSpecificFilterType() {
-    return document.querySelector('select[name="type"]').value;
+    return qs$('select[name="type"]').value;
 }
 
-function reportSpecificFilterIssue(ev) {
-    const githubURL = new URL('https://github.com/uBlockOrigin/uAssets/issues/new?template=specific_report_from_ubo.yml');
+function reportSpecificFilterIssue() {
+    const githubURL = new URL(
+        'https://github.com/dhowe/AdNauseam/issues/new?template=specific_report_from_adn.yml'
+    ); // ADN
     const issueType = reportSpecificFilterType();
     let title = `${reportedPage.hostname}: ${issueType}`;
-    if ( document.getElementById('isNSFW').checked ) {
+    if ( qs$('#isNSFW').checked ) {
         title = `[nsfw] ${title}`;
     }
     githubURL.searchParams.set('title', title);
     githubURL.searchParams.set(
-        'url_address_of_the_web_page', '`' +
-        document.querySelector('select[name="url"]').value +
-        '`'
+        'url_address_of_the_web_page',
+        '`' + qs$('select[name="url"]').value + '`'
     );
     githubURL.searchParams.set('category', issueType);
     githubURL.searchParams.set('configuration', configToMarkdown(true));
@@ -230,12 +259,19 @@ function reportSpecificFilterIssue(ev) {
         what: 'gotoURL',
         details: { url: githubURL.href, select: true, index: -1 },
     });
-    ev.preventDefault();
+}
+
+async function updateFilterLists() {
+    if ( dom.body.dataset.shouldUpdateLists === undefined ) { return false; }
+    dom.cl.add(dom.body, 'updating');
+    const assetKeys = JSON.parse(dom.body.dataset.shouldUpdateLists);
+    vAPI.messaging.send('dashboard', { what: 'supportUpdateNow', assetKeys });
+    return true;
 }
 
 /******************************************************************************/
 
-const cmEditor = new CodeMirror(document.getElementById('supportData'), {
+const cmEditor = new CodeMirror(qs$('#supportData'), {
     autofocus: true,
     readOnly: true,
     styleActiveLine: true,
@@ -246,15 +282,11 @@ uBlockDashboard.patchCodeMirrorEditor(cmEditor);
 /******************************************************************************/
 
 (async ( ) => {
-    supportData = await vAPI.messaging.send('dashboard', {
-        what: 'getSupportData',
-    });
+    await showSupportData();
 
-    showData();
-
-    uDom('[data-url]').on('click', ev => {
+    dom.on('[data-url]', 'click', ev => {
         const elem = ev.target.closest('[data-url]');
-        const url = elem.getAttribute('data-url');
+        const url = dom.attr(elem, 'data-url');
         if ( typeof url !== 'string' || url === '' ) { return; }
         vAPI.messaging.send('default', {
             what: 'gotoURL',
@@ -264,12 +296,20 @@ uBlockDashboard.patchCodeMirrorEditor(cmEditor);
     });
 
     if ( reportedPage !== null ) {
-        uDom('[data-i18n="supportReportSpecificButton"]').on('click', ev => {
-            reportSpecificFilterIssue(ev);
+        if ( dom.body.dataset.shouldUpdateLists ) {
+            dom.on('.supportEntry.shouldUpdate button', 'click', ev => {
+                if ( updateFilterLists() === false ) { return; }
+                ev.preventDefault();
+            });
+        }
+
+        dom.on('[data-i18n="supportReportSpecificButton"]', 'click', ev => {
+            reportSpecificFilterIssue();
+            ev.preventDefault();
         });
 
-        uDom('[data-i18n="supportFindSpecificButton"]').on('click', ev => {
-            const url = new URL('https://github.com/uBlockOrigin/uAssets/issues');
+        dom.on('[data-i18n="supportFindSpecificButton"]', 'click', ev => {
+            const url = new URL('https://github.com/dhowe/AdNauseam/issues');
             url.searchParams.set('q', `is:issue sort:updated-desc "${reportedPage.hostname}" in:title`);
             vAPI.messaging.send('default', {
                 what: 'gotoURL',
@@ -278,15 +318,27 @@ uBlockDashboard.patchCodeMirrorEditor(cmEditor);
             ev.preventDefault();
         });
 
-        uDom('#showSupportInfo').on('click', ev => {
-            const button = ev.target;
-            button.classList.add('hidden');
-            uDom.nodeFromSelector('.a.b.c.d').classList.add('e');
+        dom.on('#showSupportInfo', 'click', ev => {
+            const button = ev.target.closest('#showSupportInfo');
+            dom.cl.add(button, 'hidden');
+            dom.cl.add('.a.b.c.d', 'e');
             cmEditor.refresh();
         });
     }
 
-    uDom('#selectAllButton').on('click', ( ) => {
+    onBroadcast(msg => {
+        if ( msg.what === 'assetsUpdated' ) {
+            dom.cl.remove(dom.body, 'updating');
+            dom.cl.add(dom.body, 'updated');
+            return;
+        }
+        if ( msg.what === 'staticFilteringDataChanged' ) {
+            showSupportData();
+            return;
+        }
+    });
+
+    dom.on('#selectAllButton', 'click', ( ) => {
         cmEditor.focus();
         cmEditor.execCommand('selectAll');
     });

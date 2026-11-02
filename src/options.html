@@ -78,6 +78,15 @@
             </div>
           </div>
         </div>
+        <div>
+          <div class="clickExceptions-expander">
+            <label>
+              <span class="fa-icon listExpander"><svg class="fa-icon_angle-up" viewBox="0 0 998 582"><path d="m 998,499 q 0,13 -10,23 l -50,50 q -10,10 -23,10 -13,0 -23,-10 L 499,179 106,572 Q 96,582 83,582 70,582 60,572 L 10,522 Q 0,512 0,499 0,486 10,476 L 476,10 q 10,-10 23,-10 13,0 23,10 l 466,466 q 10,10 10,23 z"></path></svg></span>
+              <span id="clickExceptionsLabel" data-i18n="clickExceptionsLabelExclude"></span>
+            </label>
+						<textarea id="clickingExceptions" dir="ltr" spellcheck="false" data-i18n-placeholder="clickExceptionsPlaceholder"></textarea>
+          </div>
+        </div>
       </div>
     </li>
 
@@ -142,6 +151,17 @@
             <span data-i18n="settingsColorBlindPrompt" for="color-blind-friendly"></span>
           </label>
         </div>
+        <!-- Cloud storage -->
+        <div class="li">
+          <label>
+            <span class="input checkbox"><input type="checkbox" id="cloud-storage-enabled"
+                data-setting-name="cloudStorageEnabled" data-setting-type="bool"><svg viewBox="0 0 24 24">
+                <path d="M1.73,12.91 8.1,19.28 22.79,4.59" />
+              </svg></span>
+            <span><span data-i18n="settingsCloudStorageEnabledPrompt"></span>&nbsp;<a class="fa-icon info"
+                href="https://github.com/gorhill/uBlock/wiki/Cloud-storage" target="_blank">info-circle</a></span>
+          </label>
+        </div>
         <!-- Disable Warning -->
         <div class="li">
           <label>
@@ -162,17 +182,26 @@
             <span data-i18n="eventLoggingPrompt" for="event-logging"></span>
           </label>
         </div>
-        <!-- show ads debug 
+        <!-- blur collected ads -->
         <div class="li">
           <label>
-            <span class="input checkbox"><input type="checkbox" id="show-ads-debug" data-setting-name="showAdsDebug"
+            <span class="input checkbox"><input type="checkbox" id="blur-collected-ads" data-setting-name="blurCollectedAds"
                 data-setting-type="bool"><svg viewBox="0 0 24 24">
                 <path d="M1.73,12.91 8.1,19.28 22.79,4.59" />
               </svg></span>
-            <span data-i18n="showAdsDebugPrompt" for="show-ads-debug"></span>
+            <span data-i18n="blurCollectedAds" for="blur-collected-ads"></span>
           </label>
         </div>
-        -->
+        <!-- hide dead ads -->
+        <div class="li">
+          <label>
+            <span class="input checkbox"><input type="checkbox" id="hide-dead-ads" data-setting-name="hideDeadAds"
+                data-setting-type="bool"><svg viewBox="0 0 24 24">
+                <path d="M1.73,12.91 8.1,19.28 22.79,4.59" />
+              </svg></span>
+            <span data-i18n="hideDeadAds" for="hide-dead-ads"></span>
+          </label>
+        </div>
       </div>
     </li>
     <li class="subgroup">
@@ -239,7 +268,7 @@
 
         <div class="li">
           <label>
-            <span class="input checkbox"><input type="checkbox" id="strictBlocking" data-setting-name="strict-blocking"
+            <span class="input checkbox"><input type="checkbox" id="strictBlocking" data-setting-name="strictBlockingMode"
                 data-setting-type="bool"><svg viewBox="0 0 24 24">
                 <path d="M1.73,12.91 8.1,19.28 22.79,4.59" />
               </svg></span>
@@ -365,13 +394,13 @@
     <button class="custom" type="button" id="export" data-i18n="adnVaultExport"></button>
 
   </div>
-  <script src="js/fa-icons.js"></script>
+  <script src="js/fa-icons.js" type="module"></script>
   <script src="js/vapi.js"></script>
   <script src="js/vapi-common.js"></script>
   <script src="js/vapi-client.js"></script>
-  <script src="js/udom.js"></script>
+  <script src="js/theme.js" type="module"></script>
   <script src="js/i18n.js" type="module"></script>
-  <script src="js/dashboard-common.js"></script>
+  <script src="js/dashboard-common.js" type="module"></script>
   <script src="js/adn/options.js" type="module"></script>
 
 </body>

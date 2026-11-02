@@ -36,15 +36,15 @@
     "description": "Message asking user to confirm reset"
   },
   "adnFirstRunHideAllAdsDescription": {
-    "message": "Skryť reklamy vo vami vybraných <span>filtrovacích zoznamoch</span>",
+    "message": "Skryť reklamy vo vami vybraných <span>filtrovacích zoznamoch<\/span>",
     "description": "English: Firstrun.html -> Hide Ads in your selected filter lists"
   },
   "adnFirstRunClickingAdsDescription": {
-    "message": "Registrovať návštevy reklám nájdených prostredníctvom vašich <span>filtrovacích zoznamov</span>",
+    "message": "Registrovať návštevy reklám nájdených prostredníctvom vašich <span>filtrovacích zoznamov<\/span>",
     "description": "English: Firstrun.html -> Register visits on Ads found via your filter lists"
   },
   "adnFirstRunBlockingMalwareDescription": {
-    "message": "Blokovať trackery a iný malware (<span>prispôsobiť</span>)",
+    "message": "Blokovať trackery a iný malware (<span>prispôsobiť<\/span>)",
     "description": "English: Firstrun.html -> Block trackers and other malware (customize)"
   },
   "adnNotificationReactivate": {
@@ -96,24 +96,28 @@
     "description": "English: Notifications -> You have allowed adnauseam to have access to your online activities while private browsing."
   },
   "adnNotificationDNTAllowed": {
-    "message": "Táto stránka rešpektuje <b>Nesledovať</b>, reklamy sú povolené.",
+    "message": "Táto stránka rešpektuje <b>Nesledovať<\/b>, reklamy sú povolené.",
     "description": "English: Notifications -> This page respects Do Not Track, Ads are allowed."
   },
   "adnNotificationDNTHidingNotClicking": {
-    "message": "Táto stránka rešpektuje <b>Nesledovať</b>, reklamy sú skryté, ale neklikám na ne.",
+    "message": "Táto stránka rešpektuje <b>Nesledovať<\/b>, reklamy sú skryté, ale neklikám na ne.",
     "description": "English: Notifications -> This page respects Do Not Track, hiding not clicking."
   },
   "adnNotificationDNTClickingNotHiding": {
-    "message": "Len aby ste vedeli, táto stránka rešpektuje <b>Nesledovať</b>, klikám na reklamy, ale nie sú skryté.",
+    "message": "Len aby ste vedeli, táto stránka rešpektuje <b>Nesledovať<\/b>, klikám na reklamy, ale nie sú skryté.",
     "description": "English: Notifications -> This page respects Do Not Track, clicking not hiding."
   },
   "adnNotificationDNTJustSoYouKnow": {
-    "message": "Len aby ste vedeli, táto stránka rešpektuje <b>Nesledovať</b>.",
+    "message": "Len aby ste vedeli, táto stránka rešpektuje <b>Nesledovať<\/b>.",
     "description": "English: Notifications -> This page respects Do Not Track, just so you know."
   },
   "adnNotificationShowAdsDebug": {
-    "message": "The Advanced Setting \"Show Ads Debug\" is turned on",
+    "message": "Pokročilé nastavenie „Zobraz debuggovanie reklamy“ je zapnuté",
     "description": "English: Notifications -> The Advanced Setting \"Show Ads Debug\" is turned on"
+  },
+  "adnNewerVersionAvailableNotification": {
+    "message": "Je dostupná novšia verzia AdNauseam",
+    "description": "English: Notifications -> A newer version of AdNauseam is available"
   },
   "adnTarget": {
     "message": "CIEĽ",
@@ -153,7 +157,7 @@
   },
   "adnPausedOnPage": {
     "message": "AdNauseam je pozastavené na tejto stránke",
-    "description": "English: Menu->display when paused on page/site"
+    "description": "English: Menu->display when paused on page\/site"
   },
   "adnNotHiding": {
     "message": "AdNauseam momentálne neskrýva reklamy",
@@ -168,35 +172,35 @@
     "description": "appears in ADN vault, above ad slider"
   },
   "topAdnetworks": {
-    "message": "Top Ad Networks",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "Top reklamné siete",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "topSites": {
     "message": "Top stránky",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypes": {
     "message": "Typ reklamy",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesImageAds": {
     "message": "Obrazové reklamy",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesTextAds": {
     "message": "Textové reklamy",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adnShowingRecentAds": {
     "message": "Žiadne reklamy neboli zozbierané na tejto stránke (nedávne)",
     "description": "shown in menu when only 'recent' Ads are shown"
   },
   "adnThisPageStrictBlocked": {
-    "message": "{{domain}} is currently strict-blocked.",
+    "message": "{{domain}} doména je momentálne striktne blokovaná",
     "description": "shown in menu when the current page is strict-blocked"
   },
   "adnStrictBlockListDescription": {
-    "message": "The strict-block list serves to help the users to strict-block specific domains or pages more easily.",
+    "message": "Striktne blokovaný zoznam zjednoduší používateľom striktné blokovanie špecifických domén alebo stránok.",
     "description": "Description on the strict-block list tab, which is found on the dashboard"
   },
   "adnExportedAdsFilename": {
@@ -216,7 +220,7 @@
     "description": "appears in ADN settings"
   },
   "adnPurgeConfirm": {
-    "message": "This action will permanently remove all ads with load image error. Make sure your internet is connected, otherwise all your ads will be deleted.",
+    "message": "Táto akcia trvale odstráni všetky reklamy, ktorých obrázok nejde načítať. Pred trvalým odstránením je vhodné zálohovať svoj trezor a presvedčiť sa, že máte stabilné pripojenie kt internetu.",
     "description": "appears in ADN settings"
   },
   "adnAdClickingStatusPending": {
@@ -268,23 +272,23 @@
     "description": "appears in ADN popup menu three state button"
   },
   "adnMenuDisable": {
-    "message": "Disable",
+    "message": "Vypnúť",
     "description": "Disabled Adnauseam -> appears in ADN popup menu three state button"
   },
   "adnMenuActive": {
-    "message": "Active",
+    "message": "Aktivuj",
     "description": "Make Adnauseam Active -> appears in ADN popup menu three state button"
   },
   "adnMenuStrict": {
-    "message": "Strict",
+    "message": "",
     "description": "Activate Strict-Block -> appears in ADN popup menu three state button"
   },
   "adnMenuDisableScopeDomain": {
-    "message": "on {{domain}}",
+    "message": "Na {{domain}}",
     "description": "Disable AdNaueam Block On this Domain -> Popup option that appears inside ADN menu"
   },
   "adnMenuDisableScopePage": {
-    "message": "on this page",
+    "message": "Na tejto stránke",
     "description": "Disable AdNaueam Block On This Page -> Popup option that appears inside ADN menu"
   },
   "adnMenuSettings": {
@@ -356,8 +360,20 @@
     "description": "appears on vault page"
   },
   "adnPurgeDeadAds": {
-    "message": "Purge Dead Ads",
+    "message": "",
     "description": "appears on vault page"
+  },
+  "adnShowDeadAds": {
+    "message": "Zobrazovať mŕtve reklamy",
+    "description": "appears on vault page"
+  },
+  "adnHideDeadAds": {
+    "message": "Skryť mŕtve reklamy",
+    "description": "appears on vault page"
+  },
+  "adnCaptureVault": {
+    "message": "Zachytiť",
+    "description": "appears on vault page in dev mode"
   },
   "adnVaultFound": {
     "message": "{{total}} zozbierané reklamy",
@@ -475,24 +491,36 @@
     "message": "Posodobi",
     "description": "English: update"
   },
+  "adnUpdateButton": {
+    "message": "Aktualizovať",
+    "description": "English: update"
+  },
   "whitelistPageName": {
     "message": "Zoznam povolených",
     "description": "appears as tab name in dashboard"
   },
   "strictBlockListPageName": {
-    "message": "Strict-Block List",
+    "message": "Striktne-Blokovaný Zoznam",
     "description": "appears as tab name in dashboard"
   },
   "eventLoggingPrompt": {
-    "message": "Aktivovať režim ladenia",
+    "message": "Režim debuggovania",
     "description": "prompt for toggle"
   },
   "disableWarnings": {
     "message": "Nezobrazovať varovania",
     "description": "English:Disable warnings"
   },
+  "blurCollectedAds": {
+    "message": "Rozmazať zozbierané reklamy",
+    "description": "English: Blur Collected ads"
+  },
+  "hideDeadAds": {
+    "message": "Skryť mŕtve reklamy",
+    "description": "English: Hide Dead ads"
+  },
   "showAdsDebugPrompt": {
-    "message": "Show ads for ad-collection debugging",
+    "message": "Zobraziť reklamy pre ladenie zberu reklám",
     "description": "English: Show ads for ad-collection debugging"
   },
   "removeAdsInPrivate": {
@@ -500,7 +528,27 @@
     "description": "English:Remove ads collected in private mode - settings page"
   },
   "settingsStrictBlockingMode": {
-    "message": "Activate Strict-Blocking Mode",
+    "message": "Aktivovať Prísny Blokovací Režim",
     "description": "English: Activate Strict-Blocking Mode"
+  },
+  "adnRefreshButton": {
+    "message": "Obnov",
+    "description": "English: refresh page from menu notification button"
+  },
+  "adnRefreshNotification": {
+    "message": "Aplikuj zmeny na tejto stránke",
+    "description": "English: refresh page from menu notification"
+  },
+  "supportS6P3S1": {
+    "message": "Uistite sa, že tento problém je <b>špecifický pre AdNauseam<\/b>.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P3S2": {
+    "message": "Otestoval som webovú stránku na <a url='https:\/\/github.com\/gorhill\/uBlock'>#uBO#<\/a> a potvrdzujem že tento problém je <b>špecifický pre AdNauseam",
+    "description": "A checkbox in the filter issue reporter section"
+  },
+  "supportS6Select1Option7": {
+    "message": "Nezozbierané reklamy",
+    "description": "Ads are present on page but none are collected"
   }
 }

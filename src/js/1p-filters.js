@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2014-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,18 +19,16 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-/* global CodeMirror, uDom, uBlockDashboard */
+/* global CodeMirror, uBlockDashboard */
 
-'use strict';
-
-/******************************************************************************/
-
-import { i18n$ } from './i18n.js';
 import './codemirror/ubo-static-filtering.js';
+import { dom, qs$ } from './dom.js';
+import { i18n$ } from './i18n.js';
+import { onBroadcast } from './broadcast.js';
 
 /******************************************************************************/
 
-const cmEditor = new CodeMirror(document.getElementById('userFilters'), {
+const cmEditor = new CodeMirror(qs$('#userFilters'), {
     autoCloseBrackets: true,
     autofocus: true,
     extraKeys: {
@@ -38,7 +36,10 @@ const cmEditor = new CodeMirror(document.getElementById('userFilters'), {
         'Tab': 'toggleComment',
     },
     foldGutter: true,
-    gutters: [ 'CodeMirror-linenumbers', 'CodeMirror-foldgutter' ],
+    gutters: [
+        'CodeMirror-linenumbers',
+        { className: 'CodeMirror-lintgutter', style: 'width: 11px' },
+    ],
     lineNumbers: true,
     lineWrapping: true,
     matchBrackets: true,
@@ -50,62 +51,100 @@ const cmEditor = new CodeMirror(document.getElementById('userFilters'), {
 
 uBlockDashboard.patchCodeMirrorEditor(cmEditor);
 
-let cachedUserFilters = '';
-
 /******************************************************************************/
 
-// Add auto-complete ability to the editor.
+// Add auto-complete ability to the editor. Polling is used as the suggested
+// hints also depend on the tabs currently opened.
 
 {
     let hintUpdateToken = 0;
 
-    const responseHandler = function(response) {
-        if ( response instanceof Object === false ) { return; }
-        if ( response.hintUpdateToken !== undefined ) {
-            const mode = cmEditor.getMode();
-            if ( mode.setHints instanceof Function ) {
-                mode.setHints(response);
-            }
-            if ( hintUpdateToken === 0 ) {
-                mode.parser.expertMode = response.expertMode !== false;
-            }
-            hintUpdateToken = response.hintUpdateToken;
-        }
-        vAPI.setTimeout(getHints, 2503);
-    };
-
-    const getHints = function() {
-        vAPI.messaging.send('dashboard', {
+    const getHints = async function() {
+        const hints = await vAPI.messaging.send('dashboard', {
             what: 'getAutoCompleteDetails',
             hintUpdateToken
-        }).then(responseHandler);
+        });
+        if ( hints instanceof Object === false ) { return; }
+        if ( hints.hintUpdateToken !== undefined ) {
+            cmEditor.setOption('uboHints', hints);
+            hintUpdateToken = hints.hintUpdateToken;
+        }
+        timer.on(2503);
     };
+
+    const timer = vAPI.defer.create(( ) => {
+        getHints();
+    });
 
     getHints();
 }
 
-/******************************************************************************/
-
-const getEditorText = function() {
-    const text = cmEditor.getValue().replace(/\s+$/, '');
-    return text === '' ? text : text + '\n';
-};
-
-const setEditorText = function(text) {
-    cmEditor.setValue(text.replace(/\s+$/, '') + '\n\n');
-};
+vAPI.messaging.send('dashboard', {
+    what: 'getTrustedTokens',
+}).then(tokens => {
+    cmEditor.setOption('trustedTokens', tokens);
+});
 
 /******************************************************************************/
 
-// This is to give a visual hint that the content of user blacklist has changed.
-
-const userFiltersChanged = function(changed) {
-    if ( typeof changed !== 'boolean' ) {
-        changed = self.hasUnsavedData();
-    }
-    uDom.nodeFromId('userFiltersApply').disabled = !changed;
-    uDom.nodeFromId('userFiltersRevert').disabled = !changed;
+let originalState = {
+    enabled: true,
+    trusted: false,
+    filters: '',
 };
+
+function getCurrentState() {
+    const enabled = qs$('#enableMyFilters input').checked;
+    return {
+        enabled,
+        trusted: qs$('#trustMyFilters input').checked,
+        filters: getEditorText(),
+    };
+}
+
+function rememberCurrentState() {
+    originalState = getCurrentState();
+}
+
+function currentStateChanged() {
+    return JSON.stringify(getCurrentState()) !== JSON.stringify(originalState);
+}
+
+function getEditorText() {
+    const text = cmEditor.getValue().trimEnd();
+    return text === '' ? text : `${text}\n`;
+}
+
+function setEditorText(text) {
+    cmEditor.setValue(`${text.trimEnd()}\n\n`);
+}
+
+/******************************************************************************/
+
+function userFiltersChanged(details = {}) {
+    const changed = typeof details.changed === 'boolean'
+        ? details.changed
+        : self.hasUnsavedData();
+    qs$('#userFiltersApply').disabled = !changed;
+    qs$('#userFiltersRevert').disabled = !changed;
+    const enabled = qs$('#enableMyFilters input').checked;
+    const trustedbefore = cmEditor.getOption('trustedSource');
+    const trustedAfter = enabled && qs$('#trustMyFilters input').checked;
+    if ( trustedAfter === trustedbefore ) { return; }
+    cmEditor.startOperation();
+    cmEditor.setOption('trustedSource', trustedAfter);
+    const doc = cmEditor.getDoc();
+    const history = doc.getHistory();
+    const selections = doc.listSelections();
+    doc.replaceRange(doc.getValue(),
+        { line: 0, ch: 0 },
+        { line: doc.lineCount(), ch: 0 }
+    );
+    doc.setSelections(selections);
+    doc.setHistory(history);
+    cmEditor.endOperation();
+    cmEditor.focus();
+}
 
 /******************************************************************************/
 
@@ -114,8 +153,8 @@ const userFiltersChanged = function(changed) {
 //   made in the editor. The code assumes that no deletion occurred in the
 //   background.
 
-const threeWayMerge = function(newContent) {
-    const prvContent = cachedUserFilters.trim().split(/\n/);
+function threeWayMerge(newContent) {
+    const prvContent = originalState.filters.trim().split(/\n/);
     const differ = new self.diff_match_patch();
     const newChanges = differ.diff(
         prvContent,
@@ -154,56 +193,37 @@ const threeWayMerge = function(newContent) {
         out.push(change[1]);
     }
     return out.join('\n');
-};
+}
 
 /******************************************************************************/
 
-const renderUserFilters = async function(merge = false) {
+async function renderUserFilters() {
     const details = await vAPI.messaging.send('dashboard', {
         what: 'readUserFilters',
     });
     if ( details instanceof Object === false || details.error ) { return; }
 
-    const newContent = details.content.trim();
+    cmEditor.setOption('trustedSource', details.trusted);
 
-    if ( merge && self.hasUnsavedData() ) {
-        setEditorText(threeWayMerge(newContent));
-        userFiltersChanged(true);
-    } else {
-        setEditorText(newContent);
-        userFiltersChanged(false);
-    }
+    qs$('#enableMyFilters input').checked = details.enabled;
+    qs$('#trustMyFilters input').checked = details.trusted;
 
-    cachedUserFilters = newContent;
-};
+    setEditorText(details.content.trim());
+    userFiltersChanged({ changed: false });
+
+    rememberCurrentState();
+}
 
 /******************************************************************************/
 
-const handleImportFilePicker = function() {
-    // https://github.com/chrisaljoudi/uBlock/issues/1004
-    // Support extraction of filters from ABP backup file
-    const abpImporter = function(s) {
-        const reAbpSubscriptionExtractor = /\n\[Subscription\]\n+url=~[^\n]+([\x08-\x7E]*?)(?:\[Subscription\]|$)/ig;
-        const reAbpFilterExtractor = /\[Subscription filters\]([\x08-\x7E]*?)(?:\[Subscription\]|$)/i;
-        let matches = reAbpSubscriptionExtractor.exec(s);
-        // Not an ABP backup file
-        if ( matches === null ) { return s; }
-        const out = [];
-        do {
-            if ( matches.length === 2 ) {
-                let filterMatch = reAbpFilterExtractor.exec(matches[1].trim());
-                if ( filterMatch !== null && filterMatch.length === 2 ) {
-                    out.push(filterMatch[1].trim().replace(/\\\[/g, '['));
-                }
-            }
-            matches = reAbpSubscriptionExtractor.exec(s);
-        } while ( matches !== null );
-        return out.join('\n');
-    };
-
-    const fileReaderOnLoadHandler = function() {
-        let content = abpImporter(this.result);
-        content = uBlockDashboard.mergeNewLines(getEditorText(), content);
+function handleImportFilePicker(ev) {
+    const file = ev.target.files[0];
+    if ( file === undefined || file.name === '' ) { return; }
+    if ( file.type.indexOf('text') !== 0 ) { return; }
+    const fr = new FileReader();
+    fr.onload = function() {
+        if ( typeof fr.result !== 'string' ) { return; }
+        const content = uBlockDashboard.mergeNewLines(getEditorText(), fr.result);
         cmEditor.operation(( ) => {
             const cmPos = cmEditor.getCursor();
             setEditorText(content);
@@ -211,90 +231,94 @@ const handleImportFilePicker = function() {
             cmEditor.focus();
         });
     };
-    const file = this.files[0];
-    if ( file === undefined || file.name === '' ) { return; }
-    if ( file.type.indexOf('text') !== 0 ) { return; }
-    const fr = new FileReader();
-    fr.onload = fileReaderOnLoadHandler;
     fr.readAsText(file);
-};
+}
 
-/******************************************************************************/
+dom.on('#importFilePicker', 'change', handleImportFilePicker);
 
-const startImportFilePicker = function() {
-    const input = document.getElementById('importFilePicker');
+function startImportFilePicker() {
+    const input = qs$('#importFilePicker');
     // Reset to empty string, this will ensure an change event is properly
     // triggered if the user pick a file, even if it is the same as the last
     // one picked.
     input.value = '';
     input.click();
-};
+}
+
+dom.on('#importUserFiltersFromFile', 'click', startImportFilePicker);
 
 /******************************************************************************/
 
-const exportUserFiltersToFile = function() {
+function exportUserFiltersToFile() {
     const val = getEditorText();
     if ( val === '' ) { return; }
     const filename = i18n$('1pExportFilename')
         .replace('{{datetime}}', uBlockDashboard.dateNowToSensibleString())
         .replace(/ +/g, '_');
     vAPI.download({
-        'url': 'data:text/plain;charset=utf-8,' + encodeURIComponent(val + '\n'),
+        'url': `data:text/plain;charset=utf-8,${encodeURIComponent(val)}`,
         'filename': filename
     });
-};
+}
 
 /******************************************************************************/
 
-const applyChanges = async function() {
+async function applyChanges() {
+    const state = getCurrentState();
     const details = await vAPI.messaging.send('dashboard', {
         what: 'writeUserFilters',
-        content: getEditorText(),
+        content: state.filters,
+        enabled: state.enabled,
+        trusted: state.trusted,
     });
     if ( details instanceof Object === false || details.error ) { return; }
-
-    cachedUserFilters = details.content.trim();
-    userFiltersChanged(false);
+    rememberCurrentState();
+    userFiltersChanged({ changed: false });
     vAPI.messaging.send('dashboard', {
         what: 'reloadAllFilters',
     });
-};
+}
 
-const revertChanges = function() {
-    setEditorText(cachedUserFilters);
-};
+function revertChanges() {
+    qs$('#enableMyFilters input').checked = originalState.enabled;
+    qs$('#trustMyFilters input').checked = originalState.trusted;
+    setEditorText(originalState.filters);
+    userFiltersChanged();
+}
 
 /******************************************************************************/
 
-const getCloudData = function() {
+function getCloudData() {
     return getEditorText();
-};
+}
 
-const setCloudData = function(data, append) {
+function setCloudData(data, append) {
     if ( typeof data !== 'string' ) { return; }
     if ( append ) {
         data = uBlockDashboard.mergeNewLines(getEditorText(), data);
     }
     cmEditor.setValue(data);
-};
+}
 
 self.cloud.onPush = getCloudData;
 self.cloud.onPull = setCloudData;
 
 /******************************************************************************/
 
+self.wikilink = 'https://github.com/gorhill/uBlock/wiki/Dashboard:-My-filters';
+
 self.hasUnsavedData = function() {
-    return getEditorText().trim() !== cachedUserFilters;
+    return currentStateChanged();
 };
 
 /******************************************************************************/
 
 // Handle user interaction
-uDom('#importUserFiltersFromFile').on('click', startImportFilePicker);
-uDom('#importFilePicker').on('change', handleImportFilePicker);
-uDom('#exportUserFiltersToFile').on('click', exportUserFiltersToFile);
-uDom('#userFiltersApply').on('click', ( ) => { applyChanges(); });
-uDom('#userFiltersRevert').on('click', revertChanges);
+dom.on('#exportUserFiltersToFile', 'click', exportUserFiltersToFile);
+dom.on('#userFiltersApply', 'click', ( ) => { applyChanges(); });
+dom.on('#userFiltersRevert', 'click', revertChanges);
+dom.on('#enableMyFilters input', 'change', userFiltersChanged);
+dom.on('#trustMyFilters input', 'change', userFiltersChanged);
 
 (async ( ) => {
     await renderUserFilters();
@@ -304,38 +328,43 @@ uDom('#userFiltersRevert').on('click', revertChanges);
     // https://github.com/gorhill/uBlock/issues/3706
     //   Save/restore cursor position
     {
-        const line =
-            await vAPI.localStorage.getItemAsync('myFiltersCursorPosition');
+        const line = await vAPI.localStorage.getItemAsync('myFiltersCursorPosition');
         if ( typeof line === 'number' ) {
             cmEditor.setCursor(line, 0);
         }
+        cmEditor.focus();
     }
 
     // https://github.com/gorhill/uBlock/issues/3706
     //   Save/restore cursor position
     {
         let curline = 0;
-        let timer;
         cmEditor.on('cursorActivity', ( ) => {
-            if ( timer !== undefined ) { return; }
+            if ( timer.ongoing() ) { return; }
             if ( cmEditor.getCursor().line === curline ) { return; }
-            timer = vAPI.setTimeout(( ) => {
-                timer = undefined;
-                curline = cmEditor.getCursor().line;
-                vAPI.localStorage.setItem('myFiltersCursorPosition', curline);
-            }, 701);
+            timer.on(701);
+        });
+        const timer = vAPI.defer.create(( ) => {
+            curline = cmEditor.getCursor().line;
+            vAPI.localStorage.setItem('myFiltersCursorPosition', curline);
         });
     }
 
     // https://github.com/gorhill/uBlock/issues/3704
     //   Merge changes to user filters occurring in the background
-    vAPI.broadcastListener.add(msg => {
+    onBroadcast(msg => {
         switch ( msg.what ) {
         case 'userFiltersUpdated': {
             cmEditor.startOperation();
             const scroll = cmEditor.getScrollInfo();
             const selections = cmEditor.listSelections();
-            renderUserFilters(true).then(( ) => {
+            const shouldMerge = self.hasUnsavedData();
+            const beforeContent = getEditorText();
+            renderUserFilters().then(( ) => {
+                if ( shouldMerge ) {
+                    setEditorText(threeWayMerge(beforeContent));
+                    userFiltersChanged({ changed: true });
+                }
                 cmEditor.clearHistory();
                 cmEditor.setSelection(selections[0].anchor, selections[0].head);
                 cmEditor.scrollTo(scroll.left, scroll.top);

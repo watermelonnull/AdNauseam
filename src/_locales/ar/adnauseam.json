@@ -36,15 +36,15 @@
     "description": "Message asking user to confirm reset"
   },
   "adnFirstRunHideAllAdsDescription": {
-    "message": "إخفاء الإعلانات في <span> قوائم التصفية</span> المحددة",
+    "message": "إخفاء الإعلانات في <span> قوائم التصفية<\/span> المحددة",
     "description": "English: Firstrun.html -> Hide Ads in your selected filter lists"
   },
   "adnFirstRunClickingAdsDescription": {
-    "message": "تسجيل الزيارات على الإعلانات التي وجدت عبر <span> قوائم التصفية</span> الخاصة بك",
+    "message": "تسجيل الزيارات على الإعلانات التي وجدت عبر <span> قوائم التصفية<\/span> الخاصة بك",
     "description": "English: Firstrun.html -> Register visits on Ads found via your filter lists"
   },
   "adnFirstRunBlockingMalwareDescription": {
-    "message": "صد برامج التجسس والبرامج الضاره (<span>ضبط</span>)",
+    "message": "صد برامج التجسس والبرامج الضاره (<span>ضبط<\/span>)",
     "description": "English: Firstrun.html -> Block trackers and other malware (customize)"
   },
   "adnNotificationReactivate": {
@@ -84,7 +84,7 @@
     "description": "English: Notifications -> uBlock and AdNauseam may conflict!"
   },
   "adnNotificationOperaSetting": {
-    "message": "Please allow AdNauseam to access search page results",
+    "message": "الرجاء السماح لأدنوسيام بالوصول إلى نتائج صفحة البحث",
     "description": "English: Notifications -> Please allow AdNauseam to access search page results"
   },
   "adnNotificationBrowserSetting": {
@@ -92,28 +92,32 @@
     "description": "English: Notifications -> The 'Content Blocking' settings in your browser may interfere with AdNauseam!"
   },
   "adnNotificationPrivacyMode": {
-    "message": "You have allowed adnauseam to have access to your online activities while private browsing.",
+    "message": "لقد سمحتم بالوصول إلى أنشطتك عبر الإنترنت أثناء التصفح الخاص.",
     "description": "English: Notifications -> You have allowed adnauseam to have access to your online activities while private browsing."
   },
   "adnNotificationDNTAllowed": {
-    "message": "هذه الصفحة تحترم<b>لا تتبع</b>، الإعلانات مسموحة.",
+    "message": "هذه الصفحة تحترم<b>لا تتبع<\/b>، الإعلانات مسموحة.",
     "description": "English: Notifications -> This page respects Do Not Track, Ads are allowed."
   },
   "adnNotificationDNTHidingNotClicking": {
-    "message": "هذه الصفحة تحترم<b>لا تتبع</b>، إخفاء الاعلانات بدون النقر.",
+    "message": "هذه الصفحة تحترم<b>لا تتبع<\/b>، إخفاء الاعلانات بدون النقر.",
     "description": "English: Notifications -> This page respects Do Not Track, hiding not clicking."
   },
   "adnNotificationDNTClickingNotHiding": {
-    "message": "هذه الصفحة تحترم<b>لا تتبع</b>، يتم النقر دون اخفاء الاعلانات.",
+    "message": "هذه الصفحة تحترم<b>لا تتبع<\/b>، يتم النقر دون اخفاء الاعلانات.",
     "description": "English: Notifications -> This page respects Do Not Track, clicking not hiding."
   },
   "adnNotificationDNTJustSoYouKnow": {
-    "message": "هذه الصفحة تحترم<b>لا تتبع</b>، للاعلام فقط.",
+    "message": "هذه الصفحة تحترم<b>لا تتبع<\/b>، للاعلام فقط.",
     "description": "English: Notifications -> This page respects Do Not Track, just so you know."
   },
   "adnNotificationShowAdsDebug": {
-    "message": "The Advanced Setting \"Show Ads Debug\" is turned on",
+    "message": "الإعداد المتقدم \"إظهار تصحيح الإعلانات\" يشتغل",
     "description": "English: Notifications -> The Advanced Setting \"Show Ads Debug\" is turned on"
+  },
+  "adnNewerVersionAvailableNotification": {
+    "message": "تحديث جديد متوفر",
+    "description": "English: Notifications -> A newer version of AdNauseam is available"
   },
   "adnTarget": {
     "message": "هدف",
@@ -153,7 +157,7 @@
   },
   "adnPausedOnPage": {
     "message": "أدنوزيوم موّقف على هذا الموقع",
-    "description": "English: Menu->display when paused on page/site"
+    "description": "English: Menu->display when paused on page\/site"
   },
   "adnNotHiding": {
     "message": "أدنوزيوم لا يخبئ الإعلانات حاليًا",
@@ -164,43 +168,43 @@
     "description": "English: AdNauseam — Ad Vault"
   },
   "myStatistics": {
-    "message": "My Statistics",
+    "message": "إحصائياتي",
     "description": "appears in ADN vault, above ad slider"
   },
   "topAdnetworks": {
-    "message": "Top Ad Networks",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "أفضل شبكات الإعلانات",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "topSites": {
-    "message": "Top Sites",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "أفضل المواقع",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypes": {
-    "message": "Ad Types",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "نوع الإعلان",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesImageAds": {
-    "message": "Image Ads",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "إعلانات صورية",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesTextAds": {
-    "message": "Text Ads",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "إعلانات نصية",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adnShowingRecentAds": {
     "message": "لم يُعثر على إعلانات في هذه الصفحه (اظهار الاعلانات السابقة)",
     "description": "shown in menu when only 'recent' Ads are shown"
   },
   "adnThisPageStrictBlocked": {
-    "message": "{{domain}} is currently strict-blocked.",
+    "message": "{{domain}} حاليا محظورة بشكل صارم.",
     "description": "shown in menu when the current page is strict-blocked"
   },
   "adnStrictBlockListDescription": {
-    "message": "The strict-block list serves to help the users to strict-block specific domains or pages more easily.",
+    "message": "تعمل قائمة الحظر الصارم على مساعدة المستخدمين على حظر نطاقات أو صفحات معينة بشكل صارم بسهولة أكبر.",
     "description": "Description on the strict-block list tab, which is found on the dashboard"
   },
   "adnExportedAdsFilename": {
-    "message": "AdNauseam_Export_{{datetime}}.json",
+    "message": "",
     "description": "English: AdNauseam file export"
   },
   "adnImportAlertFormat": {
@@ -216,7 +220,7 @@
     "description": "appears in ADN settings"
   },
   "adnPurgeConfirm": {
-    "message": "This action will permanently remove all ads with load image error. Make sure your internet is connected, otherwise all your ads will be deleted.",
+    "message": "سيؤدي هذا الإجراء إلى إزالة جميع الإعلانات التي لا يمكن تحميل الصورة لها. من الجيد النسخ الاحتياطي للمخزون الخاص بك قبل التطهير، وأيضاً التأكد من أن لديك اتصال إنترنت نشط.",
     "description": "appears in ADN settings"
   },
   "adnAdClickingStatusPending": {
@@ -268,23 +272,23 @@
     "description": "appears in ADN popup menu three state button"
   },
   "adnMenuDisable": {
-    "message": "Disable",
+    "message": "متوقف",
     "description": "Disabled Adnauseam -> appears in ADN popup menu three state button"
   },
   "adnMenuActive": {
-    "message": "Active",
+    "message": "يشتغل",
     "description": "Make Adnauseam Active -> appears in ADN popup menu three state button"
   },
   "adnMenuStrict": {
-    "message": "Strict",
+    "message": "صارم",
     "description": "Activate Strict-Block -> appears in ADN popup menu three state button"
   },
   "adnMenuDisableScopeDomain": {
-    "message": "on {{domain}}",
+    "message": "على",
     "description": "Disable AdNaueam Block On this Domain -> Popup option that appears inside ADN menu"
   },
   "adnMenuDisableScopePage": {
-    "message": "on this page",
+    "message": "في هذه الصفحة",
     "description": "Disable AdNaueam Block On This Page -> Popup option that appears inside ADN menu"
   },
   "adnMenuSettings": {
@@ -308,19 +312,19 @@
     "description": "appears in Menu - Export Dialog box"
   },
   "adnMenuImportAds": {
-    "message": "Import Ads",
+    "message": "استيراد الإعلانات",
     "description": "appears in ADN popup menu"
   },
   "adnMenuDisableAllLogging": {
-    "message": "Disable all logging",
+    "message": "تعطيل كافة عمليات التسجيل",
     "description": "appears in ADN popup menu"
   },
   "adnMenuDisableOutgoingReferrer": {
-    "message": "Disable outgoing referrer",
+    "message": "تعطيل المُحيل الصادر",
     "description": "appears in ADN popup menu"
   },
   "adnMenuClearAds": {
-    "message": "Clear Ads with browser history",
+    "message": "مسح الإعلانات باستخدام سجل المتصفح",
     "description": "appears in ADN popup menu"
   },
   "adnMenuHideBadge": {
@@ -328,7 +332,7 @@
     "description": "appears in ADN popup menu"
   },
   "adnMenuClearAdsNow": {
-    "message": "Clear Ads",
+    "message": "مسح الإعلانات",
     "description": "appears in ADN popup menu"
   },
   "adnLogNoLog": {
@@ -356,8 +360,20 @@
     "description": "appears on vault page"
   },
   "adnPurgeDeadAds": {
-    "message": "Purge Dead Ads",
+    "message": "تطهير الإعلانات الميتة",
     "description": "appears on vault page"
+  },
+  "adnShowDeadAds": {
+    "message": "إظهار الإعلانات الميتة",
+    "description": "appears on vault page"
+  },
+  "adnHideDeadAds": {
+    "message": "تطهير الإعلانات الميتة",
+    "description": "appears on vault page"
+  },
+  "adnCaptureVault": {
+    "message": "التقاط",
+    "description": "appears on vault page in dev mode"
   },
   "adnVaultFound": {
     "message": "{{total}} الإعلانات التي تم جمعها",
@@ -388,15 +404,15 @@
     "description": "English: Click Ads identified by your chosen filter lists"
   },
   "blockingMalwarePrompt": {
-    "message": "Block trackers and other malware",
+    "message": "حظر أجهزة تتبع والبرامج الضارة الأخرى",
     "description": "English: lock trackers and other malware"
   },
   "parseTextAdsPrompt": {
-    "message": "Capture text-only Ads when possible",
+    "message": "التقط الإعلانات النصية فقط عندما يكون ذلك ممكنًا",
     "description": "English: Capture text-only Ads when possible"
   },
   "settingsIconBadgePrompt": {
-    "message": "Display the number of Ads on the icon",
+    "message": "عرض عدد الإعلانات على الأيقونة",
     "description": "English: Show the number of found Ads on the icon"
   },
   "settingsExtraPrivacyPrompt": {
@@ -408,7 +424,7 @@
     "description": "English: Interface"
   },
   "noIncomingCookiesPrompt": {
-    "message": "Ignore cookies returned with clicks",
+    "message": "تجاهل ملفات تعريف الارتباط التي تم إرجاعها بالنقرات",
     "description": "English: Ignore cookies returned with clicks"
   },
   "noOutgoingCookiesPrompt": {
@@ -416,11 +432,11 @@
     "description": "English: Don't send cookies on visits"
   },
   "noOutgoingUserAgentPrompt": {
-    "message": "Hide user-agent header on visits",
+    "message": "إخفاء رأس وكيل المستخدم في الزيارات",
     "description": "English: Hide user-agent header on visits"
   },
   "noOutgoingRefererPrompt": {
-    "message": "Hide referring page on visits",
+    "message": "إخفاء صفحة الإحالة في الزيارات",
     "description": "English: Hide referring page on visits"
   },
   "ClickingFrequencyRarely": {
@@ -475,32 +491,64 @@
     "message": "ترقية",
     "description": "English: update"
   },
+  "adnUpdateButton": {
+    "message": "تحديث",
+    "description": "English: update"
+  },
   "whitelistPageName": {
     "message": "القوائم البيضاء",
     "description": "appears as tab name in dashboard"
   },
   "strictBlockListPageName": {
-    "message": "Strict-Block List",
+    "message": "قائمة الحظر الصارم",
     "description": "appears as tab name in dashboard"
   },
   "eventLoggingPrompt": {
-    "message": "Activate debugging mode",
+    "message": "وضع التصحيح",
     "description": "prompt for toggle"
   },
   "disableWarnings": {
-    "message": "Disable warnings",
+    "message": "تعطيل التحذيرات",
     "description": "English:Disable warnings"
   },
+  "blurCollectedAds": {
+    "message": "طمس الإعلانات المجمعة",
+    "description": "English: Blur Collected ads"
+  },
+  "hideDeadAds": {
+    "message": "إخفاء الإعلانات الميتة",
+    "description": "English: Hide Dead ads"
+  },
   "showAdsDebugPrompt": {
-    "message": "Show ads for ad-collection debugging",
+    "message": "عرض الإعلانات لتصحيح أخطاء مجموعة الإعلانات",
     "description": "English: Show ads for ad-collection debugging"
   },
   "removeAdsInPrivate": {
-    "message": "Remove ads collected in private mode",
+    "message": "إزالة الإعلانات المجمعة في الوضع الخاص",
     "description": "English:Remove ads collected in private mode - settings page"
   },
   "settingsStrictBlockingMode": {
-    "message": "Activate Strict-Blocking Mode",
+    "message": "تفعيل وضع الحظر الصارم",
     "description": "English: Activate Strict-Blocking Mode"
+  },
+  "adnRefreshButton": {
+    "message": "تحديث",
+    "description": "English: refresh page from menu notification button"
+  },
+  "adnRefreshNotification": {
+    "message": "تطبيق التغييرات على الصفحة الحالية",
+    "description": "English: refresh page from menu notification"
+  },
+  "supportS6P3S1": {
+    "message": "تأكد من أن هذه المشكلة <b>خاصة بـ AdNauseam.<\/b>",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P3S2": {
+    "message": "لقد اختبرت نفس صفحة الويب على <a url='https:\/\/github.com\/gorhill\/uBlock'>#uBO#<\/a> وتأكيد هذه المشكلة هو <b>AdNauseam-specific<\/b>.",
+    "description": "A checkbox in the filter issue reporter section"
+  },
+  "supportS6Select1Option7": {
+    "message": "لم يتم جمع الإعلانات",
+    "description": "Ads are present on page but none are collected"
   }
 }

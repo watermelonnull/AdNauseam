@@ -36,15 +36,15 @@
     "description": "Message asking user to confirm reset"
   },
   "adnFirstRunHideAllAdsDescription": {
-    "message": "フィルターリスト（<span>filter lists</span>）に入ってる広告を隠す",
+    "message": "フィルターリスト（<span>filter lists<\/span>）に入ってる広告を隠す",
     "description": "English: Firstrun.html -> Hide Ads in your selected filter lists"
   },
   "adnFirstRunClickingAdsDescription": {
-    "message": "フィルターリスト（<span>filter lists</span>）で見つけた広告をレジスターする",
+    "message": "フィルターリスト（<span>filter lists<\/span>）で見つけた広告をレジスターする",
     "description": "English: Firstrun.html -> Register visits on Ads found via your filter lists"
   },
   "adnFirstRunBlockingMalwareDescription": {
-    "message": "トラッカーやその他のマルウェアをブロック (<span>カスタマイズ</span>)",
+    "message": "トラッカーやその他のマルウェアをブロック (<span>カスタマイズ<\/span>)",
     "description": "English: Firstrun.html -> Block trackers and other malware (customize)"
   },
   "adnNotificationReactivate": {
@@ -115,6 +115,10 @@
     "message": "The Advanced Setting \"Show Ads Debug\" is turned on",
     "description": "English: Notifications -> The Advanced Setting \"Show Ads Debug\" is turned on"
   },
+  "adnNewerVersionAvailableNotification": {
+    "message": "A newer version of AdNauseam is available",
+    "description": "English: Notifications -> A newer version of AdNauseam is available"
+  },
   "adnTarget": {
     "message": "ターゲット",
     "description": "English: Vault.html -> inspected Ad -> TARGET"
@@ -153,7 +157,7 @@
   },
   "adnPausedOnPage": {
     "message": "AdNauseamはこのページで一時停止しています",
-    "description": "English: Menu->display when paused on page/site"
+    "description": "English: Menu->display when paused on page\/site"
   },
   "adnNotHiding": {
     "message": "AdNauseamは現在広告を非表示にしていません",
@@ -169,23 +173,23 @@
   },
   "topAdnetworks": {
     "message": "トップネットワーク",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "topSites": {
     "message": "トップサイト",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypes": {
     "message": "広告の種類",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesImageAds": {
     "message": "画像広告",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesTextAds": {
     "message": "テキスト広告",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adnShowingRecentAds": {
     "message": "このページでは広告は収集されません（最近表示）",
@@ -216,7 +220,7 @@
     "description": "appears in ADN settings"
   },
   "adnPurgeConfirm": {
-    "message": "このアクションは、読み込みイメージエラーのあるすべての広告を永久に削除します。インターネットが接続されていることを確認してください。そうしないと、すべての広告が削除されます。",
+    "message": "This action will permanently remove all ads for which the image cannot be loaded. It is a good idea to backup your vault before purging, and also to make sure you have an active internet connection.",
     "description": "appears in ADN settings"
   },
   "adnAdClickingStatusPending": {
@@ -359,6 +363,18 @@
     "message": "Purge Dead Ads",
     "description": "appears on vault page"
   },
+  "adnShowDeadAds": {
+    "message": "Show Dead Ads",
+    "description": "appears on vault page"
+  },
+  "adnHideDeadAds": {
+    "message": "Hide Dead Ads",
+    "description": "appears on vault page"
+  },
+  "adnCaptureVault": {
+    "message": "キャプチャ",
+    "description": "appears on vault page in dev mode"
+  },
   "adnVaultFound": {
     "message": "{{total}} 件の広告が集められました",
     "description": "appears on vault page"
@@ -475,21 +491,33 @@
     "message": "アップデート",
     "description": "English: update"
   },
+  "adnUpdateButton": {
+    "message": "更新",
+    "description": "English: update"
+  },
   "whitelistPageName": {
     "message": "ホワイトリスト",
     "description": "appears as tab name in dashboard"
   },
   "strictBlockListPageName": {
-    "message": "Strict-Block List",
+    "message": "厳格ブロックリスト",
     "description": "appears as tab name in dashboard"
   },
   "eventLoggingPrompt": {
-    "message": "デバッグモードを有効にする",
+    "message": "デバッグモード",
     "description": "prompt for toggle"
   },
   "disableWarnings": {
     "message": "警告を無効にする",
     "description": "English:Disable warnings"
+  },
+  "blurCollectedAds": {
+    "message": "Blur Collected ads",
+    "description": "English: Blur Collected ads"
+  },
+  "hideDeadAds": {
+    "message": "Hide Dead ads",
+    "description": "English: Hide Dead ads"
   },
   "showAdsDebugPrompt": {
     "message": "Show ads for ad-collection debugging",
@@ -502,5 +530,25 @@
   "settingsStrictBlockingMode": {
     "message": "Activate Strict-Blocking Mode",
     "description": "English: Activate Strict-Blocking Mode"
+  },
+  "adnRefreshButton": {
+    "message": "再読み込み",
+    "description": "English: refresh page from menu notification button"
+  },
+  "adnRefreshNotification": {
+    "message": "Apply changes on current page",
+    "description": "English: refresh page from menu notification"
+  },
+  "supportS6P3S1": {
+    "message": "Make sure this issue is <b>AdNauseam-specific<\/b>.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P3S2": {
+    "message": "I have tested the same web-page on <a url='https:\/\/github.com\/gorhill\/uBlock'>#uBO#<\/a> and confirm this issue is <b>AdNauseam-specific<\/b>.",
+    "description": "A checkbox in the filter issue reporter section"
+  },
+  "supportS6Select1Option7": {
+    "message": "Ads not collected",
+    "description": "Ads are present on page but none are collected"
   }
 }

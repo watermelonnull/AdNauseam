@@ -220,7 +220,7 @@
     "description": "Tooltip when hovering the top-most cell of the global-rules column."
   },
   "popupTipLocalRules": {
-    "message": "Տեղական կանոններ. այս սյունակը նախատեսված է միայն այս կայքի վրա տարածվող կանոնների համար։\nՏեղական կանոնները վերասահմանում են համընդհանուր կանոնները։",
+    "message": "Տեղական կանոններ. այս սյունակը նախատեսված է միայն այս կայքի վրա տարածվող կանոնների համար։",
     "description": "Tooltip when hovering the top-most cell of the local-rules column."
   },
   "popupTipSaveRules": {
@@ -275,13 +275,13 @@
     "message": "Տարբերակ",
     "description": "Example of use: Version 1.26.4"
   },
-  "popup3pScriptFilterTip": {
-    "message": "↑: Ընդգծել 3-րդ կողմի սկրիպտներ ունեցող տողերը",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party scripts' cell"
+  "popup3pScriptFilter": {
+    "message": "սկրիպտ",
+    "description": "Appears as an option to filter out firewall rows"
   },
-  "popup3pFrameFilterTip": {
-    "message": "↑: Ընդգծել 3-րդ կողմի շրջանակներ ունեցող տողերը",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party frames' cell"
+  "popup3pFrameFilter": {
+    "message": "շրջանակ",
+    "description": "Appears as an option to filter out firewall rows"
   },
   "pickerCreate": {
     "message": "Ստեղծել",
@@ -469,35 +469,43 @@
   },
   "3pGroupDefault": {
     "message": "Ներկառուցված",
-    "description": "Header for the uBlock filters section in 'Filter lists pane'"
+    "description": "Filter lists section name"
   },
   "3pGroupAds": {
     "message": "Գովազդ",
-    "description": "English: Ads"
+    "description": "Filter lists section name"
   },
   "3pGroupPrivacy": {
     "message": "Գաղտնիություն",
-    "description": "English: Privacy"
+    "description": "Filter lists section name"
   },
   "3pGroupMalware": {
-    "message": "Վնասակար տիրույթներ",
-    "description": "English: Malware domains"
+    "message": "Վնասակար ծրագրերից պաշտպանություն, անվտանգություն",
+    "description": "Filter lists section name"
+  },
+  "3pGroupSocial": {
+    "message": "Սոցիալական վիդջեթներ",
+    "description": "Filter lists section name"
+  },
+  "3pGroupCookies": {
+    "message": "Cookie ծանուցում",
+    "description": "Filter lists section name"
   },
   "3pGroupAnnoyances": {
     "message": "Ջղայնացնող տարրեր",
-    "description": "The header identifying the filter lists in the category 'annoyances'"
+    "description": "Filter lists section name"
   },
   "3pGroupMultipurpose": {
     "message": "Բազմանպատակային",
-    "description": "English: Multipurpose"
+    "description": "Filter lists section name"
   },
   "3pGroupRegions": {
     "message": "Տարածաշրջաններ, լեզուներ",
-    "description": "English: Regions, languages"
+    "description": "Filter lists section name"
   },
   "3pGroupCustom": {
     "message": "Օգտվողային",
-    "description": "English: Custom"
+    "description": "Filter lists section name"
   },
   "3pImport": {
     "message": "Ներմուծել...",
@@ -527,17 +535,25 @@
     "message": "Ցանցի սխալի պատճառով թարմացումը տեղի չունեցավ։",
     "description": "used as a tooltip for error icon beside a list"
   },
-  "1pFormatHint": {
-    "message": "Մեկ տողում մեկ զտիչ։ Որպես զտիչ կարող է լինել կայքի անուն կամ EasyList-համաեղելի զտիչ։ <code>! </code>-ով սկսվող տողերը կանտեսվեն։",
-    "description": "Short information about how to create custom filters"
+  "1pTrustWarning": {
+    "message": "Մի՛ ավելացրեք զտիչներ անվստահելի աղբյուրներից։",
+    "description": "Warning against copy-pasting filters from random sources"
+  },
+  "1pEnableMyFiltersLabel": {
+    "message": "Թուլատրել իմ անհատական ֆիլտրերը",
+    "description": "Label for the checkbox use to enable/disable 'My filters' list"
+  },
+  "1pTrustMyFiltersLabel": {
+    "message": "Թույլատրել վստահություն պահանջող հատուկ զտիչները",
+    "description": "Label for the checkbox use to trust the content of 'My filters' list"
   },
   "1pImport": {
     "message": "Ներմուծել և հավելել",
-    "description": "English: Import and append"
+    "description": "Button in the 'My filters' pane"
   },
   "1pExport": {
     "message": "Արտահանել",
-    "description": "English: Export"
+    "description": "Button in the 'My filters' pane"
   },
   "1pExportFilename": {
     "message": "my-ublock-static-filters_{{datetime}}.txt",
@@ -581,7 +597,7 @@
   },
   "rulesExport": {
     "message": "Արտահանել դեպի նիշք",
-    "description": ""
+    "description": "Button in the 'My rules' pane"
   },
   "rulesDefaultFileName": {
     "message": "my-ublock-dynamic-rules_{{datetime}}.txt",
@@ -617,11 +633,11 @@
   },
   "whitelistImport": {
     "message": "Ներմուծել և հավելել",
-    "description": "English: Import and append"
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExport": {
     "message": "Արտահանել",
-    "description": "English: Export"
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExportFilename": {
     "message": "my-ublock-trusted-sites_{{datetime}}.txt",
@@ -881,14 +897,14 @@
   },
   "supportOpenButton": {
     "message": "Բացել",
-    "description": "Text for button which open an external webpage in Support pane"
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportReportSpecificButton": {
-    "message": "Նոր զեկույց ստեղծել",
-    "description": "Text for button which open an external webpage in Support pane"
+    "message": "Նոր զեկույց ստեղծել GitHub-ում",
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportFindSpecificButton": {
-    "message": "Գտնել նման զեկույցներ",
+    "message": "Գտնել նման զեկույցներ GitHub-ում",
     "description": "A clickable link in the filter issue reporter section"
   },
   "supportS1H": {
@@ -939,16 +955,20 @@
     "message": "Ցածում տեխնիկական տեղեկություն է, որը կարող է օգտակար լինել, երբ կամավորները փորձում են օգնել Ձեզ լուծել խնդիրը։",
     "description": "First paragraph of 'Troubleshooting Information' section in Support pane"
   },
-  "supportS5P2": {
-    "message": "<b>Կարևոր է.</b> Հնարավոր անձնական կամ զգայուն տեղեկությունները խմբագրվում է լռելյայնորեն։ Վերամշակված տեղեկություները կարող է ավելի բարդացնել խնդրի լուծումը:",
-    "description": "Second paragraph of 'Troubleshooting Information' section in Support pane"
-  },
   "supportS6H": {
     "message": "Հաղորդել զտիչի խնդրի մասին",
     "description": "Header of 'Report a filter issue' section in Support pane"
   },
   "supportS6P1S1": {
     "message": "Կամավորներին կրկնօրինակ զեկույցներով չծանրաբեռնելու համար խնդրում ենք ստուգել, որ խնդիրն արդեն հաղորդված չէ։",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S1": {
+    "message": "Զտիչների ցուցակները թարմացվում են ամեն օր։ Համոզվեք, որ Ձեր խնդիրը չի լուծվել զտիչների թարմ ցուցակներում։",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S2": {
+    "message": "Համոզվեք, որ խնդիրը պահպանվում է նույնիսկ խնդրահարույց էջը վերաբեռնելուց հետո։",
     "description": "A paragraph in the filter issue reporter section"
   },
   "supportS6URL": {
@@ -987,17 +1007,13 @@
     "message": "Բացում է անցանկալի ներդիրները կամ լուսամուտները",
     "description": "An entry in the widget used to select the type of issue"
   },
+  "supportS6Select1Option7": {
+    "message": "Բերում է վնասակար ծրագրերի, ֆիշինգի",
+    "description": "An entry in the widget used to select the type of issue"
+  },
   "supportS6Checkbox1": {
     "message": "Նշել վեբ էջը որպես «NSFW» (<a href=\"https://wikipedia.org/wiki/Not_safe_for_work\">«Աշխատանքի համար անվտանգ չէ»</a>)",
     "description": "A checkbox to use for NSFW sites"
-  },
-  "supportRedact": {
-    "message": "Խմբագրել",
-    "description": "Text for 'Redact' button"
-  },
-  "supportUnredact": {
-    "message": "Չեղարկել խմբագրումը",
-    "description": "Text for 'Unredact' button"
   },
   "aboutPrivacyPolicy": {
     "message": "Գաղտնիության քաղաքականություն",
@@ -1071,10 +1087,6 @@
     "message": "Ցանցի սխալ՝ {{msg}}",
     "description": "English: Network error: {{msg}}"
   },
-  "subscriberConfirm": {
-    "message": "Ավելացնե՞լ հետևյալ հասցեն զտիչների օգտվողային ցանկին։\n\nՎերնագիր՝ «{{title}}»\nURL՝ {{url}}",
-    "description": "No longer used"
-  },
   "subscribeButton": {
     "message": "Բաժանորդագրվել",
     "description": "For the button used to subscribe to a filter list"
@@ -1116,7 +1128,7 @@
     "description": "Firefox-specific: appears as 'uBlock₀ (off)'"
   },
   "docblockedTitle": {
-    "message": "Page blocked",
+    "message": "Էջն արգելաբացվեց",
     "description": "Used as a title for the document-blocked page"
   },
   "docblockedPrompt1": {
@@ -1144,7 +1156,7 @@
     "description": "English: Close this window"
   },
   "docblockedDontWarn": {
-    "message": "Don't warn me again about this site",
+    "message": "Այլևս չզգուշացնե՛լ ինձ այս կայքի մասին",
     "description": "Label for checkbox in document-blocked page"
   },
   "docblockedProceed": {
@@ -1160,8 +1172,28 @@
     "description": "English: Permanently"
   },
   "docblockedDisable": {
-    "message": "Proceed",
+    "message": "Շարունակել",
     "description": "Button text to navigate to the blocked page"
+  },
+  "docblockedRedirectPrompt": {
+    "message": "Արգելափակված կայքը ցանկանում է  տեղափոխել Ձեզ ուրիշ կայք։ Եթե ցանկանում եք շարունակել, Դուք անմիջապես կտեղափոխվեք {{url}}",
+    "description": "Text warning about an incoming redirect"
+  },
+  "docblockedReasonLabel": {
+    "message": "Պատճառը՝",
+    "description": "The label which prepend the actual reason why a page was blocked"
+  },
+  "docblockedReasonMalicious": {
+    "message": "Վնասակար",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonTracker": {
+    "message": "Հետևող",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonDisreputable": {
+    "message": "Անվստահելի",
+    "description": "An actual reason why a page was blocked"
   },
   "cloudPush": {
     "message": "Արտահանել առ ամպային պահեստ",
@@ -1215,6 +1247,10 @@
     "message": "Ժամանակավորապես թույլ տալ խոշոր մեդիա տարրերը",
     "description": "A context menu entry, present when large media elements have been blocked on the current site"
   },
+  "contextMenuViewSource": {
+    "message": "Դիտել աղբյուրի կոդը…",
+    "description": "A context menu entry, to view the source code of the target resource"
+  },
   "shortcutCapturePlaceholder": {
     "message": "Մուտքագրեք դյուրանցում",
     "description": "Placeholder string for input field used to capture a keyboard shortcut"
@@ -1234,6 +1270,10 @@
   "toggleCosmeticFiltering": {
     "message": "Փոխանջատել կոսմետիկ զտումը",
     "description": "Label for keyboard shortcut used to toggle cosmetic filtering"
+  },
+  "toggleJavascript": {
+    "message": "Անջատել JavaScript֊ը",
+    "description": "Label for keyboard shortcut used to toggle no-scripting switch"
   },
   "relaxBlockingMode": {
     "message": "Արգելափակման թուլացված ռեժիմ",
@@ -1258,6 +1298,14 @@
   "clickToLoad": {
     "message": "Կտտացրեք՝ բեռնելու համար",
     "description": "Message used in frame placeholders"
+  },
+  "linterMainReport": {
+    "message": "Սխալներ՝ {{count}}",
+    "description": "Summary of number of errors as reported by the linter "
+  },
+  "unprocessedRequestTooltip": {
+    "message": "Չհաջողվեց կատարել զտումը զննիչի գործարկման ժամանակ։\nՎերաբեռնեք էջը՝ պատշաճ զտումն ապահովելու համար։",
+    "description": "A warning which will appear in the popup panel if needed"
   },
   "dummy": {
     "message": "This entry must be the last one",

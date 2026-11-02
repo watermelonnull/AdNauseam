@@ -12,7 +12,7 @@
     "description": "English: uBlock₀ — Dashboard"
   },
   "dashboardUnsavedWarning": {
-    "message": "Brīdinājums! Veiktās izmaiņas nav saglabātas",
+    "message": "Uzmanību! Ir nesaglabātas izmaiņas",
     "description": "A warning in the dashboard when navigating away from unsaved changes"
   },
   "dashboardUnsavedWarningStay": {
@@ -20,7 +20,7 @@
     "description": "Label for button to prevent navigating away from unsaved changes"
   },
   "dashboardUnsavedWarningIgnore": {
-    "message": "Ignorēt",
+    "message": "Neņemt vērā",
     "description": "Label for button to ignore unsaved changes"
   },
   "settingsPageName": {
@@ -64,7 +64,7 @@
     "description": "Title for the asset viewer page"
   },
   "advancedSettingsPageName": {
-    "message": "Papildu iestatījumi",
+    "message": "Izvērstie iestatījumi",
     "description": "Title for the advanced settings page"
   },
   "popupPowerSwitchInfo": {
@@ -72,11 +72,11 @@
     "description": "English: Click: disable/enable uBlock₀ for this site.\n\nCtrl+click: disable uBlock₀ only on this page."
   },
   "popupPowerSwitchInfo1": {
-    "message": "Noklikšķināt, lai atslēgtu uBlock₀ šajā vietnē.\n\nCtrl + klikšķis, lai atslēgtu uBlock₀ tikai šajā lapā.",
+    "message": "Noklikšķināt, lai atspējotu uBlock₀ šajā vietnē.\n\nCtrl + klikšķis, lai atspējotu uBlock₀ tikai šajā lapā.",
     "description": "Message to be read by screen readers"
   },
   "popupPowerSwitchInfo2": {
-    "message": "Klikšķināt, lai šai vietnei ieslēgtu uBlock₀.",
+    "message": "Klikšķināt, lai šajā vietnē iespējotu uBlock₀.",
     "description": "Message to be read by screen readers"
   },
   "popupBlockedRequestPrompt": {
@@ -104,7 +104,7 @@
     "description": "For the new mobile-friendly popup design"
   },
   "popupBlockedSinceInstall_v2": {
-    "message": "Pavisam aizturētas",
+    "message": "Pavisam aizturētas kopš uzstādīšanas",
     "description": "For the new mobile-friendly popup design"
   },
   "popupDomainsConnected_v2": {
@@ -220,7 +220,7 @@
     "description": "Tooltip when hovering the top-most cell of the global-rules column."
   },
   "popupTipLocalRules": {
-    "message": "Vietējie ierobežojumi: šī kolonna paredzēta ierobežojumiem, kas attieksies tikai uz konkrēto mājaslapu.\nVietējie ierobežojumi pārraksta globālos ierobežojumus.",
+    "message": "Vietējie ierobežojumi: šī kolonna paredzēta ierobežojumiem, kas attieksies tikai uz konkrēto mājaslapu.",
     "description": "Tooltip when hovering the top-most cell of the local-rules column."
   },
   "popupTipSaveRules": {
@@ -275,13 +275,13 @@
     "message": "Versija",
     "description": "Example of use: Version 1.26.4"
   },
-  "popup3pScriptFilterTip": {
-    "message": "↑: Izcelt rindas, kurām ir trešo pušu skripti",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party scripts' cell"
+  "popup3pScriptFilter": {
+    "message": "skripts",
+    "description": "Appears as an option to filter out firewall rows"
   },
-  "popup3pFrameFilterTip": {
-    "message": "↑: Izcelt rindas, kurām ir trešo pušu rāmji",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party frames' cell"
+  "popup3pFrameFilter": {
+    "message": "rāmis",
+    "description": "Appears as an option to filter out firewall rows"
   },
   "pickerCreate": {
     "message": "Izveidot",
@@ -448,11 +448,11 @@
     "description": "Describes the purpose of the 'Parse and enforce cosmetic filters' feature."
   },
   "3pIgnoreGenericCosmeticFilters": {
-    "message": "Ignorēt vispārīgos kosmētiskos filtrus",
+    "message": "Neņemt vērā vispārīgos kosmētiskos aizturētājus",
     "description": "This will cause uBO to ignore all generic cosmetic filters."
   },
   "3pIgnoreGenericCosmeticFiltersInfo": {
-    "message": "<p>Vispārīgie kosmētikas filtri ir kosmētikas filtri, kurus paredzēts piemērot visās tīmekļvietnēs.<p>Lai gan uBlock ₀ darbojas efektīvi, vispārīgie kosmētikas filtri dažās tīmekļa lapās var ievērojami noslogot atmiņu un centrālo procesoru.<p>Šīs opcijas izmantošana samazinās vispārīgo kosmētikas filtru izmantotās atmiņas un procesora noslodzi kā arī samazinās paša uBlock₀ izmantoto atmiņu.<p>Ieteicams izmantot zemas veiktspējas ierīcēm.",
+    "message": "Vispārīgie kosmētiskie aizturētāji ir tādi kosmētiskie aizturētāji, kurus paredzēts pielietot visās tīmekļvietnēs. Šīs iespējas iespējošana novērsīs tīmekļa lapām pievienoto atmiņas un CPU virstēriņu kā vispārīgo kosmētisko aizturētāju apstrādāšanas iznākumu.\n\nIr ieteicams iespējot šo iespēju mazāk jaudīgās ierīcēs.",
     "description": "Describes the purpose of the 'Ignore generic cosmetic filters' feature."
   },
   "3pSuspendUntilListsAreLoaded": {
@@ -469,42 +469,50 @@
   },
   "3pGroupDefault": {
     "message": "Iebūvētie",
-    "description": "Header for the uBlock filters section in 'Filter lists pane'"
+    "description": "Filter lists section name"
   },
   "3pGroupAds": {
     "message": "Reklāmas",
-    "description": "English: Ads"
+    "description": "Filter lists section name"
   },
   "3pGroupPrivacy": {
     "message": "Konfidencialitāte",
-    "description": "English: Privacy"
+    "description": "Filter lists section name"
   },
   "3pGroupMalware": {
-    "message": "Ļaundabīgo programmu domēni",
-    "description": "English: Malware domains"
+    "message": "Aizsardzība pret ļaunprātīgām (inficētas vai satur vīrusus) vietnēm, drošība",
+    "description": "Filter lists section name"
+  },
+  "3pGroupSocial": {
+    "message": "Sabiedriskās ekrānvadīklas",
+    "description": "Filter lists section name"
+  },
+  "3pGroupCookies": {
+    "message": "Sīkdatņu paziņojumi",
+    "description": "Filter lists section name"
   },
   "3pGroupAnnoyances": {
     "message": "Traucējoši elementi",
-    "description": "The header identifying the filter lists in the category 'annoyances'"
+    "description": "Filter lists section name"
   },
   "3pGroupMultipurpose": {
     "message": "Daudzfunkcionālie",
-    "description": "English: Multipurpose"
+    "description": "Filter lists section name"
   },
   "3pGroupRegions": {
     "message": "Reģionālie, valodas",
-    "description": "English: Regions, languages"
+    "description": "Filter lists section name"
   },
   "3pGroupCustom": {
     "message": "Lietotāja",
-    "description": "English: Custom"
+    "description": "Filter lists section name"
   },
   "3pImport": {
-    "message": "Importēt…",
+    "message": "Ievietot…",
     "description": "The label for the checkbox used to import external filter lists"
   },
   "3pExternalListsHint": {
-    "message": "Vienu URL katrā rindiņā. Rindiņas, kuras sākas ar &lsquo;!&rsquo; tiks ignorētas. Nederīgs URL tiks ignorēts bez brīdinājuma.",
+    "message": "Viens URL katrā rindā. Nederīgi URL netiks ņemti vērā.",
     "description": "Short information about how to use the textarea to import external filter lists by URL"
   },
   "3pExternalListObsolete": {
@@ -527,17 +535,25 @@
     "message": "Tīkla kļūda neļāva atjaunināt resursu.",
     "description": "used as a tooltip for error icon beside a list"
   },
-  "1pFormatHint": {
-    "message": "Vienu filtru katrā rindā. Filtrs var būt vienkārši resursa adrese, vai ar Adblock Plus saderīgs filtrs. Rindiņas, kuras sākas ar &lsquo;!&rsquo; tiks ignorētas.",
-    "description": "Short information about how to create custom filters"
+  "1pTrustWarning": {
+    "message": "Nevajag pievienot filtrus no neuzticamiem avotiem.",
+    "description": "Warning against copy-pasting filters from random sources"
+  },
+  "1pEnableMyFiltersLabel": {
+    "message": "Iespējot manas pielāgotās atlases",
+    "description": "Label for the checkbox use to enable/disable 'My filters' list"
+  },
+  "1pTrustMyFiltersLabel": {
+    "message": "Ļaut pielāgotas atlases, kas pieprasa uzticēšanos",
+    "description": "Label for the checkbox use to trust the content of 'My filters' list"
   },
   "1pImport": {
     "message": "Importēt un pievienot",
-    "description": "English: Import and append"
+    "description": "Button in the 'My filters' pane"
   },
   "1pExport": {
-    "message": "Eksportēt",
-    "description": "English: Export"
+    "message": "Izgūt…",
+    "description": "Button in the 'My filters' pane"
   },
   "1pExportFilename": {
     "message": "my-ublock-static-filters_{{datetime}}.txt",
@@ -576,12 +592,12 @@
     "description": "Will discard manually-edited content and exit manual-edit mode"
   },
   "rulesImport": {
-    "message": "Importēt no faila…",
+    "message": "Ievietot no datnes…",
     "description": ""
   },
   "rulesExport": {
-    "message": "Eksportēt uz failu...",
-    "description": ""
+    "message": "Izgūt datnē…",
+    "description": "Button in the 'My rules' pane"
   },
   "rulesDefaultFileName": {
     "message": "my-ublock-dynamic-rules_{{datetime}}.txt",
@@ -617,11 +633,11 @@
   },
   "whitelistImport": {
     "message": "Importēt un pievienot",
-    "description": "English: Import and append"
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExport": {
-    "message": "Eksportēt",
-    "description": "English: Export"
+    "message": "Izgūt…",
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExportFilename": {
     "message": "my-ublock-whitelist_{{datetime}}.txt",
@@ -881,11 +897,11 @@
   },
   "supportOpenButton": {
     "message": "Atvērt",
-    "description": "Text for button which open an external webpage in Support pane"
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportReportSpecificButton": {
     "message": "Izveidot jaunu ziņojumu",
-    "description": "Text for button which open an external webpage in Support pane"
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportFindSpecificButton": {
     "message": "Meklēt līdzīgus ziņojumus",
@@ -916,7 +932,7 @@
     "description": "First paragraph of 'Filter issues' section in Support pane"
   },
   "supportS3P2": {
-    "message": "<b>Svarīgi:</b> ir jāizvairas no līdzīgu aizturētāju izmantošanas vienlaicīgi ar uBlock Origin, jo tas var radīt aizturēšanas kļūmes noteiktās vietnēs.",
+    "message": "<b>Svarīgi:</b> ir jāizvairās no līdzīgu aizturētāju izmantošanas vienlaicīgi ar uBlock Origin, jo tas var radīt aizturēšanas kļūmes noteiktās vietnēs.",
     "description": "Second paragraph of 'Filter issues' section in Support pane"
   },
   "supportS3P3": {
@@ -939,16 +955,20 @@
     "message": "Zemāk ir tehniskā informācija, kas var būt noderīga, kad brīvprātīgie mēģinās palīdzēt atrisināt sarežģījumus.",
     "description": "First paragraph of 'Troubleshooting Information' section in Support pane"
   },
-  "supportS5P2": {
-    "message": "<b>Svarīgi:</b> iespējami privāta vai sensitīva informācija pēc noklusējuma tiek izņemta. Aizvākta informācija var apgrūtināt sarežģījuma atrisināšanu.",
-    "description": "Second paragraph of 'Troubleshooting Information' section in Support pane"
-  },
   "supportS6H": {
     "message": "Ziņot par aizturētāja nepilnībām",
     "description": "Header of 'Report a filter issue' section in Support pane"
   },
   "supportS6P1S1": {
-    "message": "Lai izvairītos no brīvprātīgo noslogošanas ar ziņojumiem, kas atkārtojas, lūgums pārbaudīt, vai par šādu nepilnību jau ir ziņots.",
+    "message": "Lai izvairītos no brīvprātīgo noslogošanas ar ziņojumiem, kas atkārtojas, lūgums pārbaudīt, ka par šādu nepilnību jau nav ziņots. <b>Piebilde:</b> klikšķināšana uz pogas izraisīs arī lapas izcelsmes nosūtīšanu uz GitHub.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S1": {
+    "message": "Aizturēšanas saraksti tiek atjaunināti ik dienu. Jāpārliecinās, vai nepilnība jau nav novērsta visjaunākajos aizturēšanas sarakstos.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S2": {
+    "message": "Jāpārliecinās, vai nepilnība joprojām pastāv pēc tīmekļa vietnes ar sarežģījumiem pārlādēšanas.",
     "description": "A paragraph in the filter issue reporter section"
   },
   "supportS6URL": {
@@ -987,17 +1007,13 @@
     "message": "Atver nevēlamas cilnes vai logus",
     "description": "An entry in the widget used to select the type of issue"
   },
+  "supportS6Select1Option7": {
+    "message": "Noved pie slitkas programmatūras, pikšķerēšanas",
+    "description": "An entry in the widget used to select the type of issue"
+  },
   "supportS6Checkbox1": {
     "message": "Iezīmēt tīmekļa lapu kā \"NSFW\" (<a href=\"https://wikipedia.org/wiki/Not_safe_for_work\">\"Not Safe for Work</a> (nav droša darbam))",
     "description": "A checkbox to use for NSFW sites"
-  },
-  "supportRedact": {
-    "message": "Izņemt",
-    "description": "Text for 'Redact' button"
-  },
-  "supportUnredact": {
-    "message": "Atdarīt izņemšanu",
-    "description": "Text for 'Unredact' button"
   },
   "aboutPrivacyPolicy": {
     "message": "Privātuma nosacījumi",
@@ -1070,10 +1086,6 @@
   "errorCantConnectTo": {
     "message": "Tīkla kļūda: {{msg}}",
     "description": "English: Network error: {{msg}}"
-  },
-  "subscriberConfirm": {
-    "message": "uBlock₀: Pievienot sekojošo URL Jūsu lietotāja filtru sarakstiem?\n\nNosaukums: \"{{title}}\"\nURL: {{url}}",
-    "description": "No longer used"
   },
   "subscribeButton": {
     "message": "Abonēt",
@@ -1163,6 +1175,26 @@
     "message": "Turpināt",
     "description": "Button text to navigate to the blocked page"
   },
+  "docblockedRedirectPrompt": {
+    "message": "Aizturētā lapa veic pārvirzīšanu uz citu vietni. Ja izvēlēsies turpināt, nonāksi uzreiz šeit: {{url}}",
+    "description": "Text warning about an incoming redirect"
+  },
+  "docblockedReasonLabel": {
+    "message": "Iemesls:",
+    "description": "The label which prepend the actual reason why a page was blocked"
+  },
+  "docblockedReasonMalicious": {
+    "message": "Ļaunprātīgas darbības",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonTracker": {
+    "message": "Izsekotājs",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonDisreputable": {
+    "message": "Slikta slava",
+    "description": "An actual reason why a page was blocked"
+  },
   "cloudPush": {
     "message": "Eksports uz mākoņdatu glabātuvi",
     "description": "tooltip"
@@ -1215,6 +1247,10 @@
     "message": "Īslaicīgi atļaut lielos multivides elementus",
     "description": "A context menu entry, present when large media elements have been blocked on the current site"
   },
+  "contextMenuViewSource": {
+    "message": "Skatīt pirmkodu…",
+    "description": "A context menu entry, to view the source code of the target resource"
+  },
   "shortcutCapturePlaceholder": {
     "message": "Ievadīt saīsni",
     "description": "Placeholder string for input field used to capture a keyboard shortcut"
@@ -1234,6 +1270,10 @@
   "toggleCosmeticFiltering": {
     "message": "Pārslēgt kosmētisko atlasi",
     "description": "Label for keyboard shortcut used to toggle cosmetic filtering"
+  },
+  "toggleJavascript": {
+    "message": "Pārslēgt JavaScript",
+    "description": "Label for keyboard shortcut used to toggle no-scripting switch"
   },
   "relaxBlockingMode": {
     "message": "Atslābinātais aizturēšanas režīms",
@@ -1258,6 +1298,14 @@
   "clickToLoad": {
     "message": "Klikšķināt, lai ielādētu",
     "description": "Message used in frame placeholders"
+  },
+  "linterMainReport": {
+    "message": "Kļūdas: {{count}}",
+    "description": "Summary of number of errors as reported by the linter "
+  },
+  "unprocessedRequestTooltip": {
+    "message": "Nevarēja pienācīgi aizturēt pārlūka palaišanas laikā.\nJāpārlādē lapa, lai nodrošinātu pienācīgu aizturēšanu.",
+    "description": "A warning which will appear in the popup panel if needed"
   },
   "dummy": {
     "message": "Šim ierakstam ir jābūt pēdējam",

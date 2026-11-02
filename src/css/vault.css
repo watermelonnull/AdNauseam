@@ -4,7 +4,7 @@ html {
 
 body {
 	height: 100%;
-	background: #000 url(../img/gray_grid.png);
+
 	color: #4C4D4C;
 	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	margin: 0;
@@ -22,7 +22,7 @@ body {
 	font-stretch: 47.5%;
 	font-variation-settings: "opsz" 48, "slnt" 0, "GRAD" 0, "XTRA" 468, "YOPQ" 79, "YTAS" 750, "YTDE" -203, "YTFI" 738, "YTLC" 514, "YTUC" 712;
 	z-index: 50;
-	margin-bottom: 30px;
+	margin-bottom: 40px;
 	cursor: default;
 	user-select:none;
 	width:270px;
@@ -38,7 +38,7 @@ body {
 	display:none;
   width:100%;
 	height:320px;
-	border:solid 1px #0076FF;
+	border:solid 1px var(--adn-blue);
 	background-color:#0E1217;
 	padding:15px 15px 25px;
 }
@@ -52,18 +52,18 @@ body {
 }
 .show .myStatistics-label, .min .myStatistics-label:hover{
 	color:black;
-	background-color:#0076FF;
+	background-color:var(--adn-blue);
 	transition: 0.3s;
 }
 .min .myStatistics-label{
-	color:#0076FF;;
+	color:var(--adn-blue);;
 }
 .show .myStatistics-label:hover{
-	border-color:#0076FF;
+	border-color:var(--adn-blue);
 	border-style:solid;
 	border-width:1px 1px 0 1px;
 	background-color:rgba(0,0,0,0);
-	color:#0076FF;
+	color:var(--adn-blue);
 	transition: 0.3s;
 }
 .min .myStatistics-label:hover > span.st-icon{
@@ -91,7 +91,6 @@ body {
 .myStatistics-panel h4{
 	font-size:16px;
 	line-height:22px;
-	color:#EEE;
 }
 .myStatistics-panel li span{
 	line-height:18px;
@@ -101,7 +100,7 @@ body {
 		color:#AAA;
 }
 .myStatistics-panel li span.number{
-		color:#0076FF;
+		color:var(--adn-blue);
 		float:right;
 }
 
@@ -194,7 +193,7 @@ div.tooltip {
 }
 
 #container.posTransition {
-	transition: all 1s ease;
+	transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 #loading-img{
@@ -330,6 +329,7 @@ div.tooltip {
 	position: relative;
 	display: inline-block;
 	z-index: 100;
+	width: 700px;
 	font-size: 16px;
 	font-family: bebas_neue,roboto_flex,noto_sans,sans-serif;
 	font-stretch: 47.5%;
@@ -347,12 +347,12 @@ div.tooltip {
 
 .session-sum .clicked{
 	font-weight: 700;
-	color: #BD10E0;
+	color: var(--adn-purple);
 }
 
 .session-sum .total{
 	font-weight: 700;
-	color: #0076FF;
+	color: var(--adn-blue);
 }
 .session-sum .showing {
 	display: none;
@@ -415,10 +415,15 @@ div.tooltip {
 .item {
 	display: inline-block;
 	position: relative;
+	transform: scale(0,0);
+	margin: 0;
+	opacity: 0;
+}
+
+.item.loaded {
+	opacity: 1;
 	animation: 500ms cubic-bezier(0.175, 0.885, 0.320, 1.275) 0s normal forwards 1 pop;
 	transform: scale(1,1);
-	margin: 0;
-	opacity: 1;
 }
 
 /* -------------------INSPECTION----------------------- */
@@ -433,7 +438,7 @@ div.tooltip {
 }
 
 #container.lightbox{
-	transition: transform 0.5s ease 0.1s, margin 0.5s ease;
+	transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
 	z-index: 1000;
 }
 
@@ -610,7 +615,7 @@ div.bullets { display: none; } /* hide by default */
 }
 
 .inspected .bullets .pending {
-	background-color: #0076FF;
+	background-color: var(--adn-blue);
 }
 .inspected .bullets .visited {
 	background-color: #A020F0;
@@ -624,7 +629,7 @@ div.bullets { display: none; } /* hide by default */
 
 
 .inspected.pending .target .inspected-title {
-	color: #0076FF;
+	color: var(--adn-blue);
 }
 .inspected.visited .target .inspected-title  {
 	color: #A020F0;
@@ -641,7 +646,7 @@ div.bullets { display: none; } /* hide by default */
 }
 
 
-.item.pending #index-counter, .item.pending span.counter { background-color: #0076FF;}
+.item.pending #index-counter, .item.pending span.counter { background-color: var(--adn-blue);}
 .item.visited #index-counter, .item.visited span.counter { background-color: #A020F0;}
 .item.failed  #index-counter, .item.failed  span.counter { background-color: #B80606;}
 .item.dnt-allowed #index-counter, .item.dnt-allowed span.counter { background-color: #96B96B;}
@@ -674,7 +679,7 @@ div.bullets { display: none; } /* hide by default */
 
 .inspected.pending .item-text-div,
 .item-text.pending .item-text-div:hover {
-	border-color: #0076FF;
+	border-color: var(--adn-blue);
 }
 
 .inspected.failed .item-text-div,
@@ -765,7 +770,7 @@ div.bullets { display: none; } /* hide by default */
 
 .item-text.visited:hover,
 .item-text.visited.inspected {
-  border-color: #BD10E0;
+  border-color: var(--adn-purple);
 }
 
 .item-text.failed:hover,
@@ -803,8 +808,26 @@ div.bullets { display: none; } /* hide by default */
 	pointer-events: none;
 }
 
+#stage.blur .item:not(.inspected) .ad img {
+	filter: blur(10px);
+}
+
+#stage.blur .ad img:hover {
+	filter: blur(0px);
+}
+
 .ad img.white-bg {
 	background: white;
+}
+
+#svg-progress {
+	position: absolute;
+	display: none;
+	top: 40px;
+	left: 50%;
+	transform: translateX(-50%);
+	color: black;
+	z-index: 1000;
 }
 
 /*
@@ -844,14 +867,14 @@ div.bullets { display: none; } /* hide by default */
 
 .item.just-visited .ad::before,
 .item-text.just-visited .item-text-div::before {
-	background: #BD10E0;
+	background: var(--adn-purple);
 	animation: 1000ms ease-in-out visit-marker;
   content: "VISITED";
 	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 .item.attempting .ad::before,
 .item-text.attempting .item-text-div::before {
-	background: #0076FF;
+	background: var(--adn-blue);
   animation: 200ms ease-in-out attempting-marker infinite alternate;
 }
 
@@ -872,7 +895,7 @@ div.bullets { display: none; } /* hide by default */
 
 @keyframes just-visited {
 	from {
-		background: #BD10E0;
+		background: var(--adn-purple);
 	}
 }
 
@@ -1045,28 +1068,33 @@ div.bullets { display: none; } /* hide by default */
 }
 
 .item:hover img,
-.item:focus img{
+.item:focus img {
+	filter: blur(0px) !important;
+}
+
+.item:hover .ad,
+.item:focus .ad{
 	opacity: 1;
 	border: 3px solid #A020F0;
 	margin: -3px;
 	border-radius: 3px;
 }
-.item.visited:hover img {
-	border-color: #BD10E0;
+.item.visited:hover .ad {
+	border-color: var(--adn-purple);
 	border-radius: 3px;
 }
 
-.item.pending:hover img {
-	border: 3px solid #0076FF;
+.item.pending:hover .ad {
+	border: 3px solid var(--adn-blue);
 	border-radius: 3px;
 }
 
-.item.failed:hover img {
+.item.failed:hover .ad {
 	border-color: #B80606;
 	border-radius: 3px;
 }
 
-.item.dnt-allowed:hover img {
+.item.dnt-allowed:hover .ad {
 	border-color: #96B96B;
 	border-radius: 3px;
 }
@@ -1088,15 +1116,10 @@ svg {
   fill: #ccc;
 }
 
-.brush .extent {
+.brush .selection {
   fill-opacity: .25;
   shape-rendering: crispEdges;
 	cursor: move;
-}
-.brush .resize {
-  background: url(../img/timeline-handle.svg);
-	width: 5px;
-	height: 62px;
 }
 
 .axis text {
@@ -1172,3 +1195,47 @@ html.mobile #stats {
 html.mobile .session-sum, html.mobile #actions {
 	font-size: 21px !important;
 }
+
+/* coloBlind mode (light mode) */
+
+:root.colorBlind .myStatistics-panel {
+	background-color: #ffffffe0;
+}
+
+:root.colorBlind .session-sum {
+	color: #ffffff;
+}
+
+:root.colorBlind .zoom {
+	background: #ffffff;
+}
+
+:root.colorBlind #x-close-button {
+	color: #a0a0a0;
+}
+
+:root.colorBlind #x-close-button:hover {
+	color: #585858;
+}
+
+:root.colorBlind  .axis text {
+	fill: white;
+}
+:root.colorBlind .chart-bg {
+	fill-opacity: 0.5;
+	fill: white;
+}
+
+#x-close-button:hover {
+	color: #585858;
+}
+
+button.small {
+	font-weight: 700;
+}
+
+/*
+:root.colorBlind .myStatistics-label span {
+	color: white;
+}
+*/

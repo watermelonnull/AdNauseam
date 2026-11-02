@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2014-2018 Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,24 +19,18 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-'use strict';
-
-/******************************************************************************/
-
-import punycode from '../lib/punycode.js';
-
-import { LineIterator } from './text-utils.js';
-
 import {
     decomposeHostname,
     domainFromHostname,
 } from './uri-utils.js';
+import { LineIterator } from './text-utils.js';
+import punycode from '../lib/punycode.js';
 
 /******************************************************************************/
 
 // Object.create(null) is used below to eliminate worries about unexpected
 // property names in prototype chain -- and this way we don't have to use
-// hasOwnProperty() to avoid this.
+// Object.hasOwn() to avoid this.
 
 const supportedDynamicTypes = Object.create(null);
 Object.assign(supportedDynamicTypes, {
@@ -83,7 +77,7 @@ const intToActionMap = new Map([
 ]);
 
 // For performance purpose, as simple tests as possible
-const reBadHostname = /[^0-9a-z_.\[\]:%-]/;
+const reBadHostname = /[^0-9a-z_.[\]:%-]/;
 const reNotASCII = /[^\x20-\x7F]/;
 const decomposedSource = [];
 const decomposedDestination = [];
@@ -304,14 +298,13 @@ class DynamicHostRuleFiltering {
         this.y = '*';
 
         // Specific party
-        // TODO: equate `object` as `sub_frame`
         if ( thirdParty ) {
             // 3rd-party, specific type
             if ( type === 'script' ) {
                 if ( this.evaluateCellZ(srcHostname, '*', '3p-script') !== 0 ) {
                     return this.r;
                 }
-            } else if ( type === 'sub_frame' ) {
+            } else if ( type === 'sub_frame' || type === 'object' ) {
                 if ( this.evaluateCellZ(srcHostname, '*', '3p-frame') !== 0 ) {
                     return this.r;
                 }

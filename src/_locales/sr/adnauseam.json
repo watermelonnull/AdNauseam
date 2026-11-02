@@ -36,15 +36,15 @@
     "description": "Message asking user to confirm reset"
   },
   "adnFirstRunHideAllAdsDescription": {
-    "message": "Сакријте огласе у изабраним <span>filter listama</span>",
+    "message": "Сакријте огласе у изабраним <span>filter listama<\/span>",
     "description": "English: Firstrun.html -> Hide Ads in your selected filter lists"
   },
   "adnFirstRunClickingAdsDescription": {
-    "message": "Региструј посете огласа нађених у <span>filter listama</span>",
+    "message": "Региструј посете огласа нађених у <span>filter listama<\/span>",
     "description": "English: Firstrun.html -> Register visits on Ads found via your filter lists"
   },
   "adnFirstRunBlockingMalwareDescription": {
-    "message": "Блокирајте пратиоце и друге штетне програме (<span>customize</span>)",
+    "message": "Блокирајте пратиоце и друге штетне програме (<span>customize<\/span>)",
     "description": "English: Firstrun.html -> Block trackers and other malware (customize)"
   },
   "adnNotificationReactivate": {
@@ -84,7 +84,7 @@
     "description": "English: Notifications -> uBlock and AdNauseam may conflict!"
   },
   "adnNotificationOperaSetting": {
-    "message": "Please allow AdNauseam to access search page results",
+    "message": "Молимо да омогућите АдНаусеам приступ резултатима претраге",
     "description": "English: Notifications -> Please allow AdNauseam to access search page results"
   },
   "adnNotificationBrowserSetting": {
@@ -92,28 +92,32 @@
     "description": "English: Notifications -> The 'Content Blocking' settings in your browser may interfere with AdNauseam!"
   },
   "adnNotificationPrivacyMode": {
-    "message": "You have allowed adnauseam to have access to your online activities while private browsing.",
+    "message": "Омогућили сте АдНаузеум да приступи Вашим онлајн активностима у приватном режиму претраге.",
     "description": "English: Notifications -> You have allowed adnauseam to have access to your online activities while private browsing."
   },
   "adnNotificationDNTAllowed": {
-    "message": "Ова страница поштује <b>Не прати</b>, огласи су дозвољени.",
+    "message": "Ова страница поштује <b>Не прати<\/b>, огласи су дозвољени.",
     "description": "English: Notifications -> This page respects Do Not Track, Ads are allowed."
   },
   "adnNotificationDNTHidingNotClicking": {
-    "message": "Ова страница поштује <b>Не прати</b>, сакивање, не кликтање.",
+    "message": "Ова страница поштује <b>Не прати<\/b>, сакивање, не кликтање.",
     "description": "English: Notifications -> This page respects Do Not Track, hiding not clicking."
   },
   "adnNotificationDNTClickingNotHiding": {
-    "message": "Ова страница поштује <b>Не прати</b>, кликћући, не сакривајући",
+    "message": "Ова страница поштује <b>Не прати<\/b>, кликћући, не сакривајући",
     "description": "English: Notifications -> This page respects Do Not Track, clicking not hiding."
   },
   "adnNotificationDNTJustSoYouKnow": {
-    "message": "Ова страница поштује <b>Не прати</b>, само да знате.",
+    "message": "Ова страница поштује <b>Не прати<\/b>, само да знате.",
     "description": "English: Notifications -> This page respects Do Not Track, just so you know."
   },
   "adnNotificationShowAdsDebug": {
-    "message": "The Advanced Setting \"Show Ads Debug\" is turned on",
+    "message": "Напредно подешавање \"Прикажи дебаговање рекламе\" је угашено",
     "description": "English: Notifications -> The Advanced Setting \"Show Ads Debug\" is turned on"
+  },
+  "adnNewerVersionAvailableNotification": {
+    "message": "Нова верзија АдНаусеам је доступна",
+    "description": "English: Notifications -> A newer version of AdNauseam is available"
   },
   "adnTarget": {
     "message": "МЕТА",
@@ -153,7 +157,7 @@
   },
   "adnPausedOnPage": {
     "message": "АдНаузеам је паузиран на овој страници",
-    "description": "English: Menu->display when paused on page/site"
+    "description": "English: Menu->display when paused on page\/site"
   },
   "adnNotHiding": {
     "message": "АдНаузеам тренутно не сакрива огласе",
@@ -168,35 +172,35 @@
     "description": "appears in ADN vault, above ad slider"
   },
   "topAdnetworks": {
-    "message": "Top Ad Networks",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "Топ Мреже Реклама",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "topSites": {
-    "message": "Top Sites",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "Топ Странице",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypes": {
     "message": "Тип Огласа",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesImageAds": {
-    "message": "Image Ads",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "Сликовне ркеламе",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesTextAds": {
     "message": "Tекстуалне рекламе",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adnShowingRecentAds": {
     "message": "Огласи нису прикупљени на овој страници (приказује недавне)",
     "description": "shown in menu when only 'recent' Ads are shown"
   },
   "adnThisPageStrictBlocked": {
-    "message": "{{domain}} is currently strict-blocked.",
+    "message": "{{domain}} је тренутно строго блокиран",
     "description": "shown in menu when the current page is strict-blocked"
   },
   "adnStrictBlockListDescription": {
-    "message": "The strict-block list serves to help the users to strict-block specific domains or pages more easily.",
+    "message": "Ова строги-блок листа служи да помогне корисницима да лакше строго блокирају домене или странице.",
     "description": "Description on the strict-block list tab, which is found on the dashboard"
   },
   "adnExportedAdsFilename": {
@@ -216,7 +220,7 @@
     "description": "appears in ADN settings"
   },
   "adnPurgeConfirm": {
-    "message": "This action will permanently remove all ads with load image error. Make sure your internet is connected, otherwise all your ads will be deleted.",
+    "message": "Ова акција ће трајно уклонити све рекламе за које слика не може бити учитана. Добра је идеја да направите резервну копију трезора прије уклањања, као и да потврдите да имате активну интернет конекцију.",
     "description": "appears in ADN settings"
   },
   "adnAdClickingStatusPending": {
@@ -268,23 +272,23 @@
     "description": "appears in ADN popup menu three state button"
   },
   "adnMenuDisable": {
-    "message": "Disable",
+    "message": "Онемогући",
     "description": "Disabled Adnauseam -> appears in ADN popup menu three state button"
   },
   "adnMenuActive": {
-    "message": "Active",
+    "message": "Активно",
     "description": "Make Adnauseam Active -> appears in ADN popup menu three state button"
   },
   "adnMenuStrict": {
-    "message": "Strict",
+    "message": "Строго",
     "description": "Activate Strict-Block -> appears in ADN popup menu three state button"
   },
   "adnMenuDisableScopeDomain": {
-    "message": "on {{domain}}",
+    "message": "на {{domain}}",
     "description": "Disable AdNaueam Block On this Domain -> Popup option that appears inside ADN menu"
   },
   "adnMenuDisableScopePage": {
-    "message": "on this page",
+    "message": "на овој страници",
     "description": "Disable AdNaueam Block On This Page -> Popup option that appears inside ADN menu"
   },
   "adnMenuSettings": {
@@ -356,8 +360,20 @@
     "description": "appears on vault page"
   },
   "adnPurgeDeadAds": {
-    "message": "Purge Dead Ads",
+    "message": "Уништи Угашене Рекламе",
     "description": "appears on vault page"
+  },
+  "adnShowDeadAds": {
+    "message": "Прикажи угашене рекламе",
+    "description": "appears on vault page"
+  },
+  "adnHideDeadAds": {
+    "message": "Сакриј Угашене Рекламе",
+    "description": "appears on vault page"
+  },
+  "adnCaptureVault": {
+    "message": "Ухвати",
+    "description": "appears on vault page in dev mode"
   },
   "adnVaultFound": {
     "message": "{{total}} огласи прикупљени",
@@ -475,32 +491,64 @@
     "message": "Ажурирај",
     "description": "English: update"
   },
+  "adnUpdateButton": {
+    "message": "Ажурирај",
+    "description": "English: update"
+  },
   "whitelistPageName": {
     "message": "Беле листе",
     "description": "appears as tab name in dashboard"
   },
   "strictBlockListPageName": {
-    "message": "Strict-Block List",
+    "message": "Листа строго блокираних",
     "description": "appears as tab name in dashboard"
   },
   "eventLoggingPrompt": {
-    "message": "Активирајте режим да отклањање грешака",
+    "message": "Режим за дебаговање",
     "description": "prompt for toggle"
   },
   "disableWarnings": {
-    "message": "Disable warnings",
+    "message": "Онемогући упозорења",
     "description": "English:Disable warnings"
   },
+  "blurCollectedAds": {
+    "message": "Замути колектоване рекламе",
+    "description": "English: Blur Collected ads"
+  },
+  "hideDeadAds": {
+    "message": "Сакриј Угашене рекламе",
+    "description": "English: Hide Dead ads"
+  },
   "showAdsDebugPrompt": {
-    "message": "Show ads for ad-collection debugging",
+    "message": "Прикажи рекламе за дебаговање колекција ркелама",
     "description": "English: Show ads for ad-collection debugging"
   },
   "removeAdsInPrivate": {
-    "message": "Remove ads collected in private mode",
+    "message": "Уклони рекламе колектоване у приватном режиму",
     "description": "English:Remove ads collected in private mode - settings page"
   },
   "settingsStrictBlockingMode": {
-    "message": "Activate Strict-Blocking Mode",
+    "message": "Активирај режим строгог блокирања",
     "description": "English: Activate Strict-Blocking Mode"
+  },
+  "adnRefreshButton": {
+    "message": "Освежи",
+    "description": "English: refresh page from menu notification button"
+  },
+  "adnRefreshNotification": {
+    "message": "Примени измене на тренутну страницу",
+    "description": "English: refresh page from menu notification"
+  },
+  "supportS6P3S1": {
+    "message": "Уверите се да је овај проблем  <b> стецифичан за АдНаусеам <\/b>.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P3S2": {
+    "message": "Тестирао сам исту страницу на <a url='https:\/\/github.com\/gorhill\/uBlock'>#uBO#<\/a> и потврдио да је проблем <b>специфичан за АдНаусеам<\/b>.",
+    "description": "A checkbox in the filter issue reporter section"
+  },
+  "supportS6Select1Option7": {
+    "message": "Рекламе нису прикупљене",
+    "description": "Ads are present on page but none are collected"
   }
 }

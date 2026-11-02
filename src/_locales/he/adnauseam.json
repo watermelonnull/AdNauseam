@@ -36,15 +36,15 @@
     "description": "Message asking user to confirm reset"
   },
   "adnFirstRunHideAllAdsDescription": {
-    "message": "הסתר פרסומות על פי <span>רשימת המסננים</span> אשר בחרת",
+    "message": "הסתר פרסומות על פי <span>רשימת המסננים<\/span> אשר בחרת",
     "description": "English: Firstrun.html -> Hide Ads in your selected filter lists"
   },
   "adnFirstRunClickingAdsDescription": {
-    "message": "תעד ביקורים בפרסומות אשר נמצאו על ידי <span>רשימת המסננים</span> אשר בחרת",
+    "message": "תעד ביקורים בפרסומות אשר נמצאו על ידי <span>רשימת המסננים<\/span> אשר בחרת",
     "description": "English: Firstrun.html -> Register visits on Ads found via your filter lists"
   },
   "adnFirstRunBlockingMalwareDescription": {
-    "message": "חסום טראקרים ותוכנות זדוניות אחרות (<span>customize</span>)",
+    "message": "חסום טראקרים ותוכנות זדוניות אחרות (<span>customize<\/span>)",
     "description": "English: Firstrun.html -> Block trackers and other malware (customize)"
   },
   "adnNotificationReactivate": {
@@ -96,24 +96,28 @@
     "description": "English: Notifications -> You have allowed adnauseam to have access to your online activities while private browsing."
   },
   "adnNotificationDNTAllowed": {
-    "message": "דף זה מכבד <b>אל תעקוב</b>, פרסומות מאופשרות.",
+    "message": "דף זה מכבד <b>אל תעקוב<\/b>, פרסומות מאופשרות.",
     "description": "English: Notifications -> This page respects Do Not Track, Ads are allowed."
   },
   "adnNotificationDNTHidingNotClicking": {
-    "message": "דף זה מכבד <b>אל תעקוב</b>, מסתיר, לא לוחץ.",
+    "message": "דף זה מכבד <b>אל תעקוב<\/b>, מסתיר, לא לוחץ.",
     "description": "English: Notifications -> This page respects Do Not Track, hiding not clicking."
   },
   "adnNotificationDNTClickingNotHiding": {
-    "message": "דף זה מכבד <b>אל תעקוב</b>, לוחץ, לא מסתיר.",
+    "message": "דף זה מכבד <b>אל תעקוב<\/b>, לוחץ, לא מסתיר.",
     "description": "English: Notifications -> This page respects Do Not Track, clicking not hiding."
   },
   "adnNotificationDNTJustSoYouKnow": {
-    "message": "דף זה מכבד <b>אל תעקוב</b>, לידיעתך.",
+    "message": "דף זה מכבד <b>אל תעקוב<\/b>, לידיעתך.",
     "description": "English: Notifications -> This page respects Do Not Track, just so you know."
   },
   "adnNotificationShowAdsDebug": {
     "message": "The Advanced Setting \"Show Ads Debug\" is turned on",
     "description": "English: Notifications -> The Advanced Setting \"Show Ads Debug\" is turned on"
+  },
+  "adnNewerVersionAvailableNotification": {
+    "message": "A newer version of AdNauseam is available",
+    "description": "English: Notifications -> A newer version of AdNauseam is available"
   },
   "adnTarget": {
     "message": "יעד",
@@ -153,7 +157,7 @@
   },
   "adnPausedOnPage": {
     "message": "AdNauseam מושהה בדף זה",
-    "description": "English: Menu->display when paused on page/site"
+    "description": "English: Menu->display when paused on page\/site"
   },
   "adnNotHiding": {
     "message": "AdNauseam כרגע לא מסתיר פרסומות",
@@ -169,30 +173,30 @@
   },
   "topAdnetworks": {
     "message": "Top Ad Networks",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "topSites": {
     "message": "אתרים מובילים",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypes": {
     "message": "סוגי פרסומות",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesImageAds": {
     "message": "מודעות תמונה",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesTextAds": {
     "message": "מודעות טקסט",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adnShowingRecentAds": {
     "message": "אין פרסומות שנאספו בדף זה (מראה אחרונות)",
     "description": "shown in menu when only 'recent' Ads are shown"
   },
   "adnThisPageStrictBlocked": {
-    "message": "{{domain}} is currently strict-blocked.",
+    "message": "{{domain}} כרגע חסום",
     "description": "shown in menu when the current page is strict-blocked"
   },
   "adnStrictBlockListDescription": {
@@ -216,7 +220,7 @@
     "description": "appears in ADN settings"
   },
   "adnPurgeConfirm": {
-    "message": "This action will permanently remove all ads with load image error. Make sure your internet is connected, otherwise all your ads will be deleted.",
+    "message": "This action will permanently remove all ads for which the image cannot be loaded. It is a good idea to backup your vault before purging, and also to make sure you have an active internet connection.",
     "description": "appears in ADN settings"
   },
   "adnAdClickingStatusPending": {
@@ -359,6 +363,18 @@
     "message": "Purge Dead Ads",
     "description": "appears on vault page"
   },
+  "adnShowDeadAds": {
+    "message": "Show Dead Ads",
+    "description": "appears on vault page"
+  },
+  "adnHideDeadAds": {
+    "message": "Hide Dead Ads",
+    "description": "appears on vault page"
+  },
+  "adnCaptureVault": {
+    "message": "Capture",
+    "description": "appears on vault page in dev mode"
+  },
   "adnVaultFound": {
     "message": "{{total}} פרסומות שנאספו",
     "description": "appears on vault page"
@@ -475,6 +491,10 @@
     "message": "עדכן",
     "description": "English: update"
   },
+  "adnUpdateButton": {
+    "message": "Update",
+    "description": "English: update"
+  },
   "whitelistPageName": {
     "message": "רשימת מורשים",
     "description": "appears as tab name in dashboard"
@@ -484,12 +504,20 @@
     "description": "appears as tab name in dashboard"
   },
   "eventLoggingPrompt": {
-    "message": "הפעל מצב איתור באגים",
+    "message": "Debug mode",
     "description": "prompt for toggle"
   },
   "disableWarnings": {
     "message": "Disable warnings",
     "description": "English:Disable warnings"
+  },
+  "blurCollectedAds": {
+    "message": "Blur Collected ads",
+    "description": "English: Blur Collected ads"
+  },
+  "hideDeadAds": {
+    "message": "Hide Dead ads",
+    "description": "English: Hide Dead ads"
   },
   "showAdsDebugPrompt": {
     "message": "Show ads for ad-collection debugging",
@@ -502,5 +530,25 @@
   "settingsStrictBlockingMode": {
     "message": "Activate Strict-Blocking Mode",
     "description": "English: Activate Strict-Blocking Mode"
+  },
+  "adnRefreshButton": {
+    "message": "Refresh",
+    "description": "English: refresh page from menu notification button"
+  },
+  "adnRefreshNotification": {
+    "message": "Apply changes on current page",
+    "description": "English: refresh page from menu notification"
+  },
+  "supportS6P3S1": {
+    "message": "Make sure this issue is <b>AdNauseam-specific<\/b>.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P3S2": {
+    "message": "I have tested the same web-page on <a url='https:\/\/github.com\/gorhill\/uBlock'>#uBO#<\/a> and confirm this issue is <b>AdNauseam-specific<\/b>.",
+    "description": "A checkbox in the filter issue reporter section"
+  },
+  "supportS6Select1Option7": {
+    "message": "Ads not collected",
+    "description": "Ads are present on page but none are collected"
   }
 }

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<!--
+
+Requires a local server in the root of the AdNauseam repo:
+python3 -m http.server
+
+Then load the following URL in the browser:
+http://localhost:8000/tools/adn-parser-tests.html
+
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AdNauseam: parser tests</title>
+<link rel="stylesheet" href="../src/lib/qunit/qunit-git.css">
+</head>
+<body>
+<div id="qunit"></div>
+<div id="qunit-fixture"></div>
+
+<script src="../src/lib/qunit/qunit-git.js"></script>
+<script type="module" src="./adn-parser-tests.js"></script>
+</body>
+</html>

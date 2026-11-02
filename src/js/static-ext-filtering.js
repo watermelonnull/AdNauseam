@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2017-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,14 +19,9 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-'use strict';
-
-/******************************************************************************/
-
 import cosmeticFilteringEngine from './cosmetic-filtering.js';
 import htmlFilteringEngine from './html-filtering.js';
 import httpheaderFilteringEngine from './httpheader-filtering.js';
-import io from './assets.js';
 import logger from './logger.js';
 import scriptletFilteringEngine from './scriptlet-filtering.js';
 
@@ -95,26 +90,25 @@ staticExtFilteringEngine.freeze = function() {
 };
 
 staticExtFilteringEngine.compile = function(parser, writer) {
-    if ( parser.category !== parser.CATStaticExtFilter ) { return false; }
+    if ( parser.isExtendedFilter() === false ) { return false; }
 
-    if ( (parser.flavorBits & parser.BITFlavorUnsupported) !== 0 ) {
-        const who = writer.properties.get('name') || '?';
+    if ( parser.hasError() ) {
         logger.writeOne({
             realm: 'message',
             type: 'error',
-            text: `Invalid extended filter in ${who}: ${parser.raw}`
+            text: `Invalid extended filter in ${writer.properties.get('name') || '?'}: ${parser.raw}`
         });
         return true;
     }
 
     // Scriptlet injection
-    if ( (parser.flavorBits & parser.BITFlavorExtScriptlet) !== 0 ) {
+    if ( parser.isScriptletFilter() ) {
         scriptletFilteringEngine.compile(parser, writer);
         return true;
     }
 
     // Response header filtering
-    if ( (parser.flavorBits & parser.BITFlavorExtResponseHeader) !== 0 ) {
+    if ( parser.isResponseheaderFilter() ) {
         httpheaderFilteringEngine.compile(parser, writer);
         return true;
     }
@@ -122,27 +116,23 @@ staticExtFilteringEngine.compile = function(parser, writer) {
     // HTML filtering
     // TODO: evaluate converting Adguard's `$$` syntax into uBO's HTML
     //       filtering syntax.
-    if ( (parser.flavorBits & parser.BITFlavorExtHTML) !== 0 ) {
+    if ( parser.isHtmlFilter() ) {
         htmlFilteringEngine.compile(parser, writer);
         return true;
     }
 
     // Cosmetic filtering
-    cosmeticFilteringEngine.compile(parser, writer);
-    return true;
-};
+    if ( parser.isCosmeticFilter() ) {
+        cosmeticFilteringEngine.compile(parser, writer);
+        return true;
+    }
 
-staticExtFilteringEngine.compileTemporary = function(parser) {
-    if ( (parser.flavorBits & parser.BITFlavorExtScriptlet) !== 0 ) {
-        return scriptletFilteringEngine.compileTemporary(parser);
-    }
-    if ( (parser.flavorBits & parser.BITFlavorExtResponseHeader) !== 0 ) {
-        return httpheaderFilteringEngine.compileTemporary(parser);
-    }
-    if ( (parser.flavorBits & parser.BITFlavorExtHTML) !== 0 ) {
-        return htmlFilteringEngine.compileTemporary(parser);
-    }
-    return cosmeticFilteringEngine.compileTemporary(parser);
+    logger.writeOne({
+        realm: 'message',
+        type: 'error',
+        text: `Unknown extended filter in ${writer.properties.get('name') || '?'}: ${parser.raw}`
+    });
+    return true;
 };
 
 staticExtFilteringEngine.fromCompiledContent = function(reader, options) {
@@ -152,32 +142,24 @@ staticExtFilteringEngine.fromCompiledContent = function(reader, options) {
     htmlFilteringEngine.fromCompiledContent(reader, options);
 };
 
-staticExtFilteringEngine.toSelfie = function(path) {
-    return io.put(
-        `${path}/main`,
-        JSON.stringify({
-            cosmetic: cosmeticFilteringEngine.toSelfie(),
-            scriptlets: scriptletFilteringEngine.toSelfie(),
-            httpHeaders: httpheaderFilteringEngine.toSelfie(),
-            html: htmlFilteringEngine.toSelfie(),
-        })
-    );
+staticExtFilteringEngine.toSelfie = function() {
+    return {
+        cosmetic: cosmeticFilteringEngine.toSelfie(),
+        scriptlets: scriptletFilteringEngine.toSelfie(),
+        httpHeaders: httpheaderFilteringEngine.toSelfie(),
+        html: htmlFilteringEngine.toSelfie(),
+    };
 };
 
-staticExtFilteringEngine.fromSelfie = function(path) {
-    return io.get(`${path}/main`).then(details => {
-        let selfie;
-        try {
-            selfie = JSON.parse(details.content);
-        } catch (ex) {
-        }
-        if ( selfie instanceof Object === false ) { return false; }
-        cosmeticFilteringEngine.fromSelfie(selfie.cosmetic);
-        scriptletFilteringEngine.fromSelfie(selfie.scriptlets);
-        httpheaderFilteringEngine.fromSelfie(selfie.httpHeaders);
-        htmlFilteringEngine.fromSelfie(selfie.html);
-        return true;
-    });
+staticExtFilteringEngine.fromSelfie = async function(selfie) {
+    if ( typeof selfie !== 'object' || selfie === null ) { return false; }
+    cosmeticFilteringEngine.fromSelfie(selfie.cosmetic);
+    httpheaderFilteringEngine.fromSelfie(selfie.httpHeaders);
+    htmlFilteringEngine.fromSelfie(selfie.html);
+    if ( scriptletFilteringEngine.fromSelfie(selfie.scriptlets) === false ) {
+        return false;
+    }
+    return true;
 };
 
 /******************************************************************************/

@@ -16,7 +16,7 @@
     "description": "A warning in the dashboard when navigating away from unsaved changes"
   },
   "dashboardUnsavedWarningStay": {
-    "message": "Baki",
+    "message": "Kaa hapa",
     "description": "Label for button to prevent navigating away from unsaved changes"
   },
   "dashboardUnsavedWarningIgnore": {
@@ -220,7 +220,7 @@
     "description": "Tooltip when hovering the top-most cell of the global-rules column."
   },
   "popupTipLocalRules": {
-    "message": "Kanuni za ndani: safuwima hii ni ya kanuni zinazotekelezeka kwenye tovuti ya sasa pekee.\nKanuni za ndani hubatilisha kanuni za kila mahali.",
+    "message": "Kanuni za ndani: safuwima hii ni ya kanuni zinazotekelezeka kwenye tovuti ya sasa pekee.",
     "description": "Tooltip when hovering the top-most cell of the local-rules column."
   },
   "popupTipSaveRules": {
@@ -275,13 +275,13 @@
     "message": "Toleo",
     "description": "Example of use: Version 1.26.4"
   },
-  "popup3pScriptFilterTip": {
-    "message": "Sisitiza safumlalo zilizo na hati za 3rd-party",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party scripts' cell"
+  "popup3pScriptFilter": {
+    "message": "hati",
+    "description": "Appears as an option to filter out firewall rows"
   },
-  "popup3pFrameFilterTip": {
-    "message": "Sisitiza safumlalo zilizo na fremu 3rd-party",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party frames' cell"
+  "popup3pFrameFilter": {
+    "message": "fremu",
+    "description": "Appears as an option to filter out firewall rows"
   },
   "pickerCreate": {
     "message": "Unda",
@@ -469,35 +469,43 @@
   },
   "3pGroupDefault": {
     "message": "Vijengwa ndani",
-    "description": "Header for the uBlock filters section in 'Filter lists pane'"
+    "description": "Filter lists section name"
   },
   "3pGroupAds": {
     "message": "Mtngzo",
-    "description": "English: Ads"
+    "description": "Filter lists section name"
   },
   "3pGroupPrivacy": {
     "message": "Faragha",
-    "description": "English: Privacy"
+    "description": "Filter lists section name"
   },
   "3pGroupMalware": {
-    "message": "Vikoa vya programu hasidi",
-    "description": "English: Malware domains"
+    "message": "Ulinzi wa programu hasidi, usalama",
+    "description": "Filter lists section name"
+  },
+  "3pGroupSocial": {
+    "message": "Wijeti za kijamii",
+    "description": "Filter lists section name"
+  },
+  "3pGroupCookies": {
+    "message": "Arifa za kuki",
+    "description": "Filter lists section name"
   },
   "3pGroupAnnoyances": {
     "message": "Vikasirisho",
-    "description": "The header identifying the filter lists in the category 'annoyances'"
+    "description": "Filter lists section name"
   },
   "3pGroupMultipurpose": {
     "message": "\nVya anuwai",
-    "description": "English: Multipurpose"
+    "description": "Filter lists section name"
   },
   "3pGroupRegions": {
     "message": "Mikoa, lugha",
-    "description": "English: Regions, languages"
+    "description": "Filter lists section name"
   },
   "3pGroupCustom": {
     "message": "Inayokufaa",
-    "description": "English: Custom"
+    "description": "Filter lists section name"
   },
   "3pImport": {
     "message": "Leta...",
@@ -527,17 +535,25 @@
     "message": "Tatizo la mtandao imezuia rasilimali kusasishwa.",
     "description": "used as a tooltip for error icon beside a list"
   },
-  "1pFormatHint": {
-    "message": "Chujia moja kila laini. Chujio inaweza kuwa kuwa jina pangishi (hostname), au chujio linalotumika na Adblock Plus. Laini zilizo na viambishi awali za <code>!</code> zitapuuzwa.",
-    "description": "Short information about how to create custom filters"
+  "1pTrustWarning": {
+    "message": "Usiongeze vichujio kutoka kwa vyanzo visivyoaminika.",
+    "description": "Warning against copy-pasting filters from random sources"
+  },
+  "1pEnableMyFiltersLabel": {
+    "message": "Washa vichujio vyangu maalum",
+    "description": "Label for the checkbox use to enable/disable 'My filters' list"
+  },
+  "1pTrustMyFiltersLabel": {
+    "message": "Ruhusu vichujio maalum vinavyohitaji uaminifu",
+    "description": "Label for the checkbox use to trust the content of 'My filters' list"
   },
   "1pImport": {
-    "message": "Leta na ambatisha",
-    "description": "English: Import and append"
+    "message": "Leta na ambatisha…",
+    "description": "Button in the 'My filters' pane"
   },
   "1pExport": {
     "message": "Hamisha",
-    "description": "English: Export"
+    "description": "Button in the 'My filters' pane"
   },
   "1pExportFilename": {
     "message": "chujio-zangu-tuli-za-ublock_{{datetime}}.txt",
@@ -580,8 +596,8 @@
     "description": ""
   },
   "rulesExport": {
-    "message": "Hamisha kuenda faili",
-    "description": ""
+    "message": "Hamisha kuenda faili…",
+    "description": "Button in the 'My rules' pane"
   },
   "rulesDefaultFileName": {
     "message": "chujio-zangu-badilifu-za-ublock_{{datetime}}.txt",
@@ -616,12 +632,12 @@
     "description": "A concise description of the 'Trusted sites' pane."
   },
   "whitelistImport": {
-    "message": "Leta na ambatisha",
-    "description": "English: Import and append"
+    "message": "Leta na ambatisha…",
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExport": {
     "message": "Hamisha",
-    "description": "English: Export"
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExportFilename": {
     "message": "orodhakubalizi-yangu-ya-ublock_{{datetime}}.txt",
@@ -881,11 +897,11 @@
   },
   "supportOpenButton": {
     "message": "Fungua",
-    "description": "Text for button which open an external webpage in Support pane"
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportReportSpecificButton": {
     "message": "Unda ripoti mpya",
-    "description": "Text for button which open an external webpage in Support pane"
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportFindSpecificButton": {
     "message": "Pata ripoti sawia",
@@ -939,16 +955,20 @@
     "message": "Ifuatayo ni taarifa ya kiteknolojia inayoweza kuwa ya manufaa wakati waliojitolea wakijaribu kukusaidia.",
     "description": "First paragraph of 'Troubleshooting Information' section in Support pane"
   },
-  "supportS5P2": {
-    "message": "<b>Muhimu:</b> Taarifa inayoweza kuwa nyeti hutolewa, kama chaguo-msingi. Taarifa iliyotolewa huenda ikanya utatuzi wa shide iwe ngumu zaidi.",
-    "description": "Second paragraph of 'Troubleshooting Information' section in Support pane"
-  },
   "supportS6H": {
     "message": "Ripoti shida ya kichujio",
     "description": "Header of 'Report a filter issue' section in Support pane"
   },
   "supportS6P1S1": {
     "message": "Ili usiwasumbue wasaidizi waliojitolea kwa ripoti rudufu, tafadhali hakikisha kuwa shida haijaripotiwa bado.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S1": {
+    "message": "Orodha za vichujio husasishwa kila siku. Hakikisha suala lako bado halijashughulikiwa katika orodha za hivi majuzi za vichujio.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S2": {
+    "message": "Thibitisha kuwa suala bado lipo baada ya kupakia upya ukurasa wa wavuti wenye matatizo.",
     "description": "A paragraph in the filter issue reporter section"
   },
   "supportS6URL": {
@@ -987,17 +1007,13 @@
     "message": "Hufungua vichupo au vidirisha visivyotakikana",
     "description": "An entry in the widget used to select the type of issue"
   },
+  "supportS6Select1Option7": {
+    "message": "Husababisha badware, hadaa",
+    "description": "An entry in the widget used to select the type of issue"
+  },
   "supportS6Checkbox1": {
     "message": "Ipe tovuti lebo ya \"NSFW\" (<a href=\"https://wikipedia.org/wiki/Not_safe_for_work\">\"Haifai Kazini\"</a>)",
     "description": "A checkbox to use for NSFW sites"
-  },
-  "supportRedact": {
-    "message": "Redact",
-    "description": "Text for 'Redact' button"
-  },
-  "supportUnredact": {
-    "message": "Unredact",
-    "description": "Text for 'Unredact' button"
   },
   "aboutPrivacyPolicy": {
     "message": "Sera ya faragha",
@@ -1040,7 +1056,7 @@
     "description": "Shown in the About pane"
   },
   "aboutBackupDataButton": {
-    "message": "Cheleza kwenye faili",
+    "message": "Cheleza kwenye faili…",
     "description": "Text for button to create a backup of all settings"
   },
   "aboutBackupFilename": {
@@ -1070,10 +1086,6 @@
   "errorCantConnectTo": {
     "message": "Tatizo la mtandao: {{msg}}",
     "description": "English: Network error: {{msg}}"
-  },
-  "subscriberConfirm": {
-    "message": "uBlock₀: Ongeza URL ifuatayo kwenye orodha za uchujaji zinazokufaa?\n\nKicha: \"{{title}}\"\nURL: {{url}}",
-    "description": "No longer used"
   },
   "subscribeButton": {
     "message": "Jisajili",
@@ -1116,7 +1128,7 @@
     "description": "Firefox-specific: appears as 'uBlock₀ (off)'"
   },
   "docblockedTitle": {
-    "message": "Page blocked",
+    "message": "Ukurasa umezuiwa",
     "description": "Used as a title for the document-blocked page"
   },
   "docblockedPrompt1": {
@@ -1144,7 +1156,7 @@
     "description": "English: Close this window"
   },
   "docblockedDontWarn": {
-    "message": "Don't warn me again about this site",
+    "message": "Usinionye tena kuhusu tovuti hii",
     "description": "Label for checkbox in document-blocked page"
   },
   "docblockedProceed": {
@@ -1160,8 +1172,28 @@
     "description": "English: Permanently"
   },
   "docblockedDisable": {
-    "message": "Proceed",
+    "message": "Endelea",
     "description": "Button text to navigate to the blocked page"
+  },
+  "docblockedRedirectPrompt": {
+    "message": "Ukurasa uliozuiwa unataka kuelekeza kwenye tovuti nyingine. Ukichagua kuendelea, utaelekeza moja kwa moja hadi: {{url}}",
+    "description": "Text warning about an incoming redirect"
+  },
+  "docblockedReasonLabel": {
+    "message": "Sababu:",
+    "description": "The label which prepend the actual reason why a page was blocked"
+  },
+  "docblockedReasonMalicious": {
+    "message": "Hatari",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonTracker": {
+    "message": "Mfuatiliaji",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonDisreputable": {
+    "message": "Asiyeheshimika",
+    "description": "An actual reason why a page was blocked"
   },
   "cloudPush": {
     "message": "Hamisha hadi hifadhi ya wingu",
@@ -1215,6 +1247,10 @@
     "message": "Ruhusu kwa muda vipengele vya midia kubwa",
     "description": "A context menu entry, present when large media elements have been blocked on the current site"
   },
+  "contextMenuViewSource": {
+    "message": "Tazama msimbo wa chanzo…",
+    "description": "A context menu entry, to view the source code of the target resource"
+  },
   "shortcutCapturePlaceholder": {
     "message": "Charaza njiamkato",
     "description": "Placeholder string for input field used to capture a keyboard shortcut"
@@ -1232,8 +1268,12 @@
     "description": "Label for buttons used to select all text in editor"
   },
   "toggleCosmeticFiltering": {
-    "message": "Toggle cosmetic filtering",
+    "message": "Geuza uchujaji wa vipodozi",
     "description": "Label for keyboard shortcut used to toggle cosmetic filtering"
+  },
+  "toggleJavascript": {
+    "message": "Geuza JavaScript",
+    "description": "Label for keyboard shortcut used to toggle no-scripting switch"
   },
   "relaxBlockingMode": {
     "message": "Pumzisha mtindo wa kuzuia",
@@ -1258,6 +1298,14 @@
   "clickToLoad": {
     "message": "Bofya kupakia",
     "description": "Message used in frame placeholders"
+  },
+  "linterMainReport": {
+    "message": "Makosa: {{count}}",
+    "description": "Summary of number of errors as reported by the linter "
+  },
+  "unprocessedRequestTooltip": {
+    "message": "Haikuweza kuchuja vizuri wakati wa kuzindua kivinjari.\nAnzisha upya ukurasa huu ili kuhakikisha uchujaji unaofaa.",
+    "description": "A warning which will appear in the popup panel if needed"
   },
   "dummy": {
     "message": "This entry must be the last one",

@@ -1,7 +1,7 @@
 /*******************************************************************************
 
     AdNauseam - Fight back against advertising surveillance.
-    Copyright (C) 2014-2021 Daniel C. Howe
+    Copyright (C) 2014-2024 Daniel C. Howe
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -189,6 +189,12 @@
       var site = div.querySelector('[data-dtld]')?.getAttribute('data-dtld')
       var href = div.querySelector('[data-rw]')?.getAttribute('href') 
 
+      // local (store) ads carry no display url, use the target domain instead
+      // (the href may be page-relative, e.g. /goto?url=..., so resolve it first)
+      if (!site?.length && href?.length) {
+        try { site = parseDomain(new URL(href, document.baseURI).href, true) } catch { /* malformed href */ }
+      }
+
       if (text?.length && site?.length && title?.length && href?.length) {
         ad = vAPI.adParser.createAd('google', href, {
           title: title,
@@ -197,7 +203,7 @@
         });
 
       } else {
-        console.warn('[TEXTADS] googleTextHandler.fail: ', title, text, site);
+        console.warn('[TEXTADS] googleTextHandler.fail: ', title, text, site, href);
       }
 
       return [ad];
@@ -322,13 +328,51 @@
       return ads
     }
 
+    const startpageAdsText = function (div) {
+
+      var ads = []
+
+      if (div == null || div == undefined) return
+      
+      const titleElement = div.querySelector(".div.si40")
+      const linkElement = div.querySelector(".a.si28")
+      const textElement = div.querySelector(".span.si29 ")
+      const siteElement = div.querySelector(".a.si28")
+
+      if (titleElement && linkElement && textElement && siteElement) {
+        var link = linkElement.href
+        var site = $text(siteElement)
+        var title = $text(titleElement)
+        var text = $text(textElement)
+
+        const ad = vAPI.adParser.createAd('startpage', link, {
+          site: site,
+          title: title,
+          text: text
+        });
+
+        console.log("[TEXTAD]", ad);
+
+        ads.push(ad);
+      } else {
+
+        console.warn('[TEXTADS] startpageAdsTextHandler.fail: ', divs[i]); //title, site, text);
+      }
+      return ads
+    }
+
     var youtubeAds = function (div) {
 
       var ad, target, src,
           banner = $find(div, '#banner'),
           title = $find(div,'#title');
 
-     src = div.style.cssText.match(/url\((.*?)\)/)[1];
+     src = div.style.cssText.match(/url\((.*?)\)/)
+     if (src && src.length > 1) {
+      src = src[1]
+     } else {
+      return
+    }
      var parsed = src.replace(/\\/g,"");
 
      if (banner.length) {
@@ -435,7 +479,7 @@
       name: 'yahoo',
       domain: /^.*\.yahoo\.com/i
     }, {
-      selector: 'li.ad_scpa, li.adsMvC, li.adsMvE, li.ad_sc',
+      selector: 'div.sb_add, li.b_ad, li.ad_scpa, li.adsMvC, li.adsMvE, li.ad_sc',
       handler: bingText,
       name: 'bing',
       domain: /^.*\.bing\.com/i
@@ -459,20 +503,34 @@
       handler: yandexAdsText,
       name: 'yandex ads',
       domain: /^.*yandex\.com/i
+    },{
+      selector: 'div.clicktrackedAd_js',
+      handler: startpageAdsText,
+      name: 'startpage ads',
+      domain: /^.*startpage\.com/i
     }];
+
+    let cachedKey;
+    let activeFilters = [];
 
     const checkFilters = function (elem) {
 
-      const active = filters.filter(function (f) {
-        const domain = (parent !== window) ? parseDomain(document.referrer) : document.domain;
-        const matched = f.domain.test(domain);
-        // if (!matched) console.warn('Domain mismatch: ' + domain + ' != ' + f.domain);
-        return matched;
-      });
+      const inFrame = parent !== window;
+      const key = inFrame ? document.referrer : document.domain;
+      if (key !== cachedKey) {
+        cachedKey = key;
+        let domain;
+        try {
+          domain = inFrame ? parseDomain(key) : key;
+        } catch {
+          // Ignore malformed referrers.
+        }
+        activeFilters = filters.filter(f => f.domain.test(domain));
+      }
 
-      for (let i = 0; i < active.length; i++) {
-        if ($is(elem, active[i].selector)) {
-          return active[i].handler(elem);
+      for (let i = 0; i < activeFilters.length; i++) {
+        if ($is(elem, activeFilters[i].selector)) {
+          return activeFilters[i].handler(elem);
         }
       }
     };

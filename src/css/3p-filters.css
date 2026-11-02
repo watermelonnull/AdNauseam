@@ -7,234 +7,303 @@ body {
 }
 #actions {
     background-color: transparent; /*ADN*/
-    backdrop-filter: blur(2px); /*ADN*/
-    padding: var(--default-gap-small) 0 var(--default-gap-xsmall) 0;
     position: sticky;
     top: 0;
     z-index: 10;
 }
-/*ADN*/
 
-/*
+/* ADN */
 #actions button {
-    background-color: rgba(0, 118, 255,0.2);
     backdrop-filter: blur(5px);
 }
 
-#options .li:nth-child(2), #options .li:nth-child(3){
-    display: none;
-}
-*/
-#options .li:nth-child(1) {
-  margin-left:1em;
-}
 #options .li:nth-child(1) input{
   /* auto-update filter lists */
     margin-right: 0.6em;
 }
-/* ul {
-    list-style-type: none;
-    padding-left: 1em;
-    padding-right: 0;
+
+#buttonUpdate.active {
+    pointer-events: none;
     }
-body[dir="rtl"] ul {
-    padding-left: 0;
-    padding-right: 1em;
+#buttonUpdate.active .fa-icon svg,
+body.working #buttonUpdate:not(.disabled) .fa-icon svg {
+    animation: spin 1s linear infinite;
+    transform-origin: 50%;
     }
-ul.root {
+
+body.updating #actions,
+body.working #actions {
+    cursor: progress;
+    }
+body.updating #actions #buttonUpdate,
+body.working #actions button {
+    pointer-events: none;
+    }
+
+.listExpander {
+    font-size: 18px;
     padding: 0;
-    } */
-#options .li {
-    margin-bottom: 0.5em;
-    margin-left:0 !important;
-}
+    color: var(--info0-ink);
+    fill: var(--info0-ink);
+    }
+.listExpander:first-child {
+    justify-content: flex-start;
+    min-width: 20px;
+    }
+.listExpander:not(:first-child) {
+    color: var(--adn-blue); /* adn blue */
+    fill: var(--adn-blue); /* adn blue */
+    }
+.listExpander svg {
+    transform: rotate(90deg);
+    transform-origin: 50%;
+    }
+
+#lists .fa-icon:hover {
+    transform: scale(1.25);
+    }
+
+#lists .rootstats.expanded .listExpander svg {
+    transform: rotate(180deg);
+    }
+
+#lists .searchfield {
+    margin-block-start: calc(var(--font-size) * 0.75);
+    margin-inline-start: var(--checkbox-size);
+    }
+#lists.searchMode > .listEntries .listEntries,
+#lists.searchMode > .listEntries .listEntry.searchMatch {
+    display: flex !important;
+    }
+#lists.searchMode > .listEntries .listEntry {
+    display: none;
+    }
+#lists.searchMode > .listEntries .listExpander {
+    visibility: hidden;
+    }
+
 #listsOfBlockedHostsPrompt {
     cursor: pointer;
     }
-#listsOfBlockedHostsPrompt:before {
-    color: #888;
-    content: '\2212  ';
-    }
-body.hideUnused #listsOfBlockedHostsPrompt:before {
-    content: '+  ';
-    }
-#lists {
-    margin: 0.5em 0 0 0;
-    padding: 0;
-    }
-#listsOfBlockedHostsPrompt::before,
-.groupEntry:not([data-groupkey="user"]) .geDetails::before {
-    color: var(--ink-3);
-    content: '\2212';
-    font-family: monospace;
-    font-size: large;
-    margin-inline-end: 0.25em;
-    -webkit-margin-end: 0.25em;
-    }
-body.hideUnused #listsOfBlockedHostsPrompt::before,
-.groupEntry.hideUnused:not([data-groupkey="user"]) .geDetails::before {
-    content: '+';
-    }
-.groupEntry {
-    margin: 0.5em 0;
-    }
-.groupEntry .geDetails {
-    cursor: pointer;
-    }
-.groupEntry:not([data-groupkey="user"]) .geDetails:before {
-    color: #888;
-    content: '\2212  ';
-    }
-.groupEntry.hideUnused:not([data-groupkey="user"]) .geDetails:before {
-    content: '+  ';
-    }
-.groupEntry .geName {
-    pointer-events: none;
-    }
-.groupEntry .geCount {
-    color: var(--ink-3);
-    font-size: 90%;
-    pointer-events: none;
-    }
 
-.groupEntry .listEntries {
-    margin: 0.25em 0 0 0;
-    margin-inline-start: 0.6em;
-    -webkit-margin-start: 0.6em;
-}
-
-.listEntry {
-    margin: 0 auto 0 auto;
-    padding: 0.2em 0;
+#lists .listEntries {
+    display: flex;
+    flex-direction: column;
+    margin-inline-start: var(--checkbox-size);
+    }
+#lists > .listEntries {
+    margin-inline-start: 0;
+    }
+#lists .listEntry {
+    align-items: flex-start;
+    flex-direction: column;
+    margin-bottom: 0;
+    margin-inline-start: 0;
     white-space: nowrap;
     }
-.groupEntry:not([data-groupkey="user"]) .listEntry:not(.isDefault).unused {
+#lists .listEntry[data-key="user"] {
+    margin-top: 0;
+    }
+#lists .listEntry > .detailbar {
+    column-gap: calc(var(--default-gap-xxsmall) + 2px);
+    display: inline-flex;
+    position: relative; /* ADN */
+}
+/* ADN - font changes */
+#lists .listEntry[data-parent="root"] > .detailbar {
+    font-size: 120%;
+    font-family: bebas_neue,roboto_flex,noto_sans,sans-serif;
+    font-stretch: 47.5%;
+    font-variation-settings: "opsz" 48, "slnt" 0, "GRAD" 0, "XTRA" 468, "YOPQ" 79, "YTAS" 750, "YTDE" -203, "YTFI" 738, "YTLC" 514, "YTUC" 712;
+}
+/* end of ADN */
+#lists .listEntry[data-key="user"] > .detailbar {
     display: none;
     }
-.listEntry > * {
-    margin-left: 0;
-    margin-right: 0;
-    unicode-bidi: embed;
+#lists .listEntry[data-role="node"].expanded > .detailbar .listExpander svg {
+    transform: rotate(180deg);
     }
-.listEntry.toRemove .checkbox {
-        visibility: hidden;
+#lists .listEntry[data-parent="root"]:not(.expanded) > .listEntries > .listEntry:not(.checked):not(.isDefault):not(.stickied) {
+    display: none;
     }
-.listEntry.toRemove .listname {
-    text-decoration: line-through;
+#lists .listEntry:not([data-parent="root"]):not(.expanded) > .listEntries > .listEntry {
+    display: none;
     }
-.listEntry a,
-.listEntry .fa-icon,
-.listEntry .counts {
+#lists .nodestats {
+    align-self: flex-end;
     color: var(--info0-ink);
         fill: var(--info0-ink);
-    display: none;
+    cursor: default;
+    font-size: var(--font-size-smaller);
+}
+#lists .iconbar {
+    column-gap: var(--default-gap-xxsmall);
+    color: var(--info0-ink);
+        fill: var(--info0-ink);
+    display: inline-flex;
+    flex-direction: row;
     font-size: 120%;
-    margin: 0 0.2em 0 0;
     }
-.listEntry .fa-icon:hover {
-    transform: scale(1.25);
+#lists .iconbar a {
+    color: var(--info0-ink);
+        fill: var(--info0-ink);
     }
-.listEntry .content {
+#lists .iconbar .fa-icon {
+    display: none;
+    }
+#lists .iconbar .content {
     display: inline-flex;
-}
-body:not(.updating) .listEntry.checked.obsolete .obsolete {
+    }
+#lists .iconbar a.towiki {
     display: inline-flex;
-}
-.listEntry .content {
+    }
+#lists .listEntry > .detailbar .iconbar a.support {
     display: inline-flex;
 }
 .listEntry  a.towiki {
     display: inline-block;
     }
-.listEntry .remove,
-.listEntry .unsecure,
-.listEntry .failed {
+#lists .listEntry > .detailbar .iconbar a.support[href="#"] {
+    display: none;
+    }
+#lists .iconbar .remove,
+#lists .iconbar .unsecure,
+#lists .iconbar .failed {
     color: var(--info3-ink);
         fill: var(--info3-ink);
     cursor: pointer;
     }
-.listEntry.external  .remove {
-    display: inline-block;
+#lists .listEntry.external > .detailbar .iconbar .remove {
+    display: inline-flex;
     }
-.listEntry.mustread a.mustread {
+#lists .listEntry > .detailbar .iconbar a.mustread {
     color: var(--info1-ink);
         fill: var(--info1-ink);
     display: inline-flex;
     }
-.listEntry .counts {
-    font-size: smaller;
-}
-.listEntry.checked .counts {
-    display: inline-block;
-}
-.dim {
-    opacity: 0.6;
+#lists .listEntry > .detailbar .iconbar a.mustread[href="#"] {
+    display: none;
     }
+#lists .listEntry .leafstats {
+    align-items: flex-end;
+    color: var(--info0-ink);
+        fill: var(--info0-ink);
+    display: none;
+    font-size: var(--font-size-xsmall);
+    margin-inline-start: calc(var(--checkbox-size) + var(--checkbox-margin-end));
+}
+#lists .listEntry > .detailbar .leafstats {
+    margin-inline-start: 0;
+    }
+#lists .listEntry.checked > .leafstats,
+#lists .listEntry.checked > .detailbar .leafstats {
+    display: inline-flex;
+}
+
+/* Adn */
+.groupEntry {
+    margin: 0.5em 0;
+    }
+.groupEntry .listEntries {
+    margin: 0.25em 0 0 0;
+    margin-inline-start: 0.6em;
+    -webkit-margin-start: 0.6em;
+}
+.listEntry.toRemove .checkbox {
+        visibility: hidden;
+}
+/* end of Adn */
+
 #buttonApply {
     margin-top: 4px; /* Adn */
     margin-bottom: 0px; /* Adn */
 }
-body[dir=rtl] #buttonApply {
-    right: auto;
-    left: 1em;
-    }
-/* #buttonApply.disabled {
-    display: none;
-    } */
+
 li.listEntry span.status {
-    color: #AAA;
+    color: #AAA;  /* Adn */
+}
+
+#lists .iconbar .status {
     cursor: default;
     display: none;
 }
-.listEntry span.status:hover {
-    opacity: 1;
-    }
-.listEntry span.unsecure {
-    color: darkred;
-    }
-.listEntry.checked.unsecure .unsecure {
-        display: inline-flex;
-    }
-.listEntry span.failed {
-    color: darkred;
-    }
-.listEntry.failed span.failed {
-    display: inline-block;
-    }
-.listEntry span.cache {
-    cursor: pointer;
-    }
-.listEntry.checked.cached:not(.obsolete) .cache {
+#lists .listEntry.checked.unsecure > .detailbar .iconbar .unsecure {
     display: inline-flex;
     }
-.listEntry .obsolete {
+#lists .listEntry.failed > .detailbar .iconbar .failed {
+    display: inline-flex;
+    }
+#lists .iconbar .cache {
+    cursor: pointer;
+    }
+/* ADN: the icon next to each list, red = its blocks are kept, purple = they become
+   adn-allows; shown only with the custom option on (My filters always blocks, no icon) */
+body.customBlockLists #lists .listEntry.checked:not([data-key="user-filters"]) > .detailbar .iconbar .adnBlock {
+    cursor: pointer;
+    display: inline-flex;
+    }
+/* its colors, shared with the legend of the option */
+#options .adnBlock,
+#lists .iconbar .adnBlock {
+    color: var(--adn-purple);
+        fill: var(--adn-purple);
+    }
+#options .adnBlock.blockEnabled,
+#lists .listEntry.blockEnabled > .detailbar .iconbar .adnBlock {
+    color: var(--adn-red);
+        fill: var(--adn-red);
+    }
+#lists .listEntry.checked.cached:not(.obsolete) > .detailbar .iconbar .cache {
+    display: inline-flex;
+    }
+#lists .listEntry.cached.recent:not(.obsolete) > .detailbar .iconbar .cache {
+    color: var(--dashboard-happy-green);
+        fill: var(--dashboard-happy-green);
+    }
+#lists .iconbar .obsolete {
     color: var(--info2-ink);
         fill: var(--info2-ink);
     }
-body:not(.updating) .listEntry.checked.obsolete .obsolete {
-        display: inline-flex;
+body:not(.updating,.working) #lists .listEntry.checked.obsolete > .detailbar .iconbar .obsolete {
+    display: inline-flex;
     }
-.listEntry span.updating {
-    transform-origin: 50% 46%;
+#lists .iconbar .updating {
+    transform-origin: 50%;
     }
-body.updating .listEntry.checked.obsolete .updating {
+body.updating #lists .listEntry.checked.obsolete > .detailbar .iconbar .updating,
+body.working #lists .listEntry.checked.obsolete:not(.cached) > .detailbar .iconbar .updating {
     animation: spin 1s steps(8) infinite;
     display: inline-flex;
     }
 .listEntry.toImport.checked textarea {
     visibility: visible;
 }
-.listEntry.toImport textarea {
+
+#lists .listEntry.toRemove .checkbox {
+    visibility: hidden;
+    }
+#lists .listEntry.toRemove .listname {
+    text-decoration: line-through;
+    }
+
+#lists .listEntry[data-role="import"].expanded .listExpander svg {
+    transform: rotate(180deg);
+    }
+#lists .listEntry[data-role="import"].expanded textarea {
+    visibility: visible;
+    }
+#lists .listEntry[data-role="import"] textarea {
     border: 1px solid #ccc;
     box-sizing: border-box;
     display: block;
     font-size: smaller;
     height: 6em;
-    margin-left: 2em;
+    /* margin-left: 2em; ADN */
+    margin-top: 0.5em; /* ADN */
     resize: vertical;
     visibility: hidden;
     white-space: pre;
-    width: calc(100% - 4em);
+    width: 100%;
     color:#DDD;
     background-color:#333;
     overflow: auto;
@@ -244,39 +313,26 @@ body.updating .listEntry.checked.obsolete .updating {
     box-shadow: none;
 }
 
-#actions button:hover .fa-icon svg {
-  fill:black !important;
-}
-#actions .disabled .fa-icon svg{
-  fill:#666; /* Adn */
-}
-#actions .fa-icon svg{
-  fill:#0076FF;
-}
-/* touch-screen devices */
-:root.mobile .listEntry .fa-icon {
+/* Adn changes */
+
+#lists > .groupEntry .listname {
     font-size: 120%;
-    margin: 0 0.5em 0 0;
+    font-family: bebas_neue,roboto_flex,noto_sans,sans-serif; /* ADN */
+    font-stretch: 47.5%; /* ADN */
+    font-variation-settings: "opsz" 48, "slnt" 0, "GRAD" 0, "XTRA" 468, "YOPQ" 79, "YTAS" 750, "YTDE" -203, "YTFI" 738, "YTLC" 514, "YTUC" 712; /* ADN */
     }
-:root.mobile .listEntries {
-    margin-inline-start: 0;
-    -webkit-margin-start: 0;
+#lists > .groupEntry > .geCount {
+    font-size: 90%;
     }
-:root.mobile .li.listEntry {
-    /* background-color: var(--bg-1); */
-    overflow-x: auto;
-    height: 45px; /* adn */
-    overflow-y: hidden; /* adn */
+#lists > .groupEntry:not(:first-child) > .geName:before {
+    color: #aaa;
+    /*content: '\2212  ';*/
     }
-:root.mobile .li.listEntry label > span:not([class]) {
-    flex-grow: 1;
+#lists > .groupEntry > .geName:before {
+    content: '-  ';
     }
-:root.mobile .li.listEntry .listname,
-:root.mobile .li.listEntry .iconbar {
-    align-items: flex-start;
-    display: flex;
-    white-space: nowrap;
+#lists > .groupEntry.collapsed > .geName:before {
+    color: #aaa;
+    content: '+  ';
     }
-:root.mobile .li.listEntry .iconbar {
-    margin-top: 0.2em;
-    }
+/* end of adn */

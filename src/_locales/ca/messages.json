@@ -32,11 +32,11 @@
     "description": "appears as tab name in dashboard"
   },
   "1pPageName": {
-    "message": "Els vostres filtres",
+    "message": "Filtres personalitzats",
     "description": "appears as tab name in dashboard"
   },
   "rulesPageName": {
-    "message": "Les meves regles",
+    "message": "Regles personalitzades",
     "description": "appears as tab name in dashboard"
   },
   "whitelistPageName": {
@@ -220,7 +220,7 @@
     "description": "Tooltip when hovering the top-most cell of the global-rules column."
   },
   "popupTipLocalRules": {
-    "message": "Regles locals: les regles d'aquesta columna s'apliquen només al lloc actual.\nLes regles locals anul·len les regles globals.",
+    "message": "Regles locals: les regles d'aquesta columna s'apliquen només al lloc actual.",
     "description": "Tooltip when hovering the top-most cell of the local-rules column."
   },
   "popupTipSaveRules": {
@@ -275,13 +275,13 @@
     "message": "Versió",
     "description": "Example of use: Version 1.26.4"
   },
-  "popup3pScriptFilterTip": {
-    "message": "Emfatitza les files que contenen scripts de tercers",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party scripts' cell"
+  "popup3pScriptFilter": {
+    "message": "script",
+    "description": "Appears as an option to filter out firewall rows"
   },
-  "popup3pFrameFilterTip": {
-    "message": "Emfatitza les files que contenen marcs de tercers",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party frames' cell"
+  "popup3pFrameFilter": {
+    "message": "marc",
+    "description": "Appears as an option to filter out firewall rows"
   },
   "pickerCreate": {
     "message": "Crear",
@@ -469,35 +469,43 @@
   },
   "3pGroupDefault": {
     "message": "Local",
-    "description": "Header for the uBlock filters section in 'Filter lists pane'"
+    "description": "Filter lists section name"
   },
   "3pGroupAds": {
     "message": "Anuncis",
-    "description": "English: Ads"
+    "description": "Filter lists section name"
   },
   "3pGroupPrivacy": {
     "message": "Privacitat",
-    "description": "English: Privacy"
+    "description": "Filter lists section name"
   },
   "3pGroupMalware": {
-    "message": "Dominis de malware",
-    "description": "English: Malware domains"
+    "message": "Dominis perillosos",
+    "description": "Filter lists section name"
+  },
+  "3pGroupSocial": {
+    "message": "Ginys socials",
+    "description": "Filter lists section name"
+  },
+  "3pGroupCookies": {
+    "message": "Avís de galetes",
+    "description": "Filter lists section name"
   },
   "3pGroupAnnoyances": {
     "message": "Elements molestos",
-    "description": "The header identifying the filter lists in the category 'annoyances'"
+    "description": "Filter lists section name"
   },
   "3pGroupMultipurpose": {
     "message": "Polivalent",
-    "description": "English: Multipurpose"
+    "description": "Filter lists section name"
   },
   "3pGroupRegions": {
     "message": "Regions, llengües",
-    "description": "English: Regions, languages"
+    "description": "Filter lists section name"
   },
   "3pGroupCustom": {
     "message": "Personalitzat",
-    "description": "English: Custom"
+    "description": "Filter lists section name"
   },
   "3pImport": {
     "message": "Importa...",
@@ -527,17 +535,25 @@
     "message": "Un error de xarxa va impedir que s'actualitzés el recurs.",
     "description": "used as a tooltip for error icon beside a list"
   },
-  "1pFormatHint": {
-    "message": "Un filtre per línia. Un filtre pot ser un domini, o un filtre compatible amb l'Adblock Plus. S'ignoraran les línies amb el símbol &lsquo;!&rsquo;.",
-    "description": "Short information about how to create custom filters"
+  "1pTrustWarning": {
+    "message": "No afegiu filtres de fonts no confiables.",
+    "description": "Warning against copy-pasting filters from random sources"
+  },
+  "1pEnableMyFiltersLabel": {
+    "message": "Habilita els filtres personalitzats",
+    "description": "Label for the checkbox use to enable/disable 'My filters' list"
+  },
+  "1pTrustMyFiltersLabel": {
+    "message": "Permet filtres personalitzats que requereixin confiança",
+    "description": "Label for the checkbox use to trust the content of 'My filters' list"
   },
   "1pImport": {
-    "message": "Importar i annexar",
-    "description": "English: Import and append"
+    "message": "Importa i annexa",
+    "description": "Button in the 'My filters' pane"
   },
   "1pExport": {
-    "message": "Exportar",
-    "description": "English: Export"
+    "message": "Exporta",
+    "description": "Button in the 'My filters' pane"
   },
   "1pExportFilename": {
     "message": "ublock-custom-filters_{{datetime}}.txt",
@@ -581,7 +597,7 @@
   },
   "rulesExport": {
     "message": "Exporta a...",
-    "description": ""
+    "description": "Button in the 'My rules' pane"
   },
   "rulesDefaultFileName": {
     "message": "my-ublock-dynamic-rules.txt",
@@ -616,12 +632,12 @@
     "description": "A concise description of the 'Trusted sites' pane."
   },
   "whitelistImport": {
-    "message": "Imporar i annexar",
-    "description": "English: Import and append"
+    "message": "Importa i annexa",
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExport": {
-    "message": "Exportar",
-    "description": "English: Export"
+    "message": "Exporta",
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExportFilename": {
     "message": "Llista-blanca-de-l'ublock_{{datetime}}.txt",
@@ -881,14 +897,14 @@
   },
   "supportOpenButton": {
     "message": "Obre",
-    "description": "Text for button which open an external webpage in Support pane"
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportReportSpecificButton": {
-    "message": "Crea un informe nou",
-    "description": "Text for button which open an external webpage in Support pane"
+    "message": "Crea un informe nou al GitHub",
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportFindSpecificButton": {
-    "message": "Cerca d'informes semblants",
+    "message": "Cerca informes similars al GitHub",
     "description": "A clickable link in the filter issue reporter section"
   },
   "supportS1H": {
@@ -939,16 +955,20 @@
     "message": "A continuació es mostra informació tècnica que pot ser útil quan els voluntaris intenten ajudar-vos a resoldre un problema.",
     "description": "First paragraph of 'Troubleshooting Information' section in Support pane"
   },
-  "supportS5P2": {
-    "message": "<b>Important:</b> Per defecte es redacta informació potencialment privada o confidencial. La informació redactada pot dificultar la resolució d'un problema.",
-    "description": "Second paragraph of 'Troubleshooting Information' section in Support pane"
-  },
   "supportS6H": {
     "message": "Informeu d'un problema de filtre",
     "description": "Header of 'Report a filter issue' section in Support pane"
   },
   "supportS6P1S1": {
-    "message": "Per evitar carregar els voluntaris amb informes duplicats, verifiqueu que el problema encara no s'hagi notificat.",
+    "message": "Per a evitar la sobrecàrrega del nostre voluntariat amb informes duplicats, verifiqueu abans que el problema encara no s'ha notificat. <b>Nota:</b> en fer clic, enviareu la pàgina causant al nostre GitHub.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S1": {
+    "message": "Les llistes de filtres s'actualitzen diàriament. Assegureu-vos que el vostre problema encara no s'hagi resolt amb les llistes de filtres més recents.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S2": {
+    "message": "Comproveu que el problema encara existeix després de recarregar la pàgina web problemàtica.",
     "description": "A paragraph in the filter issue reporter section"
   },
   "supportS6URL": {
@@ -987,17 +1007,13 @@
     "message": "Obre pestanyes o finestres no desitjades",
     "description": "An entry in the widget used to select the type of issue"
   },
+  "supportS6Select1Option7": {
+    "message": "Condueix a programari maliciós, pesca electrònica",
+    "description": "An entry in the widget used to select the type of issue"
+  },
   "supportS6Checkbox1": {
     "message": "Marca aquesta pàgina com a &ldquo;NSFW&rdquo; (<a href=\"https://ca.wikipedia.org/wiki/NSFW\">&ldquo;No segur per al treball&rdquo;</a>)",
     "description": "A checkbox to use for NSFW sites"
-  },
-  "supportRedact": {
-    "message": "Redacta",
-    "description": "Text for 'Redact' button"
-  },
-  "supportUnredact": {
-    "message": "No redactis",
-    "description": "Text for 'Unredact' button"
   },
   "aboutPrivacyPolicy": {
     "message": "Política de privadesa",
@@ -1070,10 +1086,6 @@
   "errorCantConnectTo": {
     "message": "Error de xarxa: {{msg}}",
     "description": "English: Network error: {{msg}}"
-  },
-  "subscriberConfirm": {
-    "message": "uBlock₀: Voleu afegir aquest URL a la llista de filtres personalitzats?\n\nTítol: \"{{title}}\"\nURL: {{url}}",
-    "description": "No longer used"
   },
   "subscribeButton": {
     "message": "Subscriu-me",
@@ -1163,6 +1175,26 @@
     "message": "Procedeix",
     "description": "Button text to navigate to the blocked page"
   },
+  "docblockedRedirectPrompt": {
+    "message": "La pàgina blocada vol redirigir-vos a un altre web diferent. Si continueu, si us reenviarà a: {{url}}",
+    "description": "Text warning about an incoming redirect"
+  },
+  "docblockedReasonLabel": {
+    "message": "Motiu:",
+    "description": "The label which prepend the actual reason why a page was blocked"
+  },
+  "docblockedReasonMalicious": {
+    "message": "Perjudicial",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonTracker": {
+    "message": "Seguidor",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonDisreputable": {
+    "message": "Mala reputació",
+    "description": "An actual reason why a page was blocked"
+  },
   "cloudPush": {
     "message": "Exporta a un servei al núvol",
     "description": "tooltip"
@@ -1215,6 +1247,10 @@
     "message": "Permet temporalment els fitxers multimèdia grans",
     "description": "A context menu entry, present when large media elements have been blocked on the current site"
   },
+  "contextMenuViewSource": {
+    "message": "Mostra el codi font…",
+    "description": "A context menu entry, to view the source code of the target resource"
+  },
   "shortcutCapturePlaceholder": {
     "message": "Escriviu una drecera",
     "description": "Placeholder string for input field used to capture a keyboard shortcut"
@@ -1234,6 +1270,10 @@
   "toggleCosmeticFiltering": {
     "message": "Commuta els filtres cosmètics",
     "description": "Label for keyboard shortcut used to toggle cosmetic filtering"
+  },
+  "toggleJavascript": {
+    "message": "Commuta el JavaScript",
+    "description": "Label for keyboard shortcut used to toggle no-scripting switch"
   },
   "relaxBlockingMode": {
     "message": "Mode de bloqueig relaxat",
@@ -1258,6 +1298,14 @@
   "clickToLoad": {
     "message": "Clic per carregar",
     "description": "Message used in frame placeholders"
+  },
+  "linterMainReport": {
+    "message": "Errors: {{count}}",
+    "description": "Summary of number of errors as reported by the linter "
+  },
+  "unprocessedRequestTooltip": {
+    "message": "No s'ha pogut filtrar correctament en iniciar el navegador.\nTorneu a carregar la pàgina per garantir un filtratge correcte",
+    "description": "A warning which will appear in the popup panel if needed"
   },
   "dummy": {
     "message": "Aquesta entrada ha de ser l'última",

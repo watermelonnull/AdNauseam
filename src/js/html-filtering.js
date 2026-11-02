@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2017-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,26 +19,18 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-'use strict';
-
-/******************************************************************************/
-
+import { StaticExtFilteringHostnameDB } from './static-ext-filtering-db.js';
+import { entityFromHostname } from './uri-utils.js';
 import logger from './logger.js';
-import µb from './background.js';
 import { sessionFirewall } from './filtering-engines.js';
-
-import {
-    StaticExtFilteringHostnameDB,
-    StaticExtFilteringSessionDB,
-} from './static-ext-filtering-db.js';
+import µb from './background.js';
 
 /******************************************************************************/
 
 const pselectors = new Map();
 const duplicates = new Set();
 
-const filterDB = new StaticExtFilteringHostnameDB(2);
-const sessionFilterDB = new StaticExtFilteringSessionDB();
+const filterDB = new StaticExtFilteringHostnameDB();
 
 let acceptedCount = 0;
 let discardedCount = 0;
@@ -56,20 +48,46 @@ const htmlFilteringEngine = {
     },
 };
 
-const PSelectorHasTextTask = class {
+const regexFromString = (s, exact = false) => {
+    if ( s === '' ) { return /^/; }
+    const match = /^\/(.+)\/([i]?)$/.exec(s);
+    if ( match !== null ) {
+        return new RegExp(match[1], match[2] || undefined);
+    }
+    const reStr = s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp(exact ? `^${reStr}$` : reStr, 'i');
+};
+
+class PSelectorVoidTask {
     constructor(task) {
-        let arg0 = task[1], arg1;
-        if ( Array.isArray(task[1]) ) {
-            arg1 = arg0[1]; arg0 = arg0[0];
-        }
-        this.needle = new RegExp(arg0, arg1);
+        console.info(`[uBO] HTML filtering: :${task[0]}() operator is not supported`);
+    }
+    transpose() {
+    }
+}
+
+class PSelectorContentTask {
+    constructor(task) {
+        this.selector = task[1];
+    }
+    transpose(node, output) {
+        const root = node.content;
+        if ( typeof root?.querySelectorAll !== 'function' ) { return; }
+        const nodes = root.querySelectorAll(this.selector);
+        output.push(...nodes);
+    }
+}
+
+class PSelectorHasTextTask {
+    constructor(task) {
+        this.needle = regexFromString(task[1]);
     }
     transpose(node, output) {
         if ( this.needle.test(node.textContent) ) {
             output.push(node);
         }
     }
-};
+}
 
 const PSelectorIfTask = class {
     constructor(task) {
@@ -80,17 +98,14 @@ const PSelectorIfTask = class {
             output.push(node);
         }
     }
-    get invalid() {
-        return this.pselector.invalid;
-    }
 };
 PSelectorIfTask.prototype.target = true;
 
-const PSelectorIfNotTask = class extends PSelectorIfTask {
-};
+class PSelectorIfNotTask extends PSelectorIfTask {
+}
 PSelectorIfNotTask.prototype.target = false;
 
-const PSelectorMinTextLengthTask = class {
+class PSelectorMinTextLengthTask {
     constructor(task) {
         this.min = task[1];
     }
@@ -99,9 +114,9 @@ const PSelectorMinTextLengthTask = class {
             output.push(node);
         }
     }
-};
+}
 
-const PSelectorSpathTask = class {
+class PSelectorSpathTask {
     constructor(task) {
         this.spath = task[1];
         this.nth = /^(?:\s*[+~]|:)/.test(this.spath);
@@ -132,9 +147,9 @@ const PSelectorSpathTask = class {
             `:scope > :nth-child(${pos})${selector}`
         );
     }
-};
+}
 
-const PSelectorUpwardTask = class {
+class PSelectorUpwardTask {
     constructor(task) {
         const arg = task[1];
         if ( typeof arg === 'number' ) {
@@ -160,11 +175,11 @@ const PSelectorUpwardTask = class {
         }
         output.push(node);
     }
-};
+}
 PSelectorUpwardTask.prototype.i = 0;
 PSelectorUpwardTask.prototype.s = '';
 
-const PSelectorXpathTask = class {
+class PSelectorXpathTask {
     constructor(task) {
         this.xpe = task[1];
     }
@@ -184,25 +199,17 @@ const PSelectorXpathTask = class {
             }
         }
     }
-};
+}
 
-const PSelector = class {
+class PSelector {
     constructor(o) {
         this.raw = o.raw;
         this.selector = o.selector;
         this.tasks = [];
         if ( !o.tasks ) { return; }
         for ( const task of o.tasks ) {
-            const ctor = this.operatorToTaskMap.get(task[0]);
-            if ( ctor === undefined ) {
-                this.invalid = true;
-                break;
-            }
+            const ctor = this.operatorToTaskMap.get(task[0]) || PSelectorVoidTask;
             const pselector = new ctor(task);
-            if ( pselector instanceof PSelectorIfTask && pselector.invalid ) {
-                this.invalid = true;
-                break;
-            }
             this.tasks.push(pselector);
         }
     }
@@ -215,7 +222,6 @@ const PSelector = class {
         return Array.from(root.querySelectorAll(this.selector));
     }
     exec(input) {
-        if ( this.invalid ) { return []; }
         let nodes = this.prime(input);
         for ( const task of this.tasks ) {
             if ( nodes.length === 0 ) { break; }
@@ -228,7 +234,6 @@ const PSelector = class {
         return nodes;
     }
     test(input) {
-        if ( this.invalid ) { return false; }
         const nodes = this.prime(input);
         for ( const node of nodes ) {
             let output = [ node ];
@@ -244,8 +249,9 @@ const PSelector = class {
         }
         return false;
     }
-};
+}
 PSelector.prototype.operatorToTaskMap = new Map([
+    [ 'content', PSelectorContentTask ],
     [ 'has', PSelectorIfTask ],
     [ 'has-text', PSelectorHasTextTask ],
     [ 'if', PSelectorIfTask ],
@@ -257,9 +263,8 @@ PSelector.prototype.operatorToTaskMap = new Map([
     [ 'upward', PSelectorUpwardTask ],
     [ 'xpath', PSelectorXpathTask ],
 ]);
-PSelector.prototype.invalid = false;
 
-const logOne = function(details, exception, selector) {
+function logOne(details, exception, selector) {
     µb.filteringContext
         .duplicate()
         .fromTabId(details.tabId)
@@ -269,12 +274,12 @@ const logOne = function(details, exception, selector) {
         .setDocOriginFromURL(details.url)
         .setFilter({
             source: 'extended',
-            raw: `${exception === 0 ? '##' : '#@#'}^${selector}`
+            raw: `${exception === 0 ? '##' : '#@#'}^${selector}`,
         })
         .toLogger();
-};
+}
 
-const applyProceduralSelector = function(details, selector) {
+function applyProceduralSelector(details, selector) {
     let pselector = pselectors.get(selector);
     if ( pselector === undefined ) {
         pselector = new PSelector(JSON.parse(selector));
@@ -290,9 +295,9 @@ const applyProceduralSelector = function(details, selector) {
         logOne(details, 0, pselector.raw);
     }
     return modified;
-};
+}
 
-const applyCSSSelector = function(details, selector) {
+function applyCSSSelector(details, selector) {
     const nodes = docRegister.querySelectorAll(selector);
     let modified = false;
     for ( const node of nodes ) {
@@ -303,7 +308,15 @@ const applyCSSSelector = function(details, selector) {
         logOne(details, 0, selector);
     }
     return modified;
-};
+}
+
+function logError(writer, msg) {
+    logger.writeOne({
+        realm: 'message',
+        type: 'error',
+        text: msg.replace('{who}', writer.properties.get('name') || '?')
+    });
+}
 
 htmlFilteringEngine.reset = function() {
     filterDB.clear();
@@ -319,40 +332,40 @@ htmlFilteringEngine.freeze = function() {
 };
 
 htmlFilteringEngine.compile = function(parser, writer) {
-    const { raw, compiled, exception } = parser.result;
+    const isException = parser.isException();
+    const { raw, compiled } = parser.result;
     if ( compiled === undefined ) {
-        const who = writer.properties.get('name') || '?';
-        logger.writeOne({
-            realm: 'message',
-            type: 'error',
-            text: `Invalid HTML filter in ${who}: ##${raw}`
-        });
-        return;
+        return logError(writer, `Invalid HTML filter in {who}: ##${raw}`);
     }
 
     writer.select('HTML_FILTERS');
 
-    // TODO: Mind negated hostnames, they are currently discarded.
-
-    for ( const { hn, not, bad } of parser.extOptions() ) {
-        if ( bad ) { continue; }
-        let kind = 0;
-        if ( exception ) {
-            if ( not ) { continue; }
-            kind |= 0b01;
+    // Only exception filters are allowed to be global.
+    if ( parser.hasOptions() === false ) {
+        if ( isException ) {
+            writer.push([ 64, '', `-${compiled}` ]);
         }
-        if ( compiled.charCodeAt(0) === 0x7B /* '{' */ ) {
-            kind |= 0b10;
-        }
-        writer.push([ 64, hn, kind, compiled ]);
+        return;
     }
-};
 
-htmlFilteringEngine.compileTemporary = function(parser) {
-    return {
-        session: sessionFilterDB,
-        selector: parser.result.compiled,
-    };
+    const compiledFilters = [];
+    let hasOnlyNegated = true;
+    for ( const { hn, not, bad } of parser.getExtFilterDomainIterator() ) {
+        if ( bad ) { continue; }
+        if ( not === false ) {
+            hasOnlyNegated = false;
+        }
+        if ( isException && not ) { continue; }
+        const prefix = isException || not ? '-' : '+';
+        compiledFilters.push([ 64, hn, `${prefix}${compiled}` ]);
+    }
+
+    // Not allowed since it's equivalent to forbidden generic HTML filters
+    if ( isException === false && hasOnlyNegated ) {
+        return logError(writer, `Invalid HTML filter in {who}: ##${raw}`);
+    }
+
+    writer.pushMany(compiledFilters);
 };
 
 htmlFilteringEngine.fromCompiledContent = function(reader) {
@@ -370,81 +383,56 @@ htmlFilteringEngine.fromCompiledContent = function(reader) {
         }
         duplicates.add(fingerprint);
         const args = reader.args();
-        filterDB.store(args[1], args[2], args[3]);
+        filterDB.store(args[1], args[2]);
     }
 };
 
-htmlFilteringEngine.getSession = function() {
-    return sessionFilterDB;
-};
-
-htmlFilteringEngine.retrieve = function(details) {
-    const hostname = details.hostname;
-
-    const plains = new Set();
-    const procedurals = new Set();
-    const exceptions = new Set();
-
-    if ( sessionFilterDB.isNotEmpty ) {
-        sessionFilterDB.retrieve([ null, exceptions ]);
-    }
-    filterDB.retrieve(
-        hostname,
-        [ plains, exceptions, procedurals, exceptions ]
-    );
-    const entity = details.entity !== ''
-        ? `${hostname.slice(0, -details.domain.length)}${details.entity}`
-        : '*';
-    filterDB.retrieve(
-        entity,
-        [ plains, exceptions, procedurals, exceptions ],
-        1
-    );
-
-    if ( plains.size === 0 && procedurals.size === 0 ) { return; }
+htmlFilteringEngine.retrieve = function(fctxt) {
+    const all = new Set();
+    const hostname = fctxt.getHostname();
+    filterDB.retrieveSpecifics(all, hostname);
+    const entity = entityFromHostname(hostname, fctxt.getDomain());
+    filterDB.retrieveSpecifics(all, entity);
+    filterDB.retrieveSpecificsByRegex(all, hostname, fctxt.url);
+    filterDB.retrieveGenerics(all);
+    if ( all.size === 0 ) { return; }
 
     // https://github.com/gorhill/uBlock/issues/2835
     //   Do not filter if the site is under an `allow` rule.
-    if (
-        µb.userSettings.advancedUserEnabled &&
-        sessionFirewall.evaluateCellZY(hostname, hostname, '*') === 2
-    ) {
-        return;
+    if ( µb.userSettings.advancedUserEnabled ) {
+        if ( sessionFirewall.evaluateCellZY(hostname, hostname, '*') === 2 ) { return; }
     }
 
-    const out = { plains, procedurals };
-
-    if ( exceptions.size === 0 ) {
-        return out;
-    }
-
-    for ( const selector of exceptions ) {
-        if ( plains.has(selector) ) {
-            plains.delete(selector);
-            logOne(details, 1, selector);
-            continue;
-        }
-        if ( procedurals.has(selector) ) {
-            procedurals.delete(selector);
-            logOne(details, 1, JSON.parse(selector).raw);
-            continue;
+    // Split filters in different groups
+    const plains = new Set();
+    const procedurals = new Set();
+    for ( const s of all ) {
+        if ( s.charCodeAt(0) === 0x2D /* - */ ) { continue; }
+        const selector = s.slice(1);
+        const isProcedural = selector.startsWith('{');
+        if ( all.has(`-${selector}`) ) {
+            logOne(fctxt, 1, isProcedural ? JSON.parse(selector).raw : selector);
+        } else if ( isProcedural ) {
+            procedurals.add(selector);
+        } else {
+            plains.add(selector);
         }
     }
 
-    if ( plains.size !== 0 || procedurals.size !== 0 ) {
-        return out;
-    }
+    if ( plains.size === 0 && procedurals.size === 0 ) { return; }
+
+    return { plains, procedurals };
 };
 
-htmlFilteringEngine.apply = function(doc, details) {
+htmlFilteringEngine.apply = function(doc, details, selectors) {
     docRegister = doc;
     let modified = false;
-    for ( const selector of details.selectors.plains ) {
+    for ( const selector of selectors.plains ) {
         if ( applyCSSSelector(details, selector) ) {
             modified = true;
         }
     }
-    for ( const selector of details.selectors.procedurals ) {
+    for ( const selector of selectors.procedurals ) {
         if ( applyProceduralSelector(details, selector) ) {
             modified = true;
         }

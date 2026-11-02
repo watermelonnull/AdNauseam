@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Discussion Forum
+    url: https://github.com/dhowe/AdNauseam/discussions
+    about: For questions, suggestion, please open a new discussion, or check the existing ones to avoid repeats.
+  - name: uBlock Origin's uAssets Filter List Issues
+    url: https://github.com/uBlockOrigin/uAssets/issues
+    about: Strictly for issues that are NOT AdNauseam-specific. Please make sure to test with uBlock Origin and carefully follow the ticket guidelines.

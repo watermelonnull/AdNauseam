@@ -1,13 +1,20 @@
 html, body {
+    background-color: var(--surface-0);
     display: flex;
     flex-direction: column;
     height: 100vh;
+        height: 100svh;
     justify-content: stretch;
     overflow: hidden;
     position: relative;
     width: 100vw;
     }
+body.notReady {
+    display: none;
+    }
 #dashboard-nav {
+    align-items: center;
+    background-color: var(--surface-1);
     border: 0;
     font-size: 20px;
     line-height: 25px;
@@ -15,7 +22,7 @@ html, body {
     border-bottom: 1px solid var(--border-1);
     display: flex;
     flex-shrink: 0;
-    flex-wrap: wrap;
+    justify-content: space-between;
     overflow-x: hidden;
     padding: 0;
     position: sticky;
@@ -28,11 +35,16 @@ html, body {
     display: flex;
     margin: 0;
     width: 100%;
-    border-bottom: 1px solid #444;
+    border-bottom: 1px solid var(--adn-tab-button-bg);
     padding: 4px 10px 0;
     white-space: nowrap;
     background-color: #000;
 }
+#dashboard-nav > span {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    }
 #dashboard-nav-widgets span {
     align-items: center;
     display: inline-flex;
@@ -48,12 +60,13 @@ html, body {
     color: #fff;
 }
 .tabButton {
+		user-select: none;
     font-family: bebas_neue,roboto_flex,noto_sans,sans-serif;
     font-stretch: 47.5%;
     font-variation-settings: "opsz" 48, "slnt" 0, "GRAD" 0, "XTRA" 468, "YOPQ" 79, "YTAS" 750, "YTDE" -203, "YTFI" 738, "YTLC" 514, "YTUC" 712;
     text-transform: uppercase;
     background-color: #222;
-    border: 2px solid #444;
+    border: 2px solid var(--adn-tab-button-bg);
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
     border-bottom-width: 1px;
@@ -67,8 +80,7 @@ html, body {
     position: relative;
     text-decoration: none;
     top: 1px;
-    opacity: 0.75;
-    }
+}
 .tabButton:hover{
   background-color: #333;
   color:#eee;
@@ -80,9 +92,9 @@ html, body {
     /*color: inherit;*/
     }
 .tabButton.selected {
-    background-color: #444;
+    background-color: var(--adn-tab-button-bg);
     color: #fff;
-    border-color: #444;
+    border-color: var(--adn-tab-button-bg);
     opacity: 1;
     }
 iframe {
@@ -110,13 +122,11 @@ iframe {
     }
 #unsavedWarning > div:last-of-type {
     height: 100vh;
+        height: 100svh;
     position: absolute;
     width: 100vw;
     }
 
-body:not(.canUpdateShortcuts) .tabButton[data-pane="shortcuts.html"] {
-    display: none;
-    }
 body .tabButton[data-pane="no-dashboard.html"] {
     display: none;
     }
@@ -146,7 +156,7 @@ body.noDashboard #dashboard-nav {
         border-bottom: 3px solid black;
     }
     .tabButton.selected {
-        border-bottom: 3px solid #BD10E0;
+        border-bottom: 3px solid var(--adn-purple);
         background-color: #222;
     }
 }
@@ -175,16 +185,6 @@ body.noDashboard #dashboard-nav {
     border-bottom-color: var(--dashboard-tab-hover-border);
     }
 
-/* touch-screen devices */
-:root.mobile #dashboard-nav {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-    }
-:root.mobile #dashboard-nav::-webkit-scrollbar {
-  display: none;
-    }
 :root.mobile #dashboard-nav .logo {
     display: none;
     }

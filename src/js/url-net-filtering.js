@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to black/white list requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2015-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -18,10 +18,6 @@
 
     Home: https://github.com/gorhill/uBlock
 */
-
-'use strict';
-
-/******************************************************************************/
 
 import { LineIterator } from './text-utils.js';
 import { decomposeHostname } from './uri-utils.js';

@@ -7,7 +7,7 @@ body {
   font-variation-settings: "opsz" 48, "slnt" 0, "GRAD" 0, "XTRA" 468, "YOPQ" 79, "YTAS" 750, "YTDE" -203, "YTFI" 738, "YTLC" 514, "YTUC" 712;
 }
 #aboutNameVer {
-  color: #BD10E0;
+  color: var(--adn-purple);
   font-size: 22px;
   margin-top: 70px;
   margin-left: 3px;

@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2014-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,36 +19,25 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-'use strict';
-
-/******************************************************************************/
-
 import µb from './background.js';
 
 /******************************************************************************/
 
 µb.formatCount = function(count) {
-    if ( typeof count !== 'number' ) {
-        return '';
+    if ( typeof count !== 'number' ) { return ''; }
+    const s = `${count}`;
+    if ( count < 1000 ) { return s; }
+    if ( count < 10000 ) {
+        return '>' + s.slice(0,1) + 'k';
     }
-    let s = count.toFixed(0);
-    if ( count >= 1000 ) {
-        if ( count < 10000 ) {
-            s = '>' + s.slice(0,1) + 'k';
-        } else if ( count < 100000 ) {
-            s = s.slice(0,2) + 'k';
-        } else if ( count < 1000000 ) {
-            s = s.slice(0,3) + 'k';
-        } else if ( count < 10000000 ) {
-            s = s.slice(0,1) + 'M';
-        } else {
-            s = s.slice(0,-6) + 'M';
-        }
+    if ( count < 100000 ) {
+        return s.slice(0,2) + 'k';
     }
-    return s;
+    if ( count < 1000000 ) {
+        return s.slice(0,3) + 'k';
+    }
+    return s.slice(0,-6) + 'M';
 };
-
-// https://www.youtube.com/watch?v=DyvzfyqYm_s
 
 /******************************************************************************/
 
@@ -79,7 +68,7 @@ import µb from './background.js';
                 popupLoggerBox = JSON.parse(
                     vAPI.localStorage.getItem('popupLoggerBox')
                 );
-            } catch(ex) {
+            } catch {
             }
             if ( popupLoggerBox !== undefined ) {
                 details.box = popupLoggerBox;
@@ -87,48 +76,6 @@ import µb from './background.js';
         }
     }
     vAPI.tabs.open(details);
-};
-
-/******************************************************************************/
-
-µb.MRUCache = class {
-    constructor(size) {
-        this.size = size;
-        this.array = [];
-        this.map = new Map();
-        this.resetTime = Date.now();
-    }
-    add(key, value) {
-        const found = this.map.has(key);
-        this.map.set(key, value);
-        if ( !found ) {
-            if ( this.array.length === this.size ) {
-                this.map.delete(this.array.pop());
-            }
-            this.array.unshift(key);
-        }
-    }
-    remove(key) {
-        if ( this.map.has(key) ) {
-            this.array.splice(this.array.indexOf(key), 1);
-        }
-    }
-    lookup(key) {
-        const value = this.map.get(key);
-        if ( value !== undefined && this.array[0] !== key ) {
-            let i = this.array.indexOf(key);
-            do {
-                this.array[i] = this.array[i-1];
-            } while ( --i );
-            this.array[0] = key;
-        }
-        return value;
-    }
-    reset() {
-        this.array = [];
-        this.map.clear();
-        this.resetTime = Date.now();
-    }
 };
 
 /******************************************************************************/
@@ -141,24 +88,12 @@ import µb from './background.js';
 
 /******************************************************************************/
 
-µb.fireDOMEvent = function(name) {
-    if (
-        window instanceof Object &&
-        window.dispatchEvent instanceof Function &&
-        window.CustomEvent instanceof Function
-    ) {
-        window.dispatchEvent(new CustomEvent(name));
-    }
-};
-
-/******************************************************************************/
-
 // TODO: properly compare arrays
 
 µb.getModifiedSettings = function(edit, orig = {}) {
     const out = {};
     for ( const prop in edit ) {
-        if ( orig.hasOwnProperty(prop) && edit[prop] !== orig[prop] ) {
+        if ( Object.hasOwn(orig, prop) && edit[prop] !== orig[prop] ) {
             out[prop] = edit[prop];
         }
     }
@@ -167,7 +102,7 @@ import µb from './background.js';
 
 µb.settingValueFromString = function(orig, name, s) {
     if ( typeof name !== 'string' || typeof s !== 'string' ) { return; }
-    if ( orig.hasOwnProperty(name) === false ) { return; }
+    if ( Object.hasOwn(orig, name) === false ) { return; }
     let r;
     switch ( typeof orig[name] ) {
     case 'boolean':

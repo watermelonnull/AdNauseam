@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2014-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,25 +19,20 @@
     Home: https://github.com/gorhill/uMatrix
 */
 
-/* global CodeMirror, diff_match_patch, uDom, uBlockDashboard */
-
-'use strict';
-
-/******************************************************************************/
-
-import publicSuffixList from '../lib/publicsuffixlist/publicsuffixlist.js';
-
-import { hostnameFromURI } from './uri-utils.js';
-import { i18n$ } from './i18n.js';
+/* global CodeMirror, diff_match_patch, uBlockDashboard */
 
 import './codemirror/ubo-dynamic-filtering.js';
+import { dom, qs$, qsa$ } from './dom.js';
+import { hostnameFromURI } from './uri-utils.js';
+import { i18n$ } from './i18n.js';
+import publicSuffixList from '../lib/publicsuffixlist/publicsuffixlist.js';
 
 /******************************************************************************/
 
 const hostnameToDomainMap = new Map();
 
 const mergeView = new CodeMirror.MergeView(
-    document.querySelector('.codeMirrorMergeContainer'),
+    qs$('.codeMirrorMergeContainer'),
     {
         allowEditingOriginals: true,
         connect: 'align',
@@ -70,7 +65,6 @@ const thePanes = {
 
 let cleanEditToken = 0;
 let cleanEditText = '';
-let isCollapsed = false;
 
 /******************************************************************************/
 
@@ -86,27 +80,25 @@ let isCollapsed = false;
     const commitArrowSelector = '.CodeMirror-merge-copybuttons-left .CodeMirror-merge-copy-reverse:not([title="' + i18nCommitStr + '"])';
     const revertArrowSelector = '.CodeMirror-merge-copybuttons-left .CodeMirror-merge-copy:not([title="' + i18nRevertStr + '"])';
 
-    uDom.nodeFromSelector('.CodeMirror-merge-scrolllock')
-        .setAttribute('title', i18n$('genericMergeViewScrollLock'));
+    dom.attr('.CodeMirror-merge-scrolllock', 'title', i18n$('genericMergeViewScrollLock'));
 
     const translate = function() {
-        let elems = document.querySelectorAll(commitArrowSelector);
+        let elems = qsa$(commitArrowSelector);
         for ( const elem of elems ) {
-            elem.setAttribute('title', i18nCommitStr);
+            dom.attr(elem, 'title', i18nCommitStr);
         }
-        elems = document.querySelectorAll(revertArrowSelector);
+        elems = qsa$(revertArrowSelector);
         for ( const elem of elems ) {
-            elem.setAttribute('title', i18nRevertStr);
+            dom.attr(elem, 'title', i18nRevertStr);
         }
     };
 
     const mergeGapObserver = new MutationObserver(translate);
 
     mergeGapObserver.observe(
-        uDom.nodeFromSelector('.CodeMirror-merge-copybuttons-left'),
+        qs$('.CodeMirror-merge-copybuttons-left'),
         { attributes: true, attributeFilter: [ 'title' ], subtree: true }
     );
-
 }
 
 /******************************************************************************/
@@ -144,11 +136,31 @@ const updateOverlay = (( ) => {
             stream.skipToEnd();
         }
     };
-    return function(filter) {
-        reFilter = typeof filter === 'string' && filter !== '' ?
-            new RegExp(filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi') :
-            undefined;
+    return function() {
+        const f = presentationState.filter;
+        reFilter = typeof f === 'string' && f !== ''
+            ? new RegExp(f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi')
+            : undefined;
         return mode;
+    };
+})();
+
+const toggleOverlay = (( ) => {
+    let overlay = null;
+
+    return function() {
+        if ( overlay !== null ) {
+            mergeView.leftOriginal().removeOverlay(overlay);
+            mergeView.editor().removeOverlay(overlay);
+            overlay = null;
+        }
+        if ( presentationState.filter !== '' ) {
+            overlay = updateOverlay();
+            mergeView.leftOriginal().addOverlay(overlay);
+            mergeView.editor().addOverlay(overlay);
+        }
+        rulesToDoc(true);
+        savePresentationState();
     };
 })();
 
@@ -158,14 +170,14 @@ const updateOverlay = (( ) => {
 // - Scroll position preserved
 // - Minimum amount of text updated
 
-const rulesToDoc = function(clearHistory) {
+function rulesToDoc(clearHistory) {
     const orig = thePanes.orig.doc;
     const edit = thePanes.edit.doc;
     orig.startOperation();
     edit.startOperation();
 
     for ( const key in thePanes ) {
-        if ( thePanes.hasOwnProperty(key) === false ) { continue; }
+        if ( Object.hasOwn(thePanes, key) === false ) { continue; }
         const doc = thePanes[key].doc;
         const rules = filterRules(key);
         if (
@@ -212,7 +224,7 @@ const rulesToDoc = function(clearHistory) {
         if ( mark.uboEllipsis !== true ) { continue; }
         mark.clear();
     }
-    if ( isCollapsed ) {
+    if ( presentationState.isCollapsed ) {
         for ( let iline = 0, n = edit.lineCount(); iline < n; iline++ ) {
             if ( edit.getLine(iline) !== '...' ) { continue; }
             const mark = edit.markText(
@@ -242,12 +254,12 @@ const rulesToDoc = function(clearHistory) {
         { line, ch: 0 },
         (clientHeight - ldoc.defaultTextHeight()) / 2
     );
-};
+}
 
 /******************************************************************************/
 
-const filterRules = function(key) {
-    const filter = uDom.nodeFromSelector('#ruleFilter input').value;
+function filterRules(key) {
+    const filter = qs$('#ruleFilter input').value;
     const rules = thePanes[key].modified;
     if ( filter === '' ) { return rules; }
     const out = [];
@@ -256,11 +268,11 @@ const filterRules = function(key) {
         out.push(rule);
     }
     return out;
-};
+}
 
 /******************************************************************************/
 
-const applyDiff = async function(permanent, toAdd, toRemove) {
+async function applyDiff(permanent, toAdd, toRemove) {
     const details = await vAPI.messaging.send('dashboard', {
         what: 'modifyRuleset',
         permanent: permanent,
@@ -270,7 +282,7 @@ const applyDiff = async function(permanent, toAdd, toRemove) {
     thePanes.orig.original = details.permanentRules;
     thePanes.edit.original = details.sessionRules;
     onPresentationChanged();
-};
+}
 
 /******************************************************************************/
 
@@ -283,7 +295,7 @@ mergeView.options.revertChunk = function(
     to, toStart, toEnd
 ) {
     // https://github.com/gorhill/uBlock/issues/3611
-    if ( document.body.getAttribute('dir') === 'rtl' ) {
+    if ( dom.attr(dom.body, 'dir') === 'rtl' ) {
         let tmp = from; from = to; to = tmp;
         tmp = fromStart; fromStart = toStart; toStart = tmp;
         tmp = fromEnd; fromEnd = toEnd; toEnd = tmp;
@@ -311,7 +323,7 @@ function handleImportFilePicker() {
         // https://github.com/chrisaljoudi/uBlock/issues/757
         // Support RequestPolicy rule syntax
         let result = this.result;
-        let matches = /\[origins-to-destinations\]([^\[]+)/.exec(result);
+        let matches = /\[origins-to-destinations\]([^[]+)/.exec(result);
         if ( matches && matches.length === 2 ) {
             result = matches[1].trim()
                                .replace(/\|/g, ' ')
@@ -329,14 +341,14 @@ function handleImportFilePicker() {
 
 /******************************************************************************/
 
-const startImportFilePicker = function() {
-    const input = document.getElementById('importFilePicker');
+function startImportFilePicker() {
+    const input = qs$('#importFilePicker');
     // Reset to empty string, this will ensure an change event is properly
     // triggered if the user pick a file, even if it is the same as the last
     // one picked.
     input.value = '';
     input.click();
-};
+}
 
 /******************************************************************************/
 
@@ -355,41 +367,25 @@ function exportUserRulesToFile() {
 
 /******************************************************************************/
 
-const onFilterChanged = (( ) => {
+{
     let timer;
-    let overlay = null;
-    let last = '';
 
-    const process = function() {
-        timer = undefined;
-        if ( mergeView.editor().isClean(cleanEditToken) === false ) { return; }
-        const filter = uDom.nodeFromSelector('#ruleFilter input').value;
-        if ( filter === last ) { return; }
-        last = filter;
-        if ( overlay !== null ) {
-            mergeView.leftOriginal().removeOverlay(overlay);
-            mergeView.editor().removeOverlay(overlay);
-            overlay = null;
-        }
-        if ( filter !== '' ) {
-            overlay = updateOverlay(filter);
-            mergeView.leftOriginal().addOverlay(overlay);
-            mergeView.editor().addOverlay(overlay);
-        }
-        rulesToDoc(true);
-    };
-
-    return function() {
+    dom.on('#ruleFilter input', 'input', ( ) => {
         if ( timer !== undefined ) { self.cancelIdleCallback(timer); }
-        timer = self.requestIdleCallback(process, { timeout: 773 });
-    };
-})();
+        timer = self.requestIdleCallback(( ) => {
+            timer = undefined;
+            if ( mergeView.editor().isClean(cleanEditToken) === false ) { return; }
+            const filter = qs$('#ruleFilter input').value;
+            if ( filter === presentationState.filter ) { return; }
+            presentationState.filter = filter;
+            toggleOverlay();
+        }, { timeout: 773 });
+    });
+}
 
 /******************************************************************************/
 
 const onPresentationChanged = (( ) => {
-    let sortType = 1;
-
     const reSwRule = /^([^/]+): ([^/ ]+) ([^ ]+)/;
     const reRule   = /^([^ ]+) ([^/ ]+) ([^ ]+ [^ ]+)/;
     const reUrlRule = /^([^ ]+) ([^ ]+) ([^ ]+ [^ ]+)/;
@@ -433,10 +429,10 @@ const onPresentationChanged = (( ) => {
             desHn = sortNormalizeHn(hostnameFromURI(match[2]));
             extra = match[3];
         }
-        if ( sortType === 0 ) {
+        if ( presentationState.sortType === 0 ) {
             return { rule, token: `${type} ${srcHn} ${desHn} ${extra}` };
         }
-        if ( sortType === 1 ) {
+        if ( presentationState.sortType === 1 ) {
             return { rule, token: `${srcHn} ${type} ${desHn} ${extra}` };
         }
         return { rule, token: `${desHn} ${type} ${srcHn} ${extra}` };
@@ -454,18 +450,17 @@ const onPresentationChanged = (( ) => {
     };
 
     const collapse = ( ) => {
-        if ( isCollapsed !== true ) { return; }
+        if ( presentationState.isCollapsed !== true ) { return; }
         const diffs = getDiffer().diff_main(
             thePanes.orig.modified.join('\n'),
             thePanes.edit.modified.join('\n')
         );
-        const ll = []; let il = 0, lellipsis = false;
-        const rr = []; let ir = 0, rellipsis = false;
+        const ll = []; let lellipsis = false;
+        const rr = []; let rellipsis = false;
         for ( let i = 0; i < diffs.length; i++ ) {
             const diff =  diffs[i];
             if ( diff[0] === 0 ) {
                 lellipsis = rellipsis = true;
-                il += 1; ir += 1;
                 continue;
             }
             if ( diff[0] < 0 ) {
@@ -475,7 +470,6 @@ const onPresentationChanged = (( ) => {
                     lellipsis = rellipsis = false;
                 }
                 ll.push(diff[1].trim());
-                il += 1;
                 continue;
             }
             /* diff[0] > 0 */
@@ -485,7 +479,6 @@ const onPresentationChanged = (( ) => {
                 lellipsis = rellipsis = false;
             }
             rr.push(diff[1].trim());
-            ir += 1;
         }
         if ( lellipsis ) { ll.push('...'); }
         if ( rellipsis ) { rr.push('...'); }
@@ -493,23 +486,31 @@ const onPresentationChanged = (( ) => {
         thePanes.edit.modified = rr;
     };
 
-    return function(clearHistory) {
+    dom.on('#ruleFilter select', 'input', ev => {
+        presentationState.sortType = parseInt(ev.target.value, 10) || 0;
+        savePresentationState();
+        onPresentationChanged(true);
+    });
+    dom.on('#ruleFilter #diffCollapse', 'click', ev => {
+        presentationState.isCollapsed = dom.cl.toggle(ev.target, 'active');
+        savePresentationState();
+        onPresentationChanged(true);
+    });
+
+    return function onPresentationChanged(clearHistory) {
         const origPane = thePanes.orig;
         const editPane = thePanes.edit;
         origPane.modified = origPane.original.slice();
         editPane.modified = editPane.original.slice();
-        const select = document.querySelector('#ruleFilter select');
-        sortType = parseInt(select.value, 10);
-        if ( isNaN(sortType) ) { sortType = 1; }
         {
             const mode = origPane.doc.getMode();
-            mode.sortType = sortType;
+            mode.sortType = presentationState.sortType;
             mode.setHostnameToDomainMap(hostnameToDomainMap);
             mode.setPSL(publicSuffixList);
         }
         {
             const mode = editPane.doc.getMode();
-            mode.sortType = sortType;
+            mode.sortType = presentationState.sortType;
             mode.setHostnameToDomainMap(hostnameToDomainMap);
             mode.setPSL(publicSuffixList);
         }
@@ -528,7 +529,7 @@ const onTextChanged = (( ) => {
 
     const process = details => {
         timer = undefined;
-        const diff = document.getElementById('diff');
+        const diff = qs$('#diff');
         let isClean = mergeView.editor().isClean(cleanEditToken);
         if (
             details === undefined &&
@@ -539,25 +540,22 @@ const onTextChanged = (( ) => {
             isClean = true;
         }
         const isDirty = mergeView.leftChunks().length !== 0;
-        document.body.classList.toggle('editing', isClean === false);
-        diff.classList.toggle('dirty', isDirty);
-        uDom('#editSaveButton')
-            .toggleClass('disabled', isClean);
-        uDom('#exportButton,#importButton')
-            .toggleClass('disabled', isClean === false);
-        uDom('#revertButton,#commitButton')
-            .toggleClass('disabled', isClean === false || isDirty === false);
-        const input = document.querySelector('#ruleFilter input');
+        dom.cl.toggle(dom.body, 'editing', isClean === false);
+        dom.cl.toggle(diff, 'dirty', isDirty);
+        dom.cl.toggle('#editSaveButton', 'disabled', isClean);
+        dom.cl.toggle('#exportButton,#importButton', 'disabled', isClean === false);
+        dom.cl.toggle('#revertButton,#commitButton', 'disabled', isClean === false || isDirty === false);
+        const input = qs$('#ruleFilter input');
         if ( isClean ) {
-            input.removeAttribute('disabled');
+            dom.attr(input, 'disabled', null);
             CodeMirror.commands.save = undefined;
         } else {
-            input.setAttribute('disabled', '');
+            dom.attr(input, 'disabled', '');
             CodeMirror.commands.save = editSaveHandler;
         }
     };
 
-    return function(now) {
+    return function onTextChanged(now) {
         if ( timer !== undefined ) { self.cancelIdleCallback(timer); }
         timer = now ? process() : self.requestIdleCallback(process, { timeout: 57 });
     };
@@ -565,7 +563,7 @@ const onTextChanged = (( ) => {
 
 /******************************************************************************/
 
-const revertAllHandler = function() {
+function revertAllHandler() {
     const toAdd = [], toRemove = [];
     const left = mergeView.leftOriginal();
     const edit = mergeView.editor();
@@ -582,11 +580,11 @@ const revertAllHandler = function() {
         toRemove.push(removedLines.trim());
     }
     applyDiff(false, toAdd.join('\n'), toRemove.join('\n'));
-};
+}
 
 /******************************************************************************/
 
-const commitAllHandler = function() {
+function commitAllHandler() {
     const toAdd = [], toRemove = [];
     const left = mergeView.leftOriginal();
     const edit = mergeView.editor();
@@ -603,11 +601,11 @@ const commitAllHandler = function() {
         toRemove.push(removedLines.trim());
     }
     applyDiff(true, toAdd.join('\n'), toRemove.join('\n'));
-};
+}
 
 /******************************************************************************/
 
-const editSaveHandler = function() {
+function editSaveHandler() {
     const editor = mergeView.editor();
     const editText = editor.getValue().trim();
     if ( editText === cleanEditText ) {
@@ -624,7 +622,7 @@ const editSaveHandler = function() {
         }
     }
     applyDiff(false, toAdd.join(''), toRemove.join(''));
-};
+}
 
 /******************************************************************************/
 
@@ -643,9 +641,40 @@ self.cloud.onPull = function(data, append) {
 
 /******************************************************************************/
 
+self.wikilink = 'https://github.com/gorhill/uBlock/wiki/Dashboard:-My-rules';
+
 self.hasUnsavedData = function() {
     return mergeView.editor().isClean(cleanEditToken) === false;
 };
+
+/******************************************************************************/
+
+const presentationState = {
+    sortType: 0,
+    isCollapsed: false,
+    filter: '',
+};
+
+const savePresentationState = ( ) => {
+    vAPI.localStorage.setItem('dynaRulesPresentationState', presentationState);
+};
+
+vAPI.localStorage.getItemAsync('dynaRulesPresentationState').then(details => {
+    if ( details instanceof Object === false ) { return; }
+    if ( typeof details.sortType === 'number' ) {
+        presentationState.sortType = details.sortType;
+        qs$('#ruleFilter select').value = `${details.sortType}`;
+    }
+    if ( typeof details.isCollapsed === 'boolean' ) {
+        presentationState.isCollapsed = details.isCollapsed;
+        dom.cl.toggle('#ruleFilter #diffCollapse', 'active', details.isCollapsed);
+    }
+    if ( typeof details.filter === 'string' ) {
+        presentationState.filter = details.filter;
+        qs$('#ruleFilter input').value = details.filter;
+        toggleOverlay();
+    }
+});
 
 /******************************************************************************/
 
@@ -659,23 +688,16 @@ vAPI.messaging.send('dashboard', {
 });
 
 // Handle user interaction
-uDom('#importButton').on('click', startImportFilePicker);
-uDom('#importFilePicker').on('change', handleImportFilePicker);
-uDom('#exportButton').on('click', exportUserRulesToFile);
-uDom('#revertButton').on('click', revertAllHandler);
-uDom('#commitButton').on('click', commitAllHandler);
-uDom('#editSaveButton').on('click', editSaveHandler);
-uDom('#ruleFilter input').on('input', onFilterChanged);
-uDom('#ruleFilter select').on('input', ( ) => {
-    onPresentationChanged(true);
-});
-uDom('#ruleFilter #diffCollapse').on('click', ev => {
-    isCollapsed = ev.target.classList.toggle('active');
-    onPresentationChanged(true);
-});
+dom.on('#importButton', 'click', startImportFilePicker);
+dom.on('#importFilePicker', 'change', handleImportFilePicker);
+dom.on('#exportButton', 'click', exportUserRulesToFile);
+dom.on('#revertButton', 'click', revertAllHandler);
+dom.on('#commitButton', 'click', commitAllHandler);
+dom.on('#editSaveButton', 'click', editSaveHandler);
 
 // https://groups.google.com/forum/#!topic/codemirror/UQkTrt078Vs
-mergeView.editor().on('updateDiff', ( ) => { onTextChanged(); });
+mergeView.editor().on('updateDiff', ( ) => {
+    onTextChanged();
+});
 
 /******************************************************************************/
-

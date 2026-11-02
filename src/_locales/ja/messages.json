@@ -220,7 +220,7 @@
     "description": "Tooltip when hovering the top-most cell of the global-rules column."
   },
   "popupTipLocalRules": {
-    "message": "ローカルルール: この列のルールは現在のサイトだけに適用されます。\nローカルルールはグローバルルールを上書きします。",
+    "message": "ローカルルール: この列にあるルールは、現在のサイトのみに適用されます。",
     "description": "Tooltip when hovering the top-most cell of the local-rules column."
   },
   "popupTipSaveRules": {
@@ -275,13 +275,13 @@
     "message": "バージョン",
     "description": "Example of use: Version 1.26.4"
   },
-  "popup3pScriptFilterTip": {
-    "message": "↑: サードパーティスクリプトを含む行を強調表示します",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party scripts' cell"
+  "popup3pScriptFilter": {
+    "message": "スクリプト",
+    "description": "Appears as an option to filter out firewall rows"
   },
-  "popup3pFrameFilterTip": {
-    "message": "↑: サードパーティフレームを含む行を強調表示します",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party frames' cell"
+  "popup3pFrameFilter": {
+    "message": "フレーム",
+    "description": "Appears as an option to filter out firewall rows"
   },
   "pickerCreate": {
     "message": "作成",
@@ -469,35 +469,43 @@
   },
   "3pGroupDefault": {
     "message": "内製",
-    "description": "Header for the uBlock filters section in 'Filter lists pane'"
+    "description": "Filter lists section name"
   },
   "3pGroupAds": {
     "message": "広告",
-    "description": "English: Ads"
+    "description": "Filter lists section name"
   },
   "3pGroupPrivacy": {
     "message": "プライバシー",
-    "description": "English: Privacy"
+    "description": "Filter lists section name"
   },
   "3pGroupMalware": {
-    "message": "マルウェアドメイン",
-    "description": "English: Malware domains"
+    "message": "マルウェアからの保護、セキュリティ",
+    "description": "Filter lists section name"
+  },
+  "3pGroupSocial": {
+    "message": "SNS ウィジェット",
+    "description": "Filter lists section name"
+  },
+  "3pGroupCookies": {
+    "message": "クッキー通知",
+    "description": "Filter lists section name"
   },
   "3pGroupAnnoyances": {
     "message": "迷惑系",
-    "description": "The header identifying the filter lists in the category 'annoyances'"
+    "description": "Filter lists section name"
   },
   "3pGroupMultipurpose": {
     "message": "多目的",
-    "description": "English: Multipurpose"
+    "description": "Filter lists section name"
   },
   "3pGroupRegions": {
     "message": "地域・言語",
-    "description": "English: Regions, languages"
+    "description": "Filter lists section name"
   },
   "3pGroupCustom": {
     "message": "カスタム",
-    "description": "English: Custom"
+    "description": "Filter lists section name"
   },
   "3pImport": {
     "message": "インポート...",
@@ -527,17 +535,25 @@
     "message": "ネットワークエラーが発生したため、リソースを更新できませんでした。",
     "description": "used as a tooltip for error icon beside a list"
   },
-  "1pFormatHint": {
-    "message": "1 行につき 1 つのフィルターです。フィルターはただのホスト名でも EasyList と同じ形式でも構いません。<code>!</code> を先頭に付けた行は無視されます。",
-    "description": "Short information about how to create custom filters"
+  "1pTrustWarning": {
+    "message": "信頼できないソースからフィルターを追加しないでください。",
+    "description": "Warning against copy-pasting filters from random sources"
+  },
+  "1pEnableMyFiltersLabel": {
+    "message": "自分のカスタムフィルターを有効化",
+    "description": "Label for the checkbox use to enable/disable 'My filters' list"
+  },
+  "1pTrustMyFiltersLabel": {
+    "message": "信頼が必要なカスタムフィルターを許可する",
+    "description": "Label for the checkbox use to trust the content of 'My filters' list"
   },
   "1pImport": {
-    "message": "インポートして追加",
-    "description": "English: Import and append"
+    "message": "インポートと追加",
+    "description": "Button in the 'My filters' pane"
   },
   "1pExport": {
     "message": "エクスポート",
-    "description": "English: Export"
+    "description": "Button in the 'My filters' pane"
   },
   "1pExportFilename": {
     "message": "my-ublock-static-filters_{{datetime}}.txt",
@@ -580,8 +596,8 @@
     "description": ""
   },
   "rulesExport": {
-    "message": "ファイルにエクスポート",
-    "description": ""
+    "message": "ファイルへエクスポート",
+    "description": "Button in the 'My rules' pane"
   },
   "rulesDefaultFileName": {
     "message": "my-ublock-dynamic-rules_{{datetime}}.txt",
@@ -616,12 +632,12 @@
     "description": "A concise description of the 'Trusted sites' pane."
   },
   "whitelistImport": {
-    "message": "インポートして追加",
-    "description": "English: Import and append"
+    "message": "インポートと追加",
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExport": {
     "message": "エクスポート",
-    "description": "English: Export"
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExportFilename": {
     "message": "my-ublock-trusted-sites_{{datetime}}.txt",
@@ -881,11 +897,11 @@
   },
   "supportOpenButton": {
     "message": "開く",
-    "description": "Text for button which open an external webpage in Support pane"
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportReportSpecificButton": {
     "message": "新しい報告を作成",
-    "description": "Text for button which open an external webpage in Support pane"
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportFindSpecificButton": {
     "message": "似た報告を探す",
@@ -939,16 +955,20 @@
     "message": "以下の技術情報はボランティアが問題解決の手助けをするときに役立つことがあります。",
     "description": "First paragraph of 'Troubleshooting Information' section in Support pane"
   },
-  "supportS5P2": {
-    "message": "<b>重要:</b> 個人情報や機密情報の可能性のある情報は既定で削除されます。情報が削除されたことによって問題解決が困難になることがあります。",
-    "description": "Second paragraph of 'Troubleshooting Information' section in Support pane"
-  },
   "supportS6H": {
     "message": "フィルターの問題を報告する",
     "description": "Header of 'Report a filter issue' section in Support pane"
   },
   "supportS6P1S1": {
-    "message": "重複した報告によってボランティアに負担をかけないように、問題がすでに報告されていないか確認してください。",
+    "message": "重複した報告によってボランティアに負担をかけないように、問題がすでに報告されていないか確認してください。 <b>注意:</b> ボタンをクリックすると、ページのオリジンが GitHub に送信されます。",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S1": {
+    "message": "フィルターリストは毎日更新されます。まず最新のフィルターリストで問題が修正されていないか確認してください。",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S2": {
+    "message": "問題のあるページを再読み込みしても問題がまだ残っているか確認してください。",
     "description": "A paragraph in the filter issue reporter section"
   },
   "supportS6URL": {
@@ -987,17 +1007,13 @@
     "message": "勝手にタブやウィンドウを開きます",
     "description": "An entry in the widget used to select the type of issue"
   },
+  "supportS6Select1Option7": {
+    "message": "悪質ソフトやフィッシングへの誘導",
+    "description": "An entry in the widget used to select the type of issue"
+  },
   "supportS6Checkbox1": {
     "message": "ウェブページに“NSFW” (閲覧注意、<a href=\"https://ja.wikipedia.org/wiki/NSFW\">“Not Safe For Work”</a>) とラベルをつける",
     "description": "A checkbox to use for NSFW sites"
-  },
-  "supportRedact": {
-    "message": "編集済にする",
-    "description": "Text for 'Redact' button"
-  },
-  "supportUnredact": {
-    "message": "無編集にする",
-    "description": "Text for 'Unredact' button"
   },
   "aboutPrivacyPolicy": {
     "message": "プライバシーポリシー",
@@ -1071,10 +1087,6 @@
     "message": "ネットワークエラー: {{msg}}",
     "description": "English: Network error: {{msg}}"
   },
-  "subscriberConfirm": {
-    "message": "以下の URL をカスタムフィルターリストに追加しますか？\n\nフィルター名: \"{{title}}\"\nURL: {{url}}",
-    "description": "No longer used"
-  },
   "subscribeButton": {
     "message": "購読",
     "description": "For the button used to subscribe to a filter list"
@@ -1120,7 +1132,7 @@
     "description": "Used as a title for the document-blocked page"
   },
   "docblockedPrompt1": {
-    "message": "uBlock Origin は以下のページの読み込みを防ぎました:",
+    "message": "uBlock Origin は、 以下のサイトの読み込みを防止しました:",
     "description": "Used in the strict-blocking page"
   },
   "docblockedPrompt2": {
@@ -1144,7 +1156,7 @@
     "description": "English: Close this window"
   },
   "docblockedDontWarn": {
-    "message": "次回からこのサイトについて警告を表示しない",
+    "message": "今後このサイトに関する警告を表示しない",
     "description": "Label for checkbox in document-blocked page"
   },
   "docblockedProceed": {
@@ -1160,8 +1172,28 @@
     "description": "English: Permanently"
   },
   "docblockedDisable": {
-    "message": "続行",
+    "message": "続行する",
     "description": "Button text to navigate to the blocked page"
+  },
+  "docblockedRedirectPrompt": {
+    "message": "ブロックしたページは別のサイトへリダイレクトしようとしています。続行すると次の URL へ移動します: {{url}}",
+    "description": "Text warning about an incoming redirect"
+  },
+  "docblockedReasonLabel": {
+    "message": "理由:",
+    "description": "The label which prepend the actual reason why a page was blocked"
+  },
+  "docblockedReasonMalicious": {
+    "message": "悪意のある",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonTracker": {
+    "message": "トラッカー",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonDisreputable": {
+    "message": "悪い評判",
+    "description": "An actual reason why a page was blocked"
   },
   "cloudPush": {
     "message": "クラウドストレージにエクスポートします",
@@ -1215,6 +1247,10 @@
     "message": "大きなメディア要素を一時的に許可",
     "description": "A context menu entry, present when large media elements have been blocked on the current site"
   },
+  "contextMenuViewSource": {
+    "message": "ソースを表示…",
+    "description": "A context menu entry, to view the source code of the target resource"
+  },
   "shortcutCapturePlaceholder": {
     "message": "ショートカットキーを入力",
     "description": "Placeholder string for input field used to capture a keyboard shortcut"
@@ -1234,6 +1270,10 @@
   "toggleCosmeticFiltering": {
     "message": "整形フィルタリングの有効/無効を切り替える",
     "description": "Label for keyboard shortcut used to toggle cosmetic filtering"
+  },
+  "toggleJavascript": {
+    "message": "JavaScript の切り替え",
+    "description": "Label for keyboard shortcut used to toggle no-scripting switch"
   },
   "relaxBlockingMode": {
     "message": "ブロッキングモードを緩和する",
@@ -1258,6 +1298,14 @@
   "clickToLoad": {
     "message": "クリックして読み込む",
     "description": "Message used in frame placeholders"
+  },
+  "linterMainReport": {
+    "message": "エラー: {{count}}",
+    "description": "Summary of number of errors as reported by the linter "
+  },
+  "unprocessedRequestTooltip": {
+    "message": "ブラウザー起動時に正しくフィルターできませんでした。\nページを再読み込みしてください。",
+    "description": "A warning which will appear in the popup panel if needed"
   },
   "dummy": {
     "message": "This entry must be the last one",

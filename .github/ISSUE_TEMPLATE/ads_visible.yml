@@ -1,0 +1,66 @@
+name: Ads Visible Report
+description: Report a visible Ad while AdNauseam is enabled.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Only submit visible Ad tickets for AdNauseam-specific cases. 
+  - type: checkboxes
+    attributes:
+      label: This is an AdNauseam-specific issue.
+      options:
+        - label: I have tested the same page on *uBlock Origin*, and the Ad is not visible.
+          required: true
+  - type: checkboxes
+    attributes:
+      label: I have tried to reproduce the issue when...
+      options:
+        - label: AdNauseam is the only extension
+          required: true
+        - label: AdNauseam uses default lists and setting.
+          required: true
+        - label: Using a new, unmodified browser profile
+          required: true
+        - label: All filter lists are updated
+          required: true
+  - type: checkboxes
+    attributes:
+      label: Does Strict-Block mode solves the issue? 
+      options:
+        - label: I have tested the same page with Strict-Block enabled, and the Ad is still visible.
+          required: true
+  - type: textarea
+    attributes:
+      label: URL(s) where the issue occurs.
+      description: |
+        At least one URL is **MANDATORY** for an issue affecting a web page.
+        The backticks (`) surrounding the URL(s) are important, it prevents the URL(s) from being clickable. Warn with **"NSFW"** where applicable.
+      placeholder: |
+        `https://example.com`
+        `https://example.org`
+        `https://example.net`
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Your location/country.
+      description: |
+        If the issue is website specific, knowing your approximate location will help us to reproduce it.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Screenshot(s)
+      description: |
+        Screenshot(s) are **MANDATORY** for hard-to-describe visual issues.
+        Post **LINKS** instead of inline images for screenshots containing **ADULT MATERIAL**.
+    validations:
+      required: false
+  - type: textarea
+    id: configuration
+    attributes:
+      label: Configuration
+      description: |
+        If this section is auto-filled by AdNauseam, leave it alone.
+    validations:
+      required: false

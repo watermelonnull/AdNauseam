@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2017-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,206 +19,226 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-'use strict';
+/******************************************************************************/
+
+//                example.com: domain => no slash
+//           example.com/toto: domain + path => slash
+//         /example\d+\.com$/: domain regex: no literal slash in regex
+// /example\d+\.com\/toto\d+/: domain + path => literal slash in regex
 
 /******************************************************************************/
 
-const StaticExtFilteringHostnameDB = class {
-    constructor(nBits, selfie = undefined) {
-        this.nBits = nBits;
-        this.timer = undefined;
-        this.strToIdMap = new Map();
-        this.hostnameToSlotIdMap = new Map();
-        // Array of integer pairs
-        this.hostnameSlots = [];
-        // Array of strings (selectors and pseudo-selectors)
-        this.strSlots = [];
+const naivePathnameFromURL = url => {
+    if ( typeof url !== 'string' ) { return; }
+    const hnPos = url.indexOf('://');
+    if ( hnPos === -1 ) { return; }
+    const pathPos = url.indexOf('/', hnPos+3);
+    if ( pathPos === -1 ) { return; }
+    return url.slice(pathPos);
+};
+
+const extractSubTargets = target => {
+    const isRegex = target.charCodeAt(0) === 0x2F /* / */;
+    if ( isRegex === false ) {
+        const pathPos = target.indexOf('/');
+        return {
+            isRegex,
+            hn: target.slice(0, pathPos),
+            pn: target.slice(pathPos),
+        };
+    }
+    const pathPos = target.indexOf('\\/');
+    if ( pathPos !== -1 ) {
+        return {
+            isRegex,
+            hn: `${target.slice(1, pathPos)}$`,
+            pn: `^${target.slice(pathPos, -1)}`,
+        };
+    }
+    return { isRegex, hn: target.slice(1, -1) };
+};
+
+/******************************************************************************/
+
+export class StaticExtFilteringHostnameDB {
+    static VERSION = 1;
+    constructor() {
         this.size = 0;
-        if ( selfie !== undefined ) {
-            this.fromSelfie(selfie);
-        }
     }
 
-    store(hn, bits, s) {
+    #hostnameToStringListMap = new Map();
+    #matcherMap = new Map();
+    #hostnameToMatcherListMap = new Map();
+    #strSlots = [ '' ];     // Array of strings (selectors and pseudo-selectors)
+    #matcherSlots = [ null ];
+    #linkedLists = [ 0, 0 ];// Array of integer pairs
+    #regexMap = new Map();
+    #strToSlotMap = new Map();
+    #cleanupTimer = vAPI.defer.create(( ) => {
+        this.#strToSlotMap.clear();
+    });
+
+    store(target, s) {
         this.size += 1;
-        let iStr = this.strToIdMap.get(s);
+        let iStr = this.#strToSlotMap.get(s);
         if ( iStr === undefined ) {
-            iStr = this.strSlots.length;
-            this.strSlots.push(s);
-            this.strToIdMap.set(s, iStr);
-            if ( this.timer === undefined ) {
+            iStr = this.#strSlots.length;
+            this.#strSlots.push(s);
+            this.#strToSlotMap.set(s, iStr);
+            if ( this.#cleanupTimer.ongoing() === false ) {
                 this.collectGarbage(true);
             }
         }
-        const strId = iStr << this.nBits | bits;
-        let iHn = this.hostnameToSlotIdMap.get(hn);
-        if ( iHn === undefined ) {
-            this.hostnameToSlotIdMap.set(hn, this.hostnameSlots.length);
-            this.hostnameSlots.push(strId, 0);
-            return;
+        if ( target.includes('/') ) {
+            return this.#storeMatcher(target, iStr);
         }
-        // Add as last item.
-        while ( this.hostnameSlots[iHn+1] !== 0 ) {
-            iHn = this.hostnameSlots[iHn+1];
+        const iList = this.#hostnameToStringListMap.get(target) ?? 0;
+        this.#hostnameToStringListMap.set(target, this.#linkedLists.length);
+        this.#linkedLists.push(iStr, iList);
+    }
+
+    #storeMatcher(target, iStr) {
+        const iMatcher = this.#matcherMap.get(target) ||
+            this.#matcherSlots.length;
+        if ( iMatcher === this.#matcherSlots.length ) {
+            const { isRegex, hn, pn } = extractSubTargets(target);
+            this.#matcherSlots.push({ isRegex, hn, pn, iList: 0 });
+            this.#matcherMap.set(target, iMatcher);
+            if ( isRegex === false ) {
+                const iMatcherList = this.#hostnameToMatcherListMap.get(hn) ?? 0;
+                this.#hostnameToMatcherListMap.set(hn, this.#linkedLists.length);
+                this.#linkedLists.push(iMatcher, iMatcherList);
+            } else {
+                const iMatcherList = this.#hostnameToMatcherListMap.get('') ?? 0;
+                this.#hostnameToMatcherListMap.set('', this.#linkedLists.length);
+                this.#linkedLists.push(iMatcher, iMatcherList);
+            }
         }
-        this.hostnameSlots[iHn+1] = this.hostnameSlots.length;
-        this.hostnameSlots.push(strId, 0);
+        const matcher = this.#matcherSlots[iMatcher];
+        const iList = matcher.iList;
+        matcher.iList = this.#linkedLists.length;
+        this.#linkedLists.push(iStr, iList);
     }
 
     clear() {
-        this.hostnameToSlotIdMap.clear();
-        this.hostnameSlots.length = 0;
-        this.strSlots.length = 0;
-        this.strToIdMap.clear();
+        this.#hostnameToStringListMap.clear();
+        this.#matcherMap.clear();
+        this.#hostnameToMatcherListMap.clear();
+        this.#strSlots = [ '' ];
+        this.#matcherSlots = [ null ];
+        this.#linkedLists = [ 0, 0 ];
+        this.#regexMap.clear();
+        this.#strToSlotMap.clear();
         this.size = 0;
     }
 
     collectGarbage(later = false) {
-        if ( later === false ) {
-            if ( this.timer !== undefined ) {
-                self.cancelIdleCallback(this.timer);
-                this.timer = undefined;
-            }
-            this.strToIdMap.clear();
-            return;
+        if ( later ) {
+            return this.#cleanupTimer.onidle(5000, { timeout: 5000 });
         }
-        if ( this.timer !== undefined ) { return; }
-        this.timer = self.requestIdleCallback(
-            ( ) => {
-                this.timer = undefined;
-                this.strToIdMap.clear();
-            },
-            { timeout: 5000 }
-        );
+        this.#cleanupTimer.off();
+        this.#strToSlotMap.clear();
     }
 
-    // modifiers = 1: return only specific items
-    // modifiers = 2: return only generic items
-    //
-    retrieve(hostname, out, modifiers = 0) {
-        if ( modifiers === 2 ) {
-            hostname = '';
-        }
-        const mask = out.length - 1; // out.length must be power of two
+    retrieveSpecifics(out, hostname) {
+        let hn = hostname;
+        if ( hn === '' ) { return; }
         for (;;) {
-            let iHn = this.hostnameToSlotIdMap.get(hostname);
-            if ( iHn !== undefined ) {
-                do {
-                    const strId = this.hostnameSlots[iHn+0];
-                    out[strId & mask].add(
-                        this.strSlots[strId >>> this.nBits]
-                    );
-                    iHn = this.hostnameSlots[iHn+1];
-                } while ( iHn !== 0 );
+            const iList = this.#hostnameToStringListMap.get(hn);
+            if ( iList !== undefined ) {
+                this.#retrieveFromSlot(out, iList);
             }
-            if ( hostname === '' ) { break; }
-            const pos = hostname.indexOf('.');
-            if ( pos === -1 ) {
-                if ( modifiers === 1 ) { break; }
-                hostname = '';
-            } else {
-                hostname = hostname.slice(pos + 1);
-            }
+            const pos = hn.indexOf('.');
+            if ( pos === -1 ) { break; }
+            hn = hn.slice(pos + 1);
+            if ( hn === '*' ) { break; }
         }
     }
 
-    hasStr(hostname, exceptionBit, value) {
-        let found = false;
+    retrieveGenerics(out) {
+        let iList = this.#hostnameToStringListMap.get('');
+        if ( iList ) { this.#retrieveFromSlot(out, iList); }
+        iList = this.#hostnameToStringListMap.get('*');
+        if ( iList ) { this.#retrieveFromSlot(out, iList); }
+    }
+
+    retrieveSpecificsByRegex(out, hostname, url) {
+        let hn = hostname;
+        if ( hn === '' ) { return; }
+        const pathname = naivePathnameFromURL(url) ?? '';
         for (;;) {
-            let iHn = this.hostnameToSlotIdMap.get(hostname);
-            if ( iHn !== undefined ) {
-                do {
-                    const strId = this.hostnameSlots[iHn+0];
-                    const str = this.strSlots[strId >>> this.nBits];
-                    if ( (strId & exceptionBit) !== 0 ) {
-                        if ( str === value || str === '' ) { return false; }
-                    }
-                    if ( str === value ) { found = true; }
-                    iHn = this.hostnameSlots[iHn+1];
-                } while ( iHn !== 0 );
-            }
-            if ( hostname === '' ) { break; }
-            const pos = hostname.indexOf('.');
-            if ( pos !== -1 ) {
-                hostname = hostname.slice(pos + 1);
-            } else if ( hostname !== '*' ) {
-                hostname = '*';
-            } else {
-                hostname = '';
-            }
+            this.#retrieveSpecificsByRegex(hn, out, hostname, pathname);
+            const pos = hn.indexOf('.');
+            if ( pos === -1 ) { break; }
+            hn = hn.slice(pos + 1);
         }
-        return found;
+        this.#retrieveSpecificsByRegex('', out, hostname, pathname);
+    }
+
+    #retrieveSpecificsByRegex(hn, out, hostname, pathname) {
+        let iMatchList = this.#hostnameToMatcherListMap.get(hn) ?? 0;
+        while ( iMatchList !== 0 ) {
+            const iMatchSlot = this.#linkedLists[iMatchList+0];
+            const matcher = this.#matcherSlots[iMatchSlot];
+            if ( this.#matcherTest(matcher, hostname, pathname) ) {
+                this.#retrieveFromSlot(out, matcher.iList);
+            }
+            iMatchList = this.#linkedLists[iMatchList+1];
+        }
+    }
+
+    #matcherTest(matcher, hn, pn) {
+        if ( matcher.isRegex === false ) {
+            return pn.startsWith(matcher.pn);
+        }
+        if ( this.#restrTest(matcher.hn, hn) === false ) { return false; }
+        if ( matcher.pn === undefined ) { return true; }
+        return this.#restrTest(matcher.pn, pn);
+    }
+
+    #restrTest(restr, s) {
+        let re = this.#regexMap.get(restr);
+        if ( re === undefined ) {
+            this.#regexMap.set(restr, (re = new RegExp(restr)));
+        }
+        return re.test(s);
+    }
+
+    #retrieveFromSlot(out, iList) {
+        if ( iList === undefined ) { return; }
+        do {
+            const iStr = this.#linkedLists[iList+0];
+            out.add(this.#strSlots[iStr]);
+            iList = this.#linkedLists[iList+1];
+        } while ( iList !== 0 );
     }
 
     toSelfie() {
         return {
-            hostnameToSlotIdMap: Array.from(this.hostnameToSlotIdMap),
-            hostnameSlots: this.hostnameSlots,
-            strSlots: this.strSlots,
+            VERSION: StaticExtFilteringHostnameDB.VERSION,
+            hostnameToStringListMap: this.#hostnameToStringListMap,
+            matcherMap: this.#matcherMap,
+            hostnameToMatcherListMap: this.#hostnameToMatcherListMap,
+            strSlots: this.#strSlots,
+            matcherSlots: this.#matcherSlots,
+            linkedLists: this.#linkedLists,
             size: this.size
         };
     }
 
     fromSelfie(selfie) {
-        if ( selfie === undefined ) { return; }
-        this.hostnameToSlotIdMap = new Map(selfie.hostnameToSlotIdMap);
-        this.hostnameSlots = selfie.hostnameSlots;
-        this.strSlots = selfie.strSlots;
+        if ( typeof selfie !== 'object' || selfie === null ) { return; }
+        if ( selfie.VERSION !== StaticExtFilteringHostnameDB.VERSION ) {
+            throw new TypeError('Bad selfie');
+        }
+        this.#hostnameToStringListMap = selfie.hostnameToStringListMap;
+        this.#matcherMap = selfie.matcherMap;
+        this.#hostnameToMatcherListMap = selfie.hostnameToMatcherListMap;
+        this.#strSlots = selfie.strSlots;
+        this.#matcherSlots = selfie.matcherSlots;
+        this.#linkedLists = selfie.linkedLists;
         this.size = selfie.size;
     }
-};
-
-/******************************************************************************/
-
-const StaticExtFilteringSessionDB = class {
-    constructor() {
-        this.db = new Map();
-    }
-    compile(s) {
-        return s;
-    }
-    add(bits, s) {
-        const bucket = this.db.get(bits);
-        if ( bucket === undefined ) {
-            this.db.set(bits, new Set([ s ]));
-        } else {
-            bucket.add(s);
-        }
-    }
-    remove(bits, s) {
-        const bucket = this.db.get(bits);
-        if ( bucket === undefined ) { return; }
-        bucket.delete(s);
-        if ( bucket.size !== 0 ) { return; }
-        this.db.delete(bits);
-    }
-    retrieve(out) {
-        const mask = out.length - 1;
-        for ( const [ bits, bucket ] of this.db ) {
-            const i = bits & mask;
-            if ( out[i] instanceof Object === false ) { continue; }
-            for ( const s of bucket ) {
-                out[i].add(s);
-            }
-        }
-    }
-    has(bits, s) {
-        const selectors = this.db.get(bits);
-        return selectors !== undefined && selectors.has(s);
-    }
-    clear() {
-        this.db.clear();
-    }
-    get isNotEmpty() {
-        return this.db.size !== 0;
-    }
-};
-
-/******************************************************************************/
-
-export {
-    StaticExtFilteringHostnameDB,
-    StaticExtFilteringSessionDB,
-};
+}
 
 /******************************************************************************/

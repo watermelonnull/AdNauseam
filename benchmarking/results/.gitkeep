@@ -1,0 +1,3 @@
+# AdNauseam Benchmark Results
+# This directory stores JSON output from benchmark runs.
+# Files are named: benchmark-{scenario}-{timestamp}.json

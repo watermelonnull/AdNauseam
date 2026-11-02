@@ -32,19 +32,19 @@
     "description": "English: Firstrun.html -> Block Malware"
   },
   "adnAboutResetDataConfirm": {
-    "message": "Mọi thiết đặt sẽ bị và lượng quảng cáo đã ghi nhận sẽ bị xoá bỏ, AdNauseam sẽ khởi động lại.\n\nĐặt AdNauseam về thiết đặt mặc định ban đầu?",
+    "message": "Mọi cài đặt cấu hình và các quảng cáo đã lưu trong kho sẽ bị xoá, và AdNauseam sẽ khởi động lại.\n\nĐặt AdNauseam về cấu hình mặc định ?",
     "description": "Message asking user to confirm reset"
   },
   "adnFirstRunHideAllAdsDescription": {
-    "message": "ẩn quảng cáo trong <span class='link' id='To3pfilter'>bộ lọc</span> bạn đã chọn",
+    "message": "ẩn quảng cáo trong <span class='link' id='To3pfilter'>bộ lọc<\/span> bạn đã chọn",
     "description": "English: Firstrun.html -> Hide Ads in your selected filter lists"
   },
   "adnFirstRunClickingAdsDescription": {
-    "message": "đăng ký truy cập vào quảng cáo được phát hiện qua <span class='link' id='To3pfilter'>bộ lọc của bạn</span>",
+    "message": "đăng ký truy cập vào quảng cáo được phát hiện qua <span class='link' id='To3pfilter'>bộ lọc của bạn<\/span>",
     "description": "English: Firstrun.html -> Register visits on Ads found via your filter lists"
   },
   "adnFirstRunBlockingMalwareDescription": {
-    "message": "Chặn các trackers và phần mềm độc hại (<span>tùy chỉnh</span>) khác",
+    "message": "Chặn các trackers và phần mềm độc hại (<span>tùy chỉnh<\/span>) khác",
     "description": "English: Firstrun.html -> Block trackers and other malware (customize)"
   },
   "adnNotificationReactivate": {
@@ -88,32 +88,36 @@
     "description": "English: Notifications -> Please allow AdNauseam to access search page results"
   },
   "adnNotificationBrowserSetting": {
-    "message": "Thiết đặt 'Chặn nội dung' của trình duyệt có thể xung đột với AdNauseam!",
+    "message": "Cài đặt 'Chặn nội dung' của trình duyệt có thể xung đột với AdNauseam!",
     "description": "English: Notifications -> The 'Content Blocking' settings in your browser may interfere with AdNauseam!"
   },
   "adnNotificationPrivacyMode": {
-    "message": "Đã cho phép AdNauseam kiểm tra hoạt động trực tuyến khi duyệt web ở chế độ riêng tư.",
+    "message": "Đã cho phép AdNauseam kiểm tra các hoạt động lướt web online của bạn ở chế độ riêng tư.",
     "description": "English: Notifications -> You have allowed adnauseam to have access to your online activities while private browsing."
   },
   "adnNotificationDNTAllowed": {
-    "message": "Trang này tuân thủ <b>Do Not Track</b>, quảng cáo được cho phép.",
+    "message": "Trang này tuân thủ <b>Do Not Track<\/b>, quảng cáo được cho phép.",
     "description": "English: Notifications -> This page respects Do Not Track, Ads are allowed."
   },
   "adnNotificationDNTHidingNotClicking": {
-    "message": "Trang này tuân thủ <b>Do Not Track</b>, ẩn chứ không mở.",
+    "message": "Trang này tuân thủ <b>Do Not Track<\/b>, ẩn chứ không mở.",
     "description": "English: Notifications -> This page respects Do Not Track, hiding not clicking."
   },
   "adnNotificationDNTClickingNotHiding": {
-    "message": "Trang này tuân thủ <b>Do Not Track</b>, mở chứ không ẩn",
+    "message": "Trang này tuân thủ <b>Do Not Track<\/b>, mở chứ không ẩn",
     "description": "English: Notifications -> This page respects Do Not Track, clicking not hiding."
   },
   "adnNotificationDNTJustSoYouKnow": {
-    "message": "Thông báo để bạn biết rằng trang này tuân thủ <b>Do Not Track</b>.",
+    "message": "Thông báo để bạn biết rằng trang này tuân thủ <b>Do Not Track<\/b>.",
     "description": "English: Notifications -> This page respects Do Not Track, just so you know."
   },
   "adnNotificationShowAdsDebug": {
-    "message": "The Advanced Setting \"Show Ads Debug\" is turned on",
+    "message": "Cài đặt nâng cao \"Hiển thị Debug Quảng Cáo\" đang được bật",
     "description": "English: Notifications -> The Advanced Setting \"Show Ads Debug\" is turned on"
+  },
+  "adnNewerVersionAvailableNotification": {
+    "message": "AdNauseam đã có bản cập nhật mới",
+    "description": "English: Notifications -> A newer version of AdNauseam is available"
   },
   "adnTarget": {
     "message": "MỤC TIÊU",
@@ -153,7 +157,7 @@
   },
   "adnPausedOnPage": {
     "message": "AdNauseam đã được tạm dừng trên trang này",
-    "description": "English: Menu->display when paused on page/site"
+    "description": "English: Menu->display when paused on page\/site"
   },
   "adnNotHiding": {
     "message": "AdNauseam hiện không ẩn quảng cáo",
@@ -168,35 +172,35 @@
     "description": "appears in ADN vault, above ad slider"
   },
   "topAdnetworks": {
-    "message": "Top Ad Networks",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "Những mạng lưới quảng cáo hàng đầu",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "topSites": {
-    "message": "Trang hàng đầu",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "Các trang web hàng đầu",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypes": {
     "message": "Loại quảng cáo",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesImageAds": {
     "message": "Quảng cáo hình ảnh",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesTextAds": {
     "message": "Quảng cáo văn bản",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adnShowingRecentAds": {
     "message": "Không có quảng cáo được thu thập trên trang này (hiện mục gần đây)",
     "description": "shown in menu when only 'recent' Ads are shown"
   },
   "adnThisPageStrictBlocked": {
-    "message": "{{domain}} is currently strict-blocked.",
+    "message": "{{domain}} đang bị chặn ở mức độ nghiêm ngặt.",
     "description": "shown in menu when the current page is strict-blocked"
   },
   "adnStrictBlockListDescription": {
-    "message": "The strict-block list serves to help the users to strict-block specific domains or pages more easily.",
+    "message": "Danh sách chặn ở mức độ nghiêm ngặt giúp người dùng chặn những tên miền hoặc trang web cụ thể một cách dễ dàng.",
     "description": "Description on the strict-block list tab, which is found on the dashboard"
   },
   "adnExportedAdsFilename": {
@@ -216,7 +220,7 @@
     "description": "appears in ADN settings"
   },
   "adnPurgeConfirm": {
-    "message": "This action will permanently remove all ads with load image error. Make sure your internet is connected, otherwise all your ads will be deleted.",
+    "message": "Hành động này sẽ xóa vĩnh viễn các quảng cáo mà có ảnh không tải được. Bạn nên backup kho lưu trữ trước, đồng thời đảm bảo có kết nối mạng Internet.",
     "description": "appears in ADN settings"
   },
   "adnAdClickingStatusPending": {
@@ -232,11 +236,11 @@
     "description": "Menu & AdVault: Failed"
   },
   "adnAdClickingStatusSkippedDNT": {
-    "message": "SKIPPED: DNT Allowed",
+    "message": "BỎ QUA: Cho phép DNT",
     "description": "Menu & AdVault: SKIPPED: DNT Allowed"
   },
   "adnAdClickingStatusSkippedUser": {
-    "message": "SKIPPED: Clicked by user",
+    "message": "BỎ QUA: Click bởi người dùng",
     "description": "Menu & AdVault: SKIPPED: Clicked by User"
   },
   "adnAdClickingStatusSkippedFrequency": {
@@ -268,19 +272,19 @@
     "description": "appears in ADN popup menu three state button"
   },
   "adnMenuDisable": {
-    "message": "Disable",
+    "message": "Tắt",
     "description": "Disabled Adnauseam -> appears in ADN popup menu three state button"
   },
   "adnMenuActive": {
-    "message": "Active",
+    "message": "Kích hoạt",
     "description": "Make Adnauseam Active -> appears in ADN popup menu three state button"
   },
   "adnMenuStrict": {
-    "message": "Strict",
+    "message": "Nghiêm ngặt",
     "description": "Activate Strict-Block -> appears in ADN popup menu three state button"
   },
   "adnMenuDisableScopeDomain": {
-    "message": "on {{domain}}",
+    "message": "trong {{domain}}",
     "description": "Disable AdNaueam Block On this Domain -> Popup option that appears inside ADN menu"
   },
   "adnMenuDisableScopePage": {
@@ -356,8 +360,20 @@
     "description": "appears on vault page"
   },
   "adnPurgeDeadAds": {
-    "message": "Purge Dead Ads",
+    "message": "Loại bỏ những quảng cáo không hoạt động",
     "description": "appears on vault page"
+  },
+  "adnShowDeadAds": {
+    "message": "Hiển thị quảng cáo không hoạt động",
+    "description": "appears on vault page"
+  },
+  "adnHideDeadAds": {
+    "message": "Ẩn quảng cáo không hoạt động",
+    "description": "appears on vault page"
+  },
+  "adnCaptureVault": {
+    "message": "Thu thập",
+    "description": "appears on vault page in dev mode"
   },
   "adnVaultFound": {
     "message": "{{total}} quảng cáo được thu thập",
@@ -475,24 +491,36 @@
     "message": "Cập Nhật",
     "description": "English: update"
   },
+  "adnUpdateButton": {
+    "message": "Cập nhật",
+    "description": "English: update"
+  },
   "whitelistPageName": {
     "message": "Danh sách loại trừ",
     "description": "appears as tab name in dashboard"
   },
   "strictBlockListPageName": {
-    "message": "Strict-Block List",
+    "message": "Danh sách chặn nghiêm ngặt",
     "description": "appears as tab name in dashboard"
   },
   "eventLoggingPrompt": {
-    "message": "Kích hoạt chế độ gỡ rối",
+    "message": "Chế độ kiểm tra lỗi",
     "description": "prompt for toggle"
   },
   "disableWarnings": {
-    "message": "Disable warnings",
+    "message": "Tắt cảnh báo",
     "description": "English:Disable warnings"
   },
+  "blurCollectedAds": {
+    "message": "Làm mở quảng cáo thu thập được",
+    "description": "English: Blur Collected ads"
+  },
+  "hideDeadAds": {
+    "message": "Ẩn quảng cáo không hoạt động ",
+    "description": "English: Hide Dead ads"
+  },
   "showAdsDebugPrompt": {
-    "message": "Show ads for ad-collection debugging",
+    "message": "Hiển thị quảng cáo để debug chức năng thu thập quảng cáo",
     "description": "English: Show ads for ad-collection debugging"
   },
   "removeAdsInPrivate": {
@@ -500,7 +528,27 @@
     "description": "English:Remove ads collected in private mode - settings page"
   },
   "settingsStrictBlockingMode": {
-    "message": "Activate Strict-Blocking Mode",
+    "message": "Bật chế độ chặn mạnh",
     "description": "English: Activate Strict-Blocking Mode"
+  },
+  "adnRefreshButton": {
+    "message": "Tải lại",
+    "description": "English: refresh page from menu notification button"
+  },
+  "adnRefreshNotification": {
+    "message": "Áp dụng thay đổi cho trang web hiện tại",
+    "description": "English: refresh page from menu notification"
+  },
+  "supportS6P3S1": {
+    "message": "Đảm bảo vấn đề này thuộc về <b>AdNauseam-specific<\/b>.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P3S2": {
+    "message": "Tôi đã test vấn đề này trên cùng trang web trên <a url='https:\/\/github.com\/gorhill\/uBlock'>#uBO#<\/a> và tôi xác nhận vấn đề này thuộc về <b>AdNauseam-specific<\/b>.",
+    "description": "A checkbox in the filter issue reporter section"
+  },
+  "supportS6Select1Option7": {
+    "message": "Quảng cáo không được thu thập",
+    "description": "Ads are present on page but none are collected"
   }
 }

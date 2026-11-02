@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2014-2015 The uBlock Origin authors
     Copyright (C) 2014-present Raymond Hill
 
@@ -21,8 +21,6 @@
 */
 
 // For non-background page
-
-'use strict';
 
 /******************************************************************************/
 
@@ -81,10 +79,9 @@ vAPI.messaging = {
     port: null,
     portTimer: null,
     portTimerDelay: 10000,
-    extended: undefined,
-    extensions: [],
     msgIdGenerator: 1,
     pending: new Map(),
+    waitStartTime: 0,
     shuttingDown: false,
 
     shutdown: function() {
@@ -115,33 +112,16 @@ vAPI.messaging = {
     //   revisited to isolate the picker dialog DOM from the page DOM.
     messageListener: function(details) {
         if ( typeof details !== 'object' || details === null ) { return; }
-
-        // Response to specific message previously sent
-        if ( details.msgId !== undefined ) {
-            const resolver = this.pending.get(details.msgId);
-            if ( resolver !== undefined ) {
-                this.pending.delete(details.msgId);
-                resolver(details.msg);
-                return;
-            }
-        }
-
-        // Unhandled messages
-        this.extensions.every(ext => ext.canProcessMessage(details) !== true);
+        if ( details.msgId === undefined ) { return; }
+        const resolver = this.pending.get(details.msgId);
+        if ( resolver === undefined ) { return; }
+        this.pending.delete(details.msgId);
+        resolver(details.msg);
     },
     messageListenerBound: null,
 
     canDestroyPort: function() {
-        return this.pending.size === 0 && (
-            this.extensions.length === 0 ||
-            this.extensions.every(e => e.canDestroyPort())
-        );
-    },
-
-    mustDestroyPort: function() {
-        if ( this.extensions.length === 0 ) { return; }
-        this.extensions.forEach(e => e.mustDestroyPort());
-        this.extensions.length = 0;
+        return this.pending.size === 0;
     },
 
     portPoller: function() {
@@ -166,7 +146,6 @@ vAPI.messaging = {
             port.onDisconnect.removeListener(this.disconnectListenerBound);
             this.port = null;
         }
-        this.mustDestroyPort();
         // service pending callbacks
         if ( this.pending.size !== 0 ) {
             const pending = this.pending;
@@ -186,7 +165,7 @@ vAPI.messaging = {
         }
         try {
             this.port = browser.runtime.connect({name: vAPI.sessionId}) || null;
-        } catch (ex) {
+        } catch {
             this.port = null;
         }
         // Not having a valid port at this point means the main process is
@@ -216,12 +195,17 @@ vAPI.messaging = {
         // the main process is no longer reachable: memory leaks and bad
         // performance become a risk -- especially for long-lived, dynamic
         // pages. Guard against this.
-        if ( this.pending.size > 50 ) {
-            vAPI.shutdown.exec();
+        if ( this.pending.size > 64 ) {
+            if ( (Date.now() - this.waitStartTime) > 60000 ) {
+                vAPI.shutdown.exec();
+            }
         }
         const port = this.getPort();
         if ( port === null ) {
             return Promise.resolve();
+        }
+        if ( this.pending.size === 0 ) {
+            this.waitStartTime = Date.now();
         }
         const msgId = this.msgIdGenerator++;
         const promise = new Promise(resolve => {
@@ -229,22 +213,6 @@ vAPI.messaging = {
         });
         port.postMessage({ channel, msgId, msg });
         return promise;
-    },
-
-    // Dynamically extend capabilities.
-    //
-    // https://github.com/uBlockOrigin/uBlock-issues/issues/1571
-    //   Don't use `self` to access `vAPI`.
-    extend: function() {
-        if ( this.extended === undefined ) {
-            this.extended = vAPI.messaging.send('vapi', {
-                what: 'extendClient'
-            }).then(( ) =>
-                typeof vAPI === 'object' && this.extensions.length !== 0
-            ).catch(( ) => {
-            });
-        }
-        return this.extended;
     },
 };
 

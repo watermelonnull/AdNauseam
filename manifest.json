@@ -1,5 +1,5 @@
 {
-  "version": "3.16.3.1",
+  "version": "3.29.3.1",
   "key": "ilkggpgmkemaniponkfgnkonpajankkm",
   "author": "Daniel C. Howe",
   "background": {
@@ -9,7 +9,7 @@
   "browser_action": {
     "default_icon": {
       "16": "img/icon_16.png",
-      "32": "img/icon-32.png"
+      "32": "img/icon_32.png"
     },
     "default_title": "AdNauseam",
     "default_popup": "menu.html"
@@ -24,36 +24,63 @@
     "launch-logger": {
       "description": "__MSG_popupTipLog__"
     },
+    "open-dashboard": {
+      "description": "__MSG_popupTipDashboard__"
+    },
     "relax-blocking-mode": {
       "description": "__MSG_relaxBlockingMode__"
+    },
+    "toggle-cosmetic-filtering": {
+      "description": "__MSG_toggleCosmeticFiltering__"
+    },
+    "toggle-javascript": {
+      "description": "__MSG_toggleJavascript__"
     }
   },
   "content_scripts": [
     {
-    "matches": [
-      "http://*/*",
-      "https://*/*"
-    ],
-    "js": [
-      "js/vapi.js",
-      "js/vapi-client.js",
-      "js/adn/textads.js",
-      "js/adn/parser.js",
-      "js/contentscript.js"
-    ],
-    "run_at": "document_start",
-    "all_frames": true,
-    "match_about_blank": true
-  }, {
-    "matches": [
-      "http://*/*",
-      "https://*/*"
-    ],
-    "js": [
-      "js/scriptlets/subscriber.js"
-    ],
-    "run_at": "document_idle",
-    "all_frames": false
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "js/vapi.js",
+        "js/vapi-client.js",
+        "js/adn/textads.js",
+        "js/adn/parser.js",
+        "js/contentscript.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true,
+      "match_about_blank": true
+    },
+    {
+      "matches": [
+        "https://easylist.to/*",
+        "https://*.fanboy.co.nz/*",
+        "https://filterlists.com/*",
+        "https://forums.lanik.us/*",
+        "https://github.com/*",
+        "https://*.github.io/*",
+        "https://*.letsblock.it/*"
+      ],
+      "js": [
+        "/js/scriptlets/subscriber.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "https://github.com/uBlockOrigin/*",
+        "https://ublockorigin.github.io/*",
+        "https://github.com/dhowe/AdNauseam/*"
+      ],
+      "js": [
+        "/js/scriptlets/updater.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
     }
   ],
   "content_security_policy": "script-src 'self'; object-src 'self'",
@@ -64,14 +91,15 @@
     "128": "img/icon_128.png"
   },
   "manifest_version": 2,
-  "minimum_chrome_version": "66.0",
+  "minimum_chrome_version": "93.0",
   "name": "AdNauseam",
   "options_ui": {
-    "page": "options.html",
+    "page": "dashboard.html#options.html",
     "open_in_tab": true
   },
   "incognito": "spanning",
   "permissions": [
+    "alarms",
     "contextMenus",
     "privacy",
     "storage",

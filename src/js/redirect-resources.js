@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2015-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -18,8 +18,6 @@
 
     Home: https://github.com/gorhill/uBlock
 */
-
-'use strict';
 
 /******************************************************************************/
 
@@ -48,9 +46,6 @@ export default new Map([
         alias: '32x32-transparent.png',
         data: 'blob',
     } ],
-    [ 'addthis_widget.js', {
-        alias: 'addthis.com/addthis_widget.js',
-    } ],
     [ 'amazon_ads.js', {
         alias: 'amazon-adsystem.com/aax2/amzn_ads.js',
         data: 'text',
@@ -60,6 +55,9 @@ export default new Map([
     [ 'ampproject_v0.js', {
         alias: 'ampproject.org/v0.js',
     } ],  
+    [ 'adthrive_abd.js', {
+        data: 'text',
+    } ],
     [ 'chartbeat.js', {
         alias: 'static.chartbeat.com/chartbeat.js',
     } ],
@@ -98,37 +96,41 @@ export default new Map([
         alias: 'google-analytics.com/inpage_linkid.js',
     } ],
     [ 'google-ima.js', {
+        alias: 'google-ima3',                       /* adguard compatibility */
+        data: 'text',
+    } ],
+    [ 'google-ima-dai.js', {
+        alias: 'google-ima3-dai',                   /* adguard compatibility */
+        data: 'text',
+        requiresTrust: true,
     } ],
     [ 'googlesyndication_adsbygoogle.js', {
-        alias: 'googlesyndication.com/adsbygoogle.js',
+        alias: [
+            'googlesyndication.com/adsbygoogle.js',
+            'googlesyndication-adsbygoogle',        /* adguard compatibility */
+        ],
         data: 'text',
     } ],
     [ 'googletagservices_gpt.js', {
-        alias: 'googletagservices.com/gpt.js',
+        alias: [
+            'googletagservices.com/gpt.js',
+            'googletagservices-gpt',                /* adguard compatibility */
+        ],
         data: 'text',
     } ],
     [ 'hd-main.js', {
     } ],
-    [ 'ligatus_angular-tag.js', {
-        alias: 'ligatus.com/*/angular-tag.js',
+    [ 'nitropay_ads.js', {
+        data: 'text',
     } ],
-    [ 'mxpnl_mixpanel.js', {
-    } ],
-    [ 'monkeybroker.js', {
-        alias: 'd3pkae9owd2lcf.cloudfront.net/mb105.js',
+    [ 'nobab2.js', {
+        data: 'text',
     } ],
     [ 'noeval.js', {
         data: 'text',
     } ],
     [ 'noeval-silent.js', {
         alias: 'silent-noeval.js',
-        data: 'text',
-    } ],
-    [ 'nobab.js', {
-        alias: 'bab-defuser.js',
-        data: 'text',
-    } ],
-    [ 'nobab2.js', {
         data: 'text',
     } ],
     [ 'nofab.js', {
@@ -142,8 +144,11 @@ export default new Map([
     [ 'noop-0.5s.mp3', {
     } ],
     [ 'noop-1s.mp4', {
-        alias: 'noopmp4-1s',
+        alias: [ 'noopmp4-1s', 'abp-resource:blank-mp4' ],
         data: 'blob',
+    } ],
+    [ 'noop.css', {
+        data: 'text',
     } ],
     [ 'noop.html', {
         alias: 'noopframe',
@@ -152,19 +157,37 @@ export default new Map([
         alias: [ 'noopjs', 'abp-resource:blank-js' ],
         data: 'text',
     } ],
+    [ 'noop.json', {
+        alias: [ 'noopjson' ],
+        data: 'text',
+    } ],
     [ 'noop.txt', {
         alias: 'nooptext',
         data: 'text',
     } ],
-    [ 'noop-vmap1.0.xml', {
-        alias: 'noopvmap-1.0',
+    [ 'noop-vast2.xml', {
+        alias: 'noopvast-2.0',
+        data: 'text',
+    } ],
+    [ 'noop-vast3.xml', {
+        alias: 'noopvast-3.0',
+        data: 'text',
+    } ],
+    [ 'noop-vast4.xml', {
+        alias: 'noopvast-4.0',
+        data: 'text',
+    } ],
+    [ 'noop-vmap1.xml', {
+        alias: [ 'noop-vmap1.0.xml', 'noopvmap-1.0' ],
         data: 'text',
     } ],
     [ 'outbrain-widget.js', {
         alias: 'widgets.outbrain.com/outbrain.js',
     } ],
+    [ 'piano-analytics.js', {
+    } ],
     [ 'popads.js', {
-        alias: 'popads.net.js',
+        alias: [ 'popads.net.js', 'prevent-popads-net.js' ],
         data: 'text',
     } ],
     [ 'popads-dummy.js', {
@@ -176,8 +199,7 @@ export default new Map([
     [ 'scorecardresearch_beacon.js', {
         alias: 'scorecardresearch.com/beacon.js',
     } ],
-    [ 'window.open-defuser.js', {
-        alias: 'nowoif.js',
+    [ 'sensors-analytics.js', {
         data: 'text',
     } ],
 ]);

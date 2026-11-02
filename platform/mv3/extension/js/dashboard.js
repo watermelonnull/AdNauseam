@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    AdNauseam Lite - a comprehensive, MV3-compliant content blocker
     Copyright (C) 2014-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,117 +19,70 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-'use strict';
-
-/******************************************************************************/
-
-import { simpleStorage } from './storage.js';
 import { dom, qs$ } from './dom.js';
+import {
+    localRead, localRemove, localWrite,
+    runtime,
+    webextFlavor,
+} from './ext.js';
+import { faIconsInit } from './fa-icons.js';
+import { i18n } from './i18n.js';
 
 /******************************************************************************/
 
-const discardUnsavedData = function(synchronous = false) {
-    const paneFrame = document.getElementById('iframe');
-    const paneWindow = paneFrame.contentWindow;
-    if (
-        typeof paneWindow.hasUnsavedData !== 'function' ||
-        paneWindow.hasUnsavedData() === false
-    ) {
-        return true;
-    }
+dom.body.dataset.platform = webextFlavor;
 
-    if ( synchronous ) {
-        return false;
-    }
-
-    return new Promise(resolve => {
-        const modal = document.querySelector('#unsavedWarning');
-        modal.classList.add('on');
-        modal.focus();
-
-        const onDone = status => {
-            modal.classList.remove('on');
-            document.removeEventListener('click', onClick, true);
-            resolve(status);
-        };
-
-        const onClick = ev => {
-            const target = ev.target;
-            if ( target.matches('[data-i18n="dashboardUnsavedWarningStay"]') ) {
-                return onDone(false);
-            }
-            if ( target.matches('[data-i18n="dashboardUnsavedWarningIgnore"]') ) {
-                return onDone(true);
-            }
-            if ( modal.querySelector('[data-i18n="dashboardUnsavedWarning"]').contains(target) ) {
-                return;
-            }
-            onDone(false);
-        };
-
-        document.addEventListener('click', onClick, true);
-    });
-};
-
-const loadDashboardPanel = function(pane, first) {
-    const tabButton = document.querySelector(`[data-pane="${pane}"]`);
-    if ( tabButton === null || tabButton.classList.contains('selected') ) {
-        return;
-    }
-    const loadPane = ( ) => {
-        self.location.replace(`#${pane}`);
-        for ( const node of document.querySelectorAll('.tabButton.selected') ) {
-            node.classList.remove('selected');
-        }
-        tabButton.classList.add('selected');
-        tabButton.scrollIntoView();
-        document.querySelector('#iframe').contentWindow.location.replace(pane);
-        if ( pane !== 'no-dashboard.html' ) {
-            simpleStorage.setItem('dashboardLastVisitedPane', pane);
-        }
-    };
-    if ( first ) {
-        return loadPane();
-    }
-    const r = discardUnsavedData();
-    if ( r === false ) { return; }
-    if ( r === true ) {
-        return loadPane();
-    }
-    r.then(status => {
-        if ( status === false ) { return; }
-        loadPane();
-    });
-};
-
-const onTabClickHandler = function(ev) {
-    loadDashboardPanel(ev.target.getAttribute('data-pane'));
-};
-
-if ( self.location.hash.slice(1) === 'no-dashboard.html' ) {
-    document.body.classList.add('noDashboard');
+{
+    const manifest = runtime.getManifest();
+    dom.text('#aboutNameVer', `${manifest.name} ${manifest.version}`);
 }
 
-(async ( ) => {
-    let pane = null;
-    if ( self.location.hash !== '' ) {
-        pane = self.location.hash.slice(1) || null;
+dom.attr('a', 'target', '_blank');
+
+dom.on('#dashboard-nav', 'click', '.tabButton', ev => {
+    const { pane } = ev.target.dataset;
+    dom.body.dataset.pane = pane;
+    if ( pane === 'settings' ) {
+        localRemove('dashboard.activePane');
+    } else {
+        localWrite('dashboard.activePane', pane);
     }
-    loadDashboardPanel(pane !== null ? pane : 'settings.html', true);
+});
 
-    dom.on(
-        qs$('#dashboard-nav'),
-        'click',
-        '.tabButton',
-        onTabClickHandler
-    );
+localRead('dashboard.activePane').then(pane => {
+    if ( typeof pane !== 'string' ) { return; }
+    dom.body.dataset.pane = pane;
+});
 
-    // https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event
-    window.addEventListener('beforeunload', ( ) => {
-        if ( discardUnsavedData(true) ) { return; }
-        event.preventDefault();
-        event.returnValue = '';
+// Update troubleshooting on-demand
+const tsinfoObserver = new IntersectionObserver(entries => {
+    if ( entries.every(a => a.isIntersecting === false) ) { return; }
+    import('./troubleshooting.js').then(module => {
+        return module.getTroubleshootingInfo();
+    }).then(config => {
+        qs$('[data-i18n="supportS5H"] + pre').textContent = config;
     });
-})();
+});
+tsinfoObserver.observe(qs$('[data-i18n="supportS5H"] + pre'));
+
+/******************************************************************************/
+
+export function nodeFromTemplate(templateId, nodeSelector) {
+    const template = qs$(`template#${templateId}`);
+    const fragment = template.content.cloneNode(true);
+    const node = nodeSelector !== undefined
+        ? qs$(fragment, nodeSelector)
+        : fragment.firstElementChild;
+    faIconsInit(node);
+    i18n.render(node);
+    return node;
+}
+
+/******************************************************************************/
+
+export function hashFromIterable(iter) {
+    if ( Boolean(iter) === false ) { return ''; }
+    return Array.from(iter).sort().join('\n');
+}
 
 /******************************************************************************/

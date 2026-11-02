@@ -31,7 +31,7 @@
     "message": "Block Malware",
     "description": "English: Firstrun.html -> Block Malware"
   },
-  "adnAboutResetDataConfirm" : {
+  "adnAboutResetDataConfirm": {
     "message": "All your settings will be removed, ads in your vault will be deleted, and AdNauseam will restart.\n\nReset AdNauseam to factory settings?",
     "description": "Message asking user to confirm reset"
   },
@@ -71,7 +71,7 @@
     "message": "Activate the EasyList filter",
     "description": "English: Notifications -> Activate the EasyList filter"
   },
-   "adnNotificationActivateAdNauseamList": {
+  "adnNotificationActivateAdNauseamList": {
     "message": "Activate the AdNauseam filter",
     "description": "English: Notifications -> Activate the AdNauseam filter"
   },
@@ -91,7 +91,7 @@
     "message": "The 'Content Blocking' settings in your browser may interfere with AdNauseam!",
     "description": "English: Notifications -> The 'Content Blocking' settings in your browser may interfere with AdNauseam!"
   },
-  "adnNotificationPrivacyMode":{
+  "adnNotificationPrivacyMode": {
     "message": "You have allowed adnauseam to have access to your online activities while private browsing.",
     "description": "English: Notifications -> You have allowed adnauseam to have access to your online activities while private browsing."
   },
@@ -113,7 +113,11 @@
   },
   "adnNotificationShowAdsDebug": {
     "message": "The Advanced Setting \"Show Ads Debug\" is turned on",
-    "description": "English: Notifications -> The Advanced Setting \"Show Ads Debug\" is turned on" 
+    "description": "English: Notifications -> The Advanced Setting \"Show Ads Debug\" is turned on"
+  },
+  "adnNewerVersionAvailableNotification": {
+    "message": "A newer version of AdNauseam is available",
+    "description": "English: Notifications -> A newer version of AdNauseam is available"
   },
   "adnTarget": {
     "message": "TARGET",
@@ -216,7 +220,7 @@
     "description": "appears in ADN settings"
   },
   "adnPurgeConfirm": {
-    "message": "This action will permanently remove all ads with load image error. Make sure your internet is connected, otherwise all your ads will be deleted.",
+    "message": "This action will permanently remove all ads for which the image cannot be loaded. It is a good idea to backup your vault before purging, and also to make sure you have an active internet connection.",
     "description": "appears in ADN settings"
   },
   "adnAdClickingStatusPending": {
@@ -246,6 +250,10 @@
   "adnAdClickingStatusSkippedDisabled": {
     "message": "SKIPPED: Clicking Disabled",
     "description": "Menu & AdVault: SKIPPED: Clicking disabled"
+  },
+  "adnAdClickingStatusSkippedDomain": {
+    "message": "SKIPPED: Domain Exception",
+    "description": "Menu & AdVault: SKIPPED: Domain excluded from ad clicks"
   },
   "adnMenuViewLog": {
     "message": "View Log",
@@ -359,6 +367,18 @@
     "message": "Purge Dead Ads",
     "description": "appears on vault page"
   },
+  "adnShowDeadAds": {
+    "message": "Show Dead Ads",
+    "description": "appears on vault page"
+  },
+  "adnHideDeadAds": {
+    "message": "Hide Dead Ads",
+    "description": "appears on vault page"
+  },
+  "adnCaptureVault": {
+    "message": "Capture",
+    "description": "appears on vault page in dev mode"
+  },
   "adnVaultFound": {
     "message": "{{total}} ads collected",
     "description": "appears on vault page"
@@ -435,6 +455,18 @@
     "message": "Always",
     "description": "English: Click Frequency - Always"
   },
+  "clickExceptionsLabelExclude": {
+    "message": "Don't click ads on these domains (one per line)",
+    "description": "Label for click exceptions when clicking is enabled (exclusion mode)"
+  },
+  "clickExceptionsLabelInclude": {
+    "message": "Only click ads on these domains (one per line)",
+    "description": "Label for click exceptions when clicking is disabled (inclusion mode)"
+  },
+  "clickExceptionsPlaceholder": {
+    "message": "example.com",
+    "description": "Placeholder for click exceptions textarea"
+  },
   "respectDNTPrompt": {
     "message": "Make exceptions for non-tracking Ads",
     "description": "English: Make exceptions for non-tracking Ads"
@@ -471,9 +503,33 @@
     "message": "Languages",
     "description": "English: Languages"
   },
-   "3pPageUpdate":{
-    "message":"Update",
-    "description":"English: update"
+  "3pPageUpdate": {
+    "message": "Update",
+    "description": "English: update"
+  },
+  "3pAdnBlockEnabled": {
+    "message": "Requests blocked by this list stay blocked. Click to let AdNauseam allow them and collect the ads instead.",
+    "description": "Tooltip on the red AdNauseam icon next to a filter list"
+  },
+  "3pAdnBlockDisabled": {
+    "message": "Requests blocked by this list are allowed by AdNauseam so the ads can be collected. Click to block them instead.",
+    "description": "Tooltip on the purple AdNauseam icon next to a filter list"
+  },
+  "3pAdnCustomBlockLists": {
+    "message": "Custom select the filter lists that trigger adn-allow",
+    "description": "Advanced option on the filter-lists page, followed by the legend of the purple and red icons"
+  },
+  "3pAdnCustomBlockListsAllow": {
+    "message": "adn-allow",
+    "description": "Legend of the purple icon: requests blocked by the list are allowed so the ads can be collected"
+  },
+  "3pAdnCustomBlockListsBlock": {
+    "message": "strict, default uBlock Origin behavior",
+    "description": "Legend of the red icon: requests blocked by the list stay blocked"
+  },
+  "adnUpdateButton": {
+    "message": "Update",
+    "description": "English: update"
   },
   "whitelistPageName": {
     "message": "Trusted sites",
@@ -484,12 +540,20 @@
     "description": "appears as tab name in dashboard"
   },
   "eventLoggingPrompt": {
-    "message": "Activate debugging mode",
+    "message": "Debug mode",
     "description": "prompt for toggle"
   },
   "disableWarnings": {
     "message": "Disable warnings",
     "description": "English:Disable warnings"
+  },
+  "blurCollectedAds": {
+    "message": "Blur Collected ads",
+    "description": "English: Blur Collected ads"
+  },
+  "hideDeadAds": {
+    "message": "Hide Dead ads",
+    "description": "English: Hide Dead ads"
   },
   "showAdsDebugPrompt": {
     "message": "Show ads for ad-collection debugging",
@@ -510,5 +574,25 @@
   "adnRefreshNotification": {
     "message": "Apply changes on current page",
     "description": "English: refresh page from menu notification"
+  },
+  "adnOpenLetterNotification": {
+    "message": "AdNauseam needs your support!",
+    "description": "English: notification to open letter"
+  },
+  "adnOpenLetterButton": {
+    "message": "OPEN LETTER",
+    "description": "English: button to open letter"
+  },
+  "supportS6P3S1": {
+    "message": "Make sure this issue is <b>AdNauseam-specific</b>.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P3S2": {
+    "message": "I have tested the same web-page on <a url='https://github.com/gorhill/uBlock'>#uBO#</a> and confirm this issue is <b>AdNauseam-specific</b>.",
+    "description": "A checkbox in the filter issue reporter section"
+  },
+  "supportS6Select1Option7": {
+    "message": "Ads not collected",
+    "description": "Ads are present on page but none are collected"
   }
 }

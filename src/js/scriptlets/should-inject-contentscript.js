@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2018-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,22 +19,20 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-'use strict';
-
 // If content scripts are already injected, we need to respond with `false`,
 // to "should inject content scripts?"
 //
 // https://github.com/uBlockOrigin/uBlock-issues/issues/403
-//   If the content script was not boostrapped, give it another try.
+//   If the content script was not bootstrapped, give it another try.
 
 (( ) => {
     try {
-        let status = vAPI.uBO !== true;
+        const status = vAPI.uBO !== true;
         if ( status === false && vAPI.bootstrap ) {
-            self.requestIdleCallback(( ) => vAPI && vAPI.bootstrap());
+            self.requestIdleCallback(( ) => vAPI?.bootstrap?.());
         }
         return status;
-    } catch(ex) {
+    } catch {
     }
     return true;
 })();

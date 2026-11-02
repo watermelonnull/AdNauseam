@@ -1,0 +1,32 @@
+{
+  "name": "AdNauseam",
+  "version": "1.0.0",
+  "description": "npm dev tools",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint --no-warn-ignored --ignore-pattern \"**/lib/\" --ignore-pattern \"**/npm/\" -- \"./src/js/*.js\" \"./src/js/**/*.js\" \"./**/*.json\" \"./platform/**/*.js\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dhowe/AdNauseam.git"
+  },
+  "author": "Daniel C. Howe",
+  "license": "GPLv3",
+  "bugs": {
+    "url": "https://github.com/dhowe/AdNauseam/issues"
+  },
+  "homepage": "https://github.com/dhowe/AdNauseam#readme",
+  "engines": {
+    "node": ">=22",
+    "npm": ">=11"
+  },
+  "devDependencies": {
+    "@eslint/compat": "^1.2.4",
+    "@eslint/js": "^9.17.0",
+    "@eslint/json": "^0.13.1",
+    "eslint": "^9.34.0",
+    "eslint-formatter-compact": "^8.40.0",
+    "globals": "^15.14.0"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "adnauseam-benchmark",
+  "version": "1.0.0",
+  "description": "Puppeteer-based benchmarking system for AdNauseam browser extension",
+  "type": "module",
+  "scripts": {
+    "build-ext": "cd .. && bash tools/make-chromium.sh",
+    "start": "node src/index.js",
+    "test-ext": "node test-extension.js"
+  },
+  "dependencies": {
+    "puppeteer-core": "^23.0.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "puppeteer-extra-plugin-user-data-dir": "^2.4.1"
+  }
+}

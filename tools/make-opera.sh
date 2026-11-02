@@ -19,7 +19,7 @@ VERSION=`jq .version manifest.json` # top-level adnauseam manifest
 #UBLOCK=`jq .version platform/chromium/manifest.json | tr -d '"'` # ublock-version no quotes
 
 echo "*** AdNauseam.opera: Copying common files"
-bash ./tools/copy-common-files.sh  $DES
+bash ./tools/copy-common-files.sh $DES
 
 # Chromium-specific
 echo "*** AdNauseam.opera: Copying chromium-specific files"

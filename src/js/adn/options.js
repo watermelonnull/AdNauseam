@@ -1,7 +1,7 @@
 /*******************************************************************************
 
     AdNauseam - Fight back against advertising surveillance.
-    Copyright (C) 2014-2021 Daniel C. Howe
+    Copyright (C) 2014-2024 Daniel C. Howe
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,16 +19,17 @@
     Home: https://github.com/dhowe/AdNauseam
 */
 
-/* global vAPI, uDom */
+/* global vAPI */
 
 'use strict';
 
 import { i18n$ } from '../i18n.js';
+import uDom from './uDom.js';
+import { setAccentColor, setTheme } from '../theme.js';
 
 import {
   isMobile,
   exportToFile,
-  toogleVaultLoading,
   postImportAlert,
   clearAds,
   startImportFilePicker,
@@ -125,15 +126,22 @@ const synchronizeDOM = function () {
 /******************************************************************************/
 
 const changeUserSettings = function (name, value) {
+  console.log("changeUserSettings", name, value)
   Promise.all([
     vAPI.messaging.send('dashboard', {
       what: 'userSettings',
       name,
       value,
-    }),
+    })
   ]).then(() => {
     updateGroupState();
   });
+  // reflect some changes immediately
+  switch (name) {
+    case 'colorBlindFriendly':
+      setTheme(value ? 'colorBlind' : 'dark', true);
+      break;
+  }
 };
 
 /******************************************************************************/
@@ -175,10 +183,10 @@ const onDisableWarningChanged = function (ev) {
   // send to messaging so that the change is broadcasted to all tabs
   vAPI.messaging.send(
     'adnauseam', {
-      what: 'setWarningDisabled',
-      value, value
-    }
-  )  
+    what: 'setWarningDisabled',
+    value, value
+  }
+  )
 }
 
 // Workaround for:
@@ -190,6 +198,17 @@ const onPreventDefault = function (ev) {
 };
 /******************************************************************************/
 
+// Update the click exceptions label based on the clicking toggle state
+const updateClickExceptionsLabel = function () {
+  const label = document.getElementById('clickExceptionsLabel');
+  if (!label) return;
+  const clickingEnabled = uDom('#clickingAds').prop('checked');
+  label.textContent = i18n$(clickingEnabled
+    ? 'clickExceptionsLabelExclude'
+    : 'clickExceptionsLabelInclude'
+  );
+}
+
 // if any of 3 main toggles are off, disabled their subgroups
 const updateGroupState = function () {
 
@@ -198,7 +217,13 @@ const updateGroupState = function () {
 
   uDom('.clickingAds-child').prop('disabled', !uDom('#clickingAds').prop('checked'));
   uDom('.clickingAds-child').parent().parent().parent().toggleClass('disabled', !uDom('#clickingAds').prop('checked'));
-  
+
+  // Click exceptions textarea should never be disabled (used in both on/off states)
+  const clickExTextarea = document.getElementById('clickingExceptions');
+  if (clickExTextarea) clickExTextarea.disabled = false;
+
+  updateClickExceptionsLabel();
+
   /*
   blocking malware doesnt have any subgroup
   uDom('.blockingMalware-child').prop('disabled', !uDom('#blockingMalware').prop('checked'));
@@ -311,6 +336,23 @@ const onUserSettingsReceived = function (details) {
       .on('change', onInputChanged)
       .on('click', onPreventDefault);
   });
+
+  // Click exceptions textarea
+  const clickExTextarea = document.getElementById('clickingExceptions');
+  if (clickExTextarea) {
+    clickExTextarea.value = details.clickingExceptions || '';
+    clickExTextarea.addEventListener('change', function () {
+      changeUserSettings('clickingExceptions', this.value);
+    });
+  }
+  // Expand/collapse click exceptions
+  const expander = document.querySelector('.clickExceptions-expander');
+  if (expander) {
+    expander.querySelector('label').addEventListener('click', function () {
+      expander.classList.toggle('expanded');
+    });
+  }
+  updateClickExceptionsLabel();
 
   // disable warning
   uDom('[data-setting-name="disableWarnings"]')

@@ -1,7 +1,7 @@
 /*******************************************************************************
 
     AdNauseam - Fight back against advertising surveillance.
-    Copyright (C) 2014-2021 Daniel C. Howe
+    Copyright (C) 2014-2024 Daniel C. Howe
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,13 +19,17 @@
     Home: https://github.com/dhowe/AdNauseam
 */
 
+// watch: fswatch - o - r src / js / | xargs - n1 - I{ } ./tools/make - chromium.sh
+
 /* global vAPI, µb */
 
 'use strict';
 
 import µb from '../background.js';
-import staticFilteringReverseLookup from '../reverselookup.js';
+import { staticFilteringReverseLookup } from '../reverselookup.js';
 import staticNetFilteringEngine from '../static-net-filtering.js'
+import { broadcast } from '../broadcast.js';
+
 import dnt from './dnt.js'
 
 import {
@@ -37,7 +41,7 @@ import {
   CompiledListWriter,
 } from '../static-filtering-io.js';
 
-import { StaticFilteringParser } from '../static-filtering-parser.js';
+import * as sfp from '../static-filtering-parser.js';
 
 import {
   log,
@@ -48,7 +52,6 @@ import {
   logNetEvent
 } from './log.js';
 
-import { i18n$ } from '../i18n.js';
 
 import {
   DNTAllowed,
@@ -66,7 +69,9 @@ import {
   EasyList,
   BlockingDisabled,
   ClickingDisabled,
-  HidingDisabled
+  HidingDisabled,
+  NewerVersionAvailable,
+  OpenLetter
 } from './notifications.js';
 
 import {
@@ -78,7 +83,8 @@ import {
   computeHash,
   parseHostname,
   parseDomain,
-  isValidDomain
+  isValidDomain,
+  enabledBlockListsDefault
 } from './adn-utils.js';
 
 const adnauseam = (function () {
@@ -99,7 +105,9 @@ const adnauseam = (function () {
   let lastActivity = 0;
   let lastUserActivity = 0;
   let lastStorageUpdate = 0;
+  let adReadFailed = false; // true if the stored vault could not be read, see #2536 #2764
   let xhr, idgen, admap, listsLoaded = false;
+  let verifying = false; // true while verifyTarget() is pending for a visit
   let inspected, listEntries, devbuild, adsetSize = 0;
 
   const production = 1;
@@ -113,29 +121,17 @@ const adnauseam = (function () {
   const repeatVisitInterval = Number.MAX_VALUE;
   const updateStorageInterval = 1000 * 60 * 30; // 30min
 
-  // properties set to true for a devbuild (if version-num has a 4th digit, eg. 3.2.3.4)
+  // properties set to true for a devbuild
   const devProps = ["hidingAds", "clickingAds", "blockingMalware",
     "eventLogging", "disableClickingForDNT", "disableHidingForDNT"]
 
   // blocks requests to/from these domains even if the list is not in enabledBlockLists
   const allowAnyBlockOnDomains = ['youtube.com', 'funnyordie.com']; // no dnt in here
 
-  // allow blocks only from this set of lists (recheck this)
-  const enabledBlockLists = ['EasyPrivacy',
-    'uBlock filters – Badware risks', 'uBlock filters – Unbreak',
-    'uBlock filters – Privacy', 'Malware domains', 'Malware Domain List',
-    'Anti-ThirdpartySocial', 'AdNauseam filters', 'Fanboy’s Annoyance List',
-    'CHN: CJX\'s Annoyance List', 'Spam404', 'Anti-Adblock Killer | Reek',
-    'Fanboy’s Social Blocking List', 'Malware domains (long-lived)',
-    'Adblock Warning Removal List', 'Malware filter list by Disconnect',
-    'Basic tracking list by Disconnect', 'EFF DNT Policy Whitelist',
-    'AdGuard Annoyances', 'AdGuard Tracking Protection'
-  ];
+  // blocks are kept only from the lists in µb.userSettings.enabledBlockLists (asset
+  // keys, toggled per list on the filter-lists page), see activeBlockList()
 
   const removableBlockLists = ['hphosts', 'mvps-0', 'plowe-0'];
-
-  // mark ad visits as failure if any of these are included in title
-  const errorStrings = ['file not found', 'website is currently unavailable', 'not found on this server'];
 
   const reSpecialChars = /[\*\^\t\v\n]/, remd5 = /[a-fA-F0-9]{32}/;
 
@@ -346,7 +342,8 @@ const adnauseam = (function () {
     // changes for #1657
     //const pending = pendingAds();
     const settings = µb.userSettings;
-    if (/*pending.length && */settings.clickingAds && !isAutomated()) { // no visits if automated
+    const hasClickInclusions = !settings.clickingAds && (settings.clickingExceptions || '').trim();
+    if (/*pending.length && */(settings.clickingAds || hasClickInclusions) && !isAutomated()) { // no visits if automated
 
       // check whether an idle timeout has been specified
       const idleMs = disableIdler ? 0 : settings.clickOnlyWhenIdleFor;
@@ -393,6 +390,22 @@ const adnauseam = (function () {
     });
   }
 
+  const isClickingAllowedOnDomain = function (domain) {
+    const exceptions = (µb.userSettings.clickingExceptions || '').trim();
+    if (!exceptions) return µb.userSettings.clickingAds;
+    const domains = exceptions.split(/\s+/).filter(Boolean);
+    const isInList = domains.some(function (d) {
+      return domain === d || domain.endsWith('.' + d);
+    });
+    if (µb.userSettings.clickingAds) {
+      // Toggle ON: list is exclusion (click everywhere except listed)
+      return !isInList;
+    } else {
+      // Toggle OFF: list is inclusion (only click on listed)
+      return isInList;
+    }
+  }
+
   const visitPending = function (ad) {
     let pending = ad && ad.attempts < maxAttemptsPerAd &&
       ad.visitedTs <= 0 && !ad.dntAllowed && !ad.noVisit;
@@ -437,7 +450,7 @@ const adnauseam = (function () {
         if (ad.title === 'Pending') ad.title = 'Failed';
       }
 
-      vAPI.messaging.broadcast({
+      broadcast({
         what: 'adVisited',
         ad: ad
       });
@@ -451,7 +464,7 @@ const adnauseam = (function () {
   /* send to vault/menu/dashboard if open */
   const sendNotifications = function (notes) {
 
-    vAPI.messaging.broadcast({
+    broadcast({
       what: 'notifications',
       notifications: notes
       // TODO: do we need to make these cloneable ? see #1163
@@ -464,25 +477,7 @@ const adnauseam = (function () {
     let title = html.match(/<title[^>]*>([^<]+)<\/title>/i);
 
     if (title && title.length > 1) {
-
-      title = unescapeHTML(title[1].trim());
-
-      for (let i = 0; i < errorStrings.length; i++) {
-
-        // check the title isn't something like 'file not found'
-        if (title.toLowerCase().indexOf(errorStrings[i]) > -1) {
-
-          onVisitError.call(xhr, {
-            title: title,
-            status: xhr.status,
-            responseText: html
-          });
-
-          throw Error('Bad-title: ' + title + " from: " + xhr.requestUrl);
-        }
-      }
-
-      return title;
+      return unescapeHTML(title[1].trim());
     }
 
     const shtml = html.length > 100 ? html.substring(0, 100) + '...' : html;
@@ -497,7 +492,7 @@ const adnauseam = (function () {
 
     if (ad) {
 
-      if (title) ad.title = title;
+      if (title && ad.title === 'Pending') ad.title = title;
 
       if (ad.title === 'Pending')
         ad.title = parseDomain(xhr.requestUrl, true);
@@ -513,7 +508,7 @@ const adnauseam = (function () {
       }
       // else warn('Null tab in click animation: ', tab); // not a problem
 
-      vAPI.messaging.broadcast({
+      broadcast({
         what: 'adVisited',
         ad: ad
       });
@@ -627,10 +622,12 @@ const adnauseam = (function () {
       });
     }
 
+    if (verifying) return; // still verifying the previous target
+
     const url = ad && ad.targetUrl, now = markActivity();
 
     // tell menu/vault we have a new attempt
-    vAPI.messaging.broadcast({
+    broadcast({
       what: 'adAttempt',
       ad: ad
     });
@@ -656,17 +653,24 @@ const adnauseam = (function () {
     ad.attempts++;
     ad.attemptedTs = now;
 
-    if (!validateTarget(ad)) return deleteAd(ad);
+		// dont delete ad if target fails (content might still be valuable, contection issues etc)
+		if (!validateTarget(ad)) return warn('[SKIP] not visiting, invalid target: ' + ad.targetUrl); // adn
 
-    return sendXhr(ad);
+    // if we've parsed an obfuscated target, use it
+    const target = ad.parsedTargetUrl || ad.targetUrl;
+
+    // only visit what we have verified to be a public target, see #2848
+    verifying = true;
+    verifyTarget(target).then(ok => {
+      verifying = false;
+      if (!ok) return warn('[SKIP] not visiting, non-public target: ' + target);
+      sendXhr(ad, target);
+    });
     // return openAdInNewTab(ad);
     // return popUnderAd(ad)
   };
 
-  const sendXhr = function (ad) {
-
-    // if we've parsed an obfuscated target, use it
-    const target = ad.parsedTargetUrl || ad.targetUrl;
+  const sendXhr = function (ad, target) {
 
     log('[TRYING] ' + adinfo(ad), ad.targetUrl);
 
@@ -676,6 +680,7 @@ const adnauseam = (function () {
       xhr.open('get', target, true);
       xhr.withCredentials = true;
       xhr.delegate = ad;
+      xhr.visitHostname = new URL(target).hostname; // how isLocalVisit() knows the visit
       xhr.timeout = visitTimeout;
       xhr.onload = onVisitResponse;
       xhr.onerror = onVisitError;
@@ -688,14 +693,16 @@ const adnauseam = (function () {
   }
 
   const storeAdData = function (immediate) {
+    // never overwrite a stored vault we could not read, see #2536 #2764
+    if (adReadFailed) return;
+
     // always update store as long as adsetSize is less than 1000
     if (adsetSize < 1000) immediate = true;
 
     const now = millis();
     // defer if we've recently written and !immediate
     if (immediate || (!immediate && now - lastStorageUpdate > updateStorageInterval)) {
-      vAPI.storage.set({ admap: admap });
-      µb.changeUserSettings('admap', admap); 
+      vAPI.storage.set({ admap: admap }); // ads only, not in userSettings, see #2536 #2764
       lastStorageUpdate = millis();
       //log("--Storage Ad Data--")
     }
@@ -733,13 +740,83 @@ const adnauseam = (function () {
     ad.targetDomain = dInfo.domain;
 
     // Check: a slash at the end of the domain https://github.com/dhowe/AdNauseam/issues/1304
-
+    // ':' (port), '?' (query) and '#' (fragment) are also valid host terminators; without them a
+    // port turned "host:8642/x" into "host/:8642/x" and the visit failed // adn
     const idx = url.indexOf(ad.targetDomain) + ad.targetDomain.length;
-    if (idx < url.length - 1 && url.charAt(idx) != "/") {
+    const sep = url.charAt(idx); // adn
+    if (idx < url.length - 1 && sep !== "/" && sep !== ":" && sep !== "?" && sep !== "#") { // adn
       ad.targetUrl = url.substring(0, idx) + "/" + url.substring(idx, url.length);
     }
 
     return true;
+  }
+
+  // names that only exist on a local network, see #2848
+  const reLocalHostname = /(^|\.)(localhost|local|localdomain|lan|home|corp|internal|intranet|private|home\.arpa)$/;
+
+  // True for addresses an ad visit must never reach: loopback, private,
+  // link-local (incl. cloud metadata), cgnat, multicast and reserved ranges
+  const isLocalAddress = function (ip) {
+
+    ip = ip.toLowerCase();
+
+    if (ip.includes(':')) { // ipv6
+
+      const mapped = /^::ffff:(?:(\d+\.\d+\.\d+\.\d+)|([\da-f]{1,4}):([\da-f]{1,4}))$/.exec(ip);
+
+      // unspecified, loopback, unique-local (fc/fd), link-local (fe) and multicast (ff)
+      if (!mapped) return ip === '::' || ip === '::1' || /^f[c-f]/.test(ip);
+
+      if (mapped[1]) {
+        ip = mapped[1]; // ::ffff:127.0.0.1
+      } else {
+        const hi = parseInt(mapped[2], 16), lo = parseInt(mapped[3], 16); // ::ffff:7f00:1
+        ip = [hi >> 8, hi & 255, lo >> 8, lo & 255].join('.');
+      }
+    }
+
+    const [a, b, c] = ip.split('.').map(Number);
+
+    return a === 0 || a === 10 || a === 127 || a >= 224 ||
+      (a === 100 && b >= 64 && b <= 127) ||
+      (a === 169 && b === 254) ||
+      (a === 172 && b >= 16 && b <= 31) ||
+      (a === 192 && b === 168) ||
+      (a === 192 && b === 0 && c === 0) ||
+      (a === 198 && (b === 18 || b === 19));
+  }
+
+  // no ip literals (URL normalizes every notation), single-label or local names
+  const isPublicHostname = function (hostname) {
+
+    return !(/^[\d.]+$|^\[/.test(hostname) || !hostname.includes('.') || reLocalHostname.test(hostname));
+  }
+
+  // Resolves to true only if the url is safe to visit: plain http(s), with a
+  // public hostname which (where we can check) resolves to public addresses
+  const verifyTarget = async function (url) {
+
+    try {
+
+      const parsed = new URL(url); // same parser the xhr will use
+
+      if (!/^https?:$/.test(parsed.protocol) || parsed.username || parsed.password) return false;
+
+      const hostname = parsed.hostname.replace(/\.+$/, '');
+
+      if (!isPublicHostname(hostname)) return false;
+
+      // no dns api (chromium), or lookups disabled by the user: the name is all we can check
+      if (browser.dns instanceof Object === false || µb.hiddenSettings.dnsResolveEnabled === false) return true;
+
+      const record = await browser.dns.resolve(hostname);
+
+      return record.addresses.length > 0 && !record.addresses.some(isLocalAddress);
+
+    } catch (e) {
+
+      return false; // unparseable or unresolvable
+    }
   }
 
   const domainInfo = function (url) { // via uBlock/psl
@@ -786,6 +863,11 @@ const adnauseam = (function () {
     const cd = ad.contentData, ct = ad.contentType, pu = ad.pageUrl;
 
     ad.title = unescapeHTML(ad.title); // fix to #31
+
+    // Reject titles that look like JavaScript/CSS code
+    if (ad.title && (/^(var|let|const|function)\s/.test(ad.title) || (ad.title.match(/;/g) || []).length >= 2)) {
+      ad.title = parseDomain(ad.targetUrl, true) || 'Pending';
+    }
 
     if (ct === 'text') {
 
@@ -839,7 +921,7 @@ const adnauseam = (function () {
   };
   
   const purgeDeadAdsAdmap = function (deadAds) {
-    let deadIds = deadAds.map(deadad => deadad.children.map(c => c.id))[0]
+    let deadIds = deadAds.map(deadad => deadad.children.map(c => c.id)[0])
     const pages = Object.keys(admap);
     for (let i = 0; i < pages.length; i++) {
       if (admap[pages[i]]) {
@@ -956,6 +1038,31 @@ const adnauseam = (function () {
 
     adsetSize--;
     storeAdData();
+  }
+
+  const deadAd = function (ad, setDead) {
+    console.log("deadAd", ad)
+    if (!ad) {
+      return warn("No Ad to set Dead", id, admap);
+    }
+
+    const pageHash = YaMD5.hashStr(ad.pageUrl);
+    if (pageHash !== YaMD5.hashStr("")) {
+      const hash = computeHash(ad);
+      if (admap[pageHash][hash]) {
+        let addata = admap[pageHash][hash];
+        if(setDead) { // set ad as dead
+          if (admap[pageHash][hash]["dead"]) {
+            admap[pageHash][hash]["dead"] = parseInt(admap[pageHash][hash]["dead"]) + 1;
+          } else {
+            admap[pageHash][hash]["dead"] = 1;
+          }
+        } else { // set as not dead
+          admap[pageHash][hash]["dead"] = 0;
+        }
+        storeAdData();
+      }
+    }
   }
 
   const adsForUI = function (pageUrl) {
@@ -1107,18 +1214,13 @@ const adnauseam = (function () {
 
     log('[FOUND] ' + adinfo(ad), ad);
 
-    const vaultOpen = typeof getExtPageTabId('vault.html') !== 'undefined';
-    if (vaultOpen || isPopupOpen()) {
+    // broadcast the new ad to vault/menu if open
+    const json = adsForUI(ad.pageUrl);
+    json.what = 'adDetected';
+    json.ad = ad;
 
-      // if vault/menu is open, send the new ad
-      const json = adsForUI(ad.pageUrl);
-      json.what = 'adDetected';
-      json.ad = ad;
-
-      //if (automatedMode) json.automated = true; // not used ?
-
-      vAPI.messaging.broadcast(json);
-    }
+    log('[BROADCAST] adDetected', adinfo(ad));
+    broadcast(json);
 
     if (µb.userSettings.showIconBadge)
       µb.updateToolbarIcon(tabId);
@@ -1126,11 +1228,13 @@ const adnauseam = (function () {
     storeAdData();
   };
 
-  const activeBlockList = function (test) {
-    // either from the enabledBlockedLists, or if it matches "My Filter". \
-    // OR added because of previous where "My Filters" didn't match the other language names this value can have
-    // https://github.com/dhowe/AdNauseam/issues/1914
-    return enabledBlockLists.contains(test) || test === i18n$('1pPageName');
+  // true if blocks from this list (an asset key) are kept: the default set, or the
+  // user's own enabledBlockLists once the custom option of the filter-lists page is
+  // on; "My filters" always blocks, whatever its localized title, see #1914
+  const activeBlockList = function (listKey) {
+    const lists = µb.userSettings.customBlockLists ?
+      µb.userSettings.enabledBlockLists : enabledBlockListsDefault;
+    return listKey === µb.userFiltersPath || lists.includes(listKey);
   };
 
   // check target domain against page-domain #337
@@ -1149,15 +1253,17 @@ const adnauseam = (function () {
     let content;
     let pos;
     let c;
+
     const writer = new CompiledListWriter();
-    const parser = new StaticFilteringParser();
-    // urlTokenizer property doesn't exist anymore, MAX_TOKEN_LENGTH can now be found on 'staticNetFilteringEngine'
-    // parser.setMaxTokenLength(µb.urlTokenizer.MAX_TOKEN_LENGTH);
-    parser.setMaxTokenLength(staticNetFilteringEngine.MAX_TOKEN_LENGTH);
-    parser.analyze(filter.raw);
+    const parser = new sfp.AstFilterParser({
+      expertMode: true,
+      nativeCssHas: vAPI.webextFlavor.env.includes('native_css_has'),
+      maxTokenLength: staticNetFilteringEngine.MAX_TOKEN_LENGTH,
+    });
+    parser.parse(filter.raw);
 
     const compiler = staticNetFilteringEngine.createCompiler(parser);
-    if ( compiler.compile(writer) === false ) { return; }
+    if ( compiler.compile(parser, writer) === false ) { return; }
 
     const compiledFilter = writer.last();
 
@@ -1188,9 +1294,7 @@ const adnauseam = (function () {
         continue;
       }
 
-      if (lists[entry.title] == undefined) {
-        lists[entry.title] = compiledFilter;
-      }
+      lists[path] = compiledFilter; // keyed by asset key, titles change and are localized
 
     }
     return lists;
@@ -1238,7 +1342,7 @@ const adnauseam = (function () {
    *
    *  3) whether the request is strictBlocked (iff strictBlocking is enabled)
    *      if so, return true;
-   *      A) If global Strict Block is enabled
+   *      A) If global Strict Block is enabled OR the request is blocked by net rules.
    *      B) If request domain/page is in the StrictBlockList
    *
    *  4) check if any list it was found on allows blocks
@@ -1275,26 +1379,26 @@ const adnauseam = (function () {
     const snfe = staticNetFilteringEngine, snfeData = snfe.toLogData();
 
     /* Case 4 */
-    const lists = listsForFilter(snfeData);
+    const lists = listsForFilter(snfeData); // get lists that match the filter
     if (Object.keys(lists).length === 0) {                                  // 4.A
       snfeData && logNetBlock('UserList', snfeData.raw); // always block
       return true;
     }
 
     let misses = [];
-    for (let name in lists) {
-      if (activeBlockList(name)) {
+    for (let listKey in lists) {
+      if (activeBlockList(listKey)) {
         // Check if this rule is an allow-rule, if yes, then don't block
-        if (lists[name].indexOf('@@') === 0) {                              // 4.B
-          logNetAllow(name, snfeData.raw, context.url);
+        if (lists[listKey].indexOf('@@') === 0) {                           // 4.B
+          logNetAllow(listKey, snfeData.raw, context.url);
           return false;
         }
         // this a block rule from a blockEnabledList, so we don't need to block the cookies ourselves, uBlock already does that
-        logNetBlock(name, snfeData.raw, context.url);                       // 4.C
+        logNetBlock(listKey, snfeData.raw, context.url);                    // 4.C
         return true; // blocked, no need to continue
       }
       else {
-        if (!misses.contains(name)) misses.push(name); // [save misses for 4.D]
+        if (!misses.contains(listKey)) misses.push(listKey); // [save misses for 4.D]
       }
     }
     // Adds the request url to the allowedExceptions list, later used to know which cookies need to be block by AdNauseam
@@ -1502,28 +1606,17 @@ const adnauseam = (function () {
     return removed;
   }
 
-  const initUserSettings = async function () {
-    const settings = await vAPI.storage.get(µb.userSettings);
-    // start by grabbing user-settings, then calling initialize()
-
-    // this for backwards compatibility only ---------------------
-    const mapSz = Object.keys(settings.admap).length;
-    if (!mapSz && µb.adnSettings && µb.adnSettings.admap) {// Sally: do we still need this?
-
-      settings.admap = µb.adnSettings.admap;
-
-      log("[IMPORT] Using legacy admap...");
-
-      setTimeout(function () {
-        storeAdData(true);
-      }, 2000);
+  // ads are read on their own, so a bad vault record can no longer reset settings, see #2536 #2764
+  const initAdData = async function () {
+    const ads = await vAPI.storage.get('admap');
+    if (ads === undefined) { // read rejected: keep the stored vault, don't overwrite it
+      adReadFailed = true;
+      err('[INIT] Unable to read stored ads, not saving ads this session');
     }
-    const ads = await vAPI.storage.get("admap");
-    initialize(ads ? ads : settings);
-
+    initialize(ads || {});
   }
 
-  initUserSettings();//
+  initAdData();
 
   //browser.windows not supported for firefox android
   browser.windows && browser.windows.onRemoved.addListener(function (windowId) {
@@ -1541,6 +1634,18 @@ const adnauseam = (function () {
     });
   };
 
+  // Called from the filter-lists page: keep the blocks of one list (red icon) or
+  // turn them into adn-allows (purple icon), applied at once and saved
+  exports.toggleBlockList = function (request) {
+
+    const current = µb.userSettings.enabledBlockLists;
+    const lists = current.filter(key => key !== request.listKey);
+    if (lists.length === current.length) lists.push(request.listKey);
+    µb.changeUserSettings('enabledBlockLists', lists);
+
+    return { enabledBlockLists: lists };
+  };
+
   exports.adsForVault = function (request, pageStore, tabId) {
     return adsForUI();
   };
@@ -1550,6 +1655,32 @@ const adnauseam = (function () {
   exports.mustAllowRequest = function (result, context) {
     return result !== 0 && !isBlockableRequest(result, context);
   };
+
+  // Called for every behind-the-scene request. True if the request is part of the
+  // visit in progress, the target or a redirect (the xhr follows those on its own),
+  // and is not for a public host, see #2848
+  exports.isLocalVisit = function (details, fctxt) {
+
+    if (!xhr || !xhr.delegate) return false; // not visiting
+
+    // a visit starts on the host we have verified, its redirects keep the same requestId
+    if (xhr.visitId === undefined && fctxt.getHostname() === xhr.visitHostname) {
+      xhr.visitId = details.requestId;
+    }
+
+    if (xhr.visitId !== details.requestId) return false; // some other request
+
+    const hostname = fctxt.getHostname().replace(/\.+$/, '');
+
+    // firefox: uBO has resolved the name by now, unless a proxy does the dns
+    const addresses = fctxt.getIPAddress().split('\n').filter(ip => ip !== '');
+
+    if (isPublicHostname(hostname) && !addresses.some(isLocalAddress)) return false;
+
+    warn('[BLOCK] ad visit to non-public host: ' + details.url);
+
+    return true;
+  }
 
   exports.itemInspected = function (request, pageStore, tabId) {
 
@@ -1569,7 +1700,8 @@ const adnauseam = (function () {
       hidingDisabled: !us.hidingAds || showDnt,
       clickingDisabled: !us.clickingAds,
       textAdsDisabled: !us.parseTextAds,
-      logEvents: us.eventLogging
+      logEvents: us.eventLogging,
+      devMode: us.devMode,
     };
   };
 
@@ -1655,6 +1787,11 @@ const adnauseam = (function () {
     verifyAdBlockers();
     verifySettings();
     verifyLists();
+    verifyVersion();
+
+    // remove open letter notification
+    // const modified = addNotification(notifications, OpenLetter);
+    // modified && sendNotifications(notifications);
 
     dnt.updateFilters();
 
@@ -1689,17 +1826,20 @@ const adnauseam = (function () {
   }
 
   exports.lookupAd = function (url, requestId) {
-
-    const ads = adlist();
-    for (let i = 0; i < ads.length; i++) {
-
-      if (ads[i].attemptedTs) {
-        //console.log('check: '+ads[i].requestId+'/'+ads[i].targetUrl+' ?= '+requestId+'/'+url);
-        if (ads[i].requestId === requestId || ads[i].targetUrl === url) {
-          return ads[i];
-        }
-      }
-    }
+		if (requestId) {
+			const ads = adlist();
+			for (let i = 0; i < ads.length; i++) {
+	
+				if (ads[i].attemptedTs) {
+					//console.log('check: '+ads[i].requestId+'/'+ads[i].targetUrl+' ?= '+requestId+'/'+url);
+					if (ads[i].requestId === requestId || ads[i].targetUrl === url) {
+						return ads[i];
+					}
+				}
+			}
+		} else {
+			return false; 
+		}
   };
 
   exports.registerAd = function (request, pageStore, tabId) {
@@ -1707,6 +1847,9 @@ const adnauseam = (function () {
 
     let json, adhash, pageHash, msSinceFound, orig;
     const ad = request.ad;
+
+    // no page store (tab not bound yet, e.g. right after startup): nothing to attribute the ad to
+    if (!pageStore) return warn('[REGISTER] No pageStore for tab ' + tabId + ', ignoring ' + ad.targetUrl);
 
     ad.current = true;
     ad.attemptedTs = 0;
@@ -1736,7 +1879,7 @@ const adnauseam = (function () {
 
       if (msSinceFound < repeatVisitInterval) {
 
-        log('[EXISTS] ' + adinfo(ad) + ' found ' + msSinceFound + ' ms ago');
+        log('[DUPLICATE] ' + adinfo(ad) + ' found ' + msSinceFound + ' ms ago');
         return;
       }
     }
@@ -1746,6 +1889,11 @@ const adnauseam = (function () {
     if (dnt.mustNotVisit(ad)) { // see #1168
       ad.noVisit = true;
       ad.dntAllowed = true;
+    }
+    else if (!isClickingAllowedOnDomain(ad.pageDomain)) {
+      ad.noVisit = true;
+      ad.domainExcluded = true;
+      log('[SKIP] Domain excluded from ad clicks: ' + ad.pageDomain);
     }
     else {
       ad.noVisit = Math.random() > µb.userSettings.clickProbability; // if true, ad will never be visited
@@ -1851,9 +1999,26 @@ const adnauseam = (function () {
     this.dnt.shutdown();
   };
 
+  // for the backup, ads are no longer part of userSettings, see #2536 #2764
+  exports.getAdmap = function () {
+    return admap;
+  };
+
   exports.deleteAdSet = function (request, pageStore, tabId) {
     request.ids.forEach(deleteAd);
   };
+
+
+  exports.deadAd = function (request, pageStore, tabId) {
+    let ad = request.ad;
+    deadAd(ad, true);
+  };
+
+  exports.notDeadAd = function (request, pageStore, tabId) {
+    let ad = request.ad;
+    deadAd(ad, false);
+  };
+
 
   exports.logAdSet = function (request, pageStore, tabId) {
 
@@ -1864,7 +2029,7 @@ const adnauseam = (function () {
 
     log('ADSET #' + request.gid + '\n', data);
 
-    vAPI.messaging.broadcast({
+    broadcast({
       what: 'logJSON',
       data: data
     });
@@ -1929,6 +2094,31 @@ const adnauseam = (function () {
     });
 
     return notifications.indexOf(AdBlockerEnabled) > -1 ? [AdBlockerEnabled] : [];
+  };
+
+  const verifyVersion = exports.verifyVersion = async function () {
+    const version = vAPI.app.version;
+    // run get request on /repos/dhowe/AdNauseam/releases
+    const response = await fetch("https://api.github.com/repos/dhowe/AdNauseam/releases/latest");
+    // if (!response.ok) {  // validate
+    //   //throw new Error(`HTTP error! status: ${response.status}`);
+    // }
+    // parse response
+    const latestRelease = await response.json();
+    const latestVersion = latestRelease.tag_name.replace('v', '');    
+    // compare versions numerically, as strings "3.28.11" < "3.28.8"
+    const toInt = vAPI.app.intFromVersion;
+    if (toInt(version) < toInt(latestVersion)) {
+      // if browser is chrome
+      console.log("vAPI.webextFlavor.soup", vAPI.webextFlavor.soup)
+      if (vAPI.webextFlavor.soup.has('chromium') && !vAPI.webextFlavor.soup.has('edge')) {
+        // show notification
+        const modified = addNotification(notifications, NewerVersionAvailable);
+        modified && sendNotifications(notifications);
+        // open chrome webstore
+        // vAPI.tabs.open({ url: "https://chrome.google.com/webstore/detail/adnauseam/obdkhmpfckondpndnmahlekdlpiinaha" });
+      }
+    }
   };
 
   exports.verifyAdBlockersAndDNT = function (request) {
@@ -2167,6 +2357,7 @@ const adnauseam = (function () {
     clearAdmap();
     reloadExtPage('vault.html');
     updateBadges();
+    adReadFailed = false; // user replaced the vault, safe to write again
     storeAdData(true);
     computeNextId();
 
@@ -2235,6 +2426,7 @@ const adnauseam = (function () {
     reloadExtPage('vault.html'); // reload Vault page if open
 
     validateHashes();
+    adReadFailed = false; // user replaced the vault, safe to write again
     storeAdData(true);
 
     return {
@@ -2243,25 +2435,36 @@ const adnauseam = (function () {
     };
   };
 
-  // check if "disable warning" optnion is enabled or not 
+  // check if "disable warning" option is enabled or not 
   exports.getWarningDisabled = function () {
     return µb.userSettings.disableWarnings;
   };
   
+  
+  // check if "blur collected ads" options is enabled or not 
+  exports.getBlurCollectedAds = function () {
+    return µb.userSettings.blurCollectedAds;
+  };
+
+  // check if "blur collected ads" options is enabled or not 
+  exports.getHideDeadAds = function () {
+    return µb.userSettings.hideDeadAds;
+  };
+  
   // ADN broadcast change of "disable warning" to all tabs
   exports.setWarningDisabled = function () {
-    vAPI.messaging.broadcast({
+    broadcast({
       what: µb.userSettings.disableWarnings ? 'hideNotifications' : 'showNotifications',
     });
     return µb.userSettings.disableWarnings;
   };
 
-  
 
   exports.getNotifications = function () {
     return {
       notifications:notifications,
-      disableWarnings:µb.userSettings.disableWarnings
+      disableWarnings:µb.userSettings.disableWarnings,
+      blurCollectedAds: µb.userSettings.blurCollectedAds
     };
   };
 
@@ -2298,6 +2501,7 @@ const adnauseam = (function () {
     const allAds = adlist()
     const json = adsForUI(reqPageStore.rawURL);
     json.total = allAds.length;
+    json.clicked = allAds.filter(ad => ad.visitedTs).length;
 
     // if we have no page ads, use the most recent (6)
     // avoid sending data for too many ads in messaging
@@ -2307,6 +2511,11 @@ const adnauseam = (function () {
     }
 
     return json;
+  };
+
+  exports.purgeDeadAds = function (request, pageStore, tabId) {
+    purgeDeadAdsAdmap(request.deadAds);
+    return adsForUI();
   };
 
   return exports;
@@ -2319,25 +2528,22 @@ const adnauseam = (function () {
   'use strict';
 
   const onMessage = function (request, sender, callback) {
-    //console.log("adnauseam.MSG: "+request.what, sender.frameId);
+    //console.log("adnauseam.MSG: "+request.what);
 
     switch (request.what) {
       default: break;
     } // Async
 
-    let pageStore, tabId, frameId;
-
-    if (sender && sender.tabId) {
-
-      tabId = sender.tabId;
-      frameId = sender.frameId;
-      pageStore = µb.pageStoreFromTabId(tabId);
-    }
+    let tabId = request.tabId || (sender && sender.tabId) || null;
+    let pageStore = µb.pageStoreFromTabId(tabId);
 
     if (typeof adnauseam[request.what] === 'function') {
 
-      request.url && (request.url = trimChar(request.url, '/')); // no trailing slash
-      callback(adnauseam[request.what](request, pageStore, tabId, frameId));
+      if (request.what !== 'toggleEnabled') { // fix for https://github.com/dhowe/AdNauseam/issues/2516
+        // Why do we do this?
+        request.url && (request.url = trimChar(request.url, '/')); // no trailing slash
+      }
+      callback(adnauseam[request.what](request, pageStore, tabId));
       adnauseam.markUserAction(); // assume user-initiated and thus no longer 'idle'
 
     } else {
@@ -2400,6 +2606,9 @@ if (!String.prototype.hasOwnProperty('includes')) {
 }
 
 /*************************************************************************/
+
+// Expose globally for benchmarking/automation tools (mirrors self.µBlock pattern)
+self.adnauseam = adnauseam;
 
 export default adnauseam
 

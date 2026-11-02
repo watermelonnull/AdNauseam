@@ -4,7 +4,7 @@
     "description": "extension name."
   },
   "extShortDesc": {
-    "message": "অবশেষে, একটি সাশ্রয়ী বিজ্ঞাপন রোধক। সিপিইউ এবং মেমরিতে নমনীয়।",
+    "message": "একটি শক্তিশালী বিজ্ঞাপন প্রতিরোধক, অবশেষে তৈরী হল। যা সিপিইউ এবং মেমরির জন্য সহনীয়।",
     "description": "this will be in the Chrome web store: must be 132 characters or less"
   },
   "dashboardName": {
@@ -16,11 +16,11 @@
     "description": "A warning in the dashboard when navigating away from unsaved changes"
   },
   "dashboardUnsavedWarningStay": {
-    "message": "থাকুন",
+    "message": "এখানে থাকুন",
     "description": "Label for button to prevent navigating away from unsaved changes"
   },
   "dashboardUnsavedWarningIgnore": {
-    "message": "অবজ্ঞা করুন",
+    "message": "বাদ দিন",
     "description": "Label for button to ignore unsaved changes"
   },
   "settingsPageName": {
@@ -64,7 +64,7 @@
     "description": "Title for the asset viewer page"
   },
   "advancedSettingsPageName": {
-    "message": "উন্নত সেটিংস",
+    "message": "অ্যাডভান্সড সেটিংস",
     "description": "Title for the advanced settings page"
   },
   "popupPowerSwitchInfo": {
@@ -136,19 +136,19 @@
     "description": "Tooltip for the no-popups per-site switch"
   },
   "popupTipNoPopups1": {
-    "message": "এই সাইটে সব পপআপ অবরুদ্ধ করতে ক্লিক করুন",
+    "message": "এই সাইটে সকল পপআপ বন্ধ করতে ক্লিক করুন",
     "description": "Tooltip for the no-popups per-site switch"
   },
   "popupTipNoPopups2": {
-    "message": "এই সাইটে সব পপআপ আর অবরুদ্ধ না করতে ক্লিক করুন",
+    "message": "এই সাইটে আর কোনো পপআপ ব্লক না করতে ক্লিক করুন",
     "description": "Tooltip for the no-popups per-site switch"
   },
   "popupTipNoLargeMedia": {
-    "message": "এই সাইটের জন্য বড় মিডিয়া উপাদান অবরোধ চালু/বন্ধ করুন",
+    "message": "এই সাইটের বড় মিডিয়া উপাদানগুলো অবরোধ ব্লক করার জন্য অদলবদল করুন",
     "description": "Tooltip for the no-large-media per-site switch"
   },
   "popupTipNoLargeMedia1": {
-    "message": "এই সাইটে বড় মিডিয়া উপাদান অবরুদ্ধ করতে ক্লিক করুন",
+    "message": "এই সাইটে বড় মিডিয়া এলিমেন্ট ব্লক করতে ক্লিক করুন",
     "description": "Tooltip for the no-large-media per-site switch"
   },
   "popupTipNoLargeMedia2": {
@@ -156,27 +156,27 @@
     "description": "Tooltip for the no-large-media per-site switch"
   },
   "popupTipNoCosmeticFiltering": {
-    "message": "এই সাইটের জন্য কসমেটিক ছাঁকন চালু/বন্ধ করুন",
+    "message": "এই সাইটের জন্য সৌন্দর্যবর্ধক ছাঁকন চালু/বন্ধ করুন",
     "description": "Tooltip for the no-cosmetic-filtering per-site switch"
   },
   "popupTipNoCosmeticFiltering1": {
-    "message": "এই সাইটে কসমেটিক ফিল্টার নিষ্ক্রিয় করতে ক্লিক করুন",
+    "message": "এই সাইটে সৌন্দর্যবর্ধক ছাঁকন প্রক্রিয়া বন্ধ করতে ক্লিক করুন",
     "description": "Tooltip for the no-cosmetic-filtering per-site switch"
   },
   "popupTipNoCosmeticFiltering2": {
-    "message": "এই সাইটে কসমেটিক ফিল্টার সক্রিয় করতে ক্লিক করুন",
+    "message": "এই সাইটে সৌন্দর্যবর্ধক ছাঁকন প্রক্রিয়া চালু করতে ক্লিক করুন",
     "description": "Tooltip for the no-cosmetic-filtering per-site switch"
   },
   "popupTipNoRemoteFonts": {
-    "message": "এই সাইটের রিমোট ফন্টের অবরোধ চালু/বন্ধ করুন",
+    "message": "এই সাইটের রিমোট ফন্ট বন্ধের প্রক্রিয়া অদলবদল করুন",
     "description": "Tooltip for the no-remote-fonts per-site switch"
   },
   "popupTipNoRemoteFonts1": {
-    "message": "এই সাইটে রিমোট ফন্ট অবরুদ্ধ করতে ক্লিক করুন",
+    "message": "এই সাইটে রিমোট ফন্ট ব্লক করতে ক্লিক করুন",
     "description": "Tooltip for the no-remote-fonts per-site switch"
   },
   "popupTipNoRemoteFonts2": {
-    "message": "এই সাইটে রিমোট ফন্ট আর অবরুদ্ধ না করতে ক্লিক করুন",
+    "message": "এই সাইটে রিমোট ফন্ট আর ব্লক না করতে ক্লিক করুন",
     "description": "Tooltip for the no-remote-fonts per-site switch"
   },
   "popupTipNoScripting1": {
@@ -184,7 +184,7 @@
     "description": "Tooltip for the no-scripting per-site switch"
   },
   "popupTipNoScripting2": {
-    "message": "এই সাইটের জাভাস্ক্রিপ্ট চালু করতে ক্লিক করুণ",
+    "message": "এই সাইটের জাভাস্ক্রিপ্ট চালু করতে ক্লিক করুন",
     "description": "Tooltip for the no-scripting per-site switch"
   },
   "popupNoPopups_v2": {
@@ -192,11 +192,11 @@
     "description": "Caption for the no-popups per-site switch"
   },
   "popupNoLargeMedia_v2": {
-    "message": "বড় মিডিয়া এলিমেন্টগুলি",
+    "message": "বড় মিডিয়ার এলিমেন্টগুলো",
     "description": "Caption for the no-large-media per-site switch"
   },
   "popupNoCosmeticFiltering_v2": {
-    "message": "সৌন্দর্য্যবর্ধক ছাকন",
+    "message": "সৌন্দর্য্যবর্ধক ছাকন প্রক্রিয়া",
     "description": "Caption for the no-cosmetic-filtering per-site switch"
   },
   "popupNoRemoteFonts_v2": {
@@ -220,7 +220,7 @@
     "description": "Tooltip when hovering the top-most cell of the global-rules column."
   },
   "popupTipLocalRules": {
-    "message": "অভ্যন্তরীন নিয়ম: এই কলামটি সেইসব নিয়মের জন্য যা শুধু বর্তমান সাইটে প্রয়োগ করা হবে।\nঅভ্যন্তরীন নিয়ম সার্বজনীন নিয়মকে অগ্রাহ্য করবে।",
+    "message": "অভ্যন্তরীন নিয়ম: এই কলামটি সেইসব নিয়মের জন্য যা শুধু বর্তমান সাইটে প্রয়োগ করা হবে।",
     "description": "Tooltip when hovering the top-most cell of the local-rules column."
   },
   "popupTipSaveRules": {
@@ -275,13 +275,13 @@
     "message": "সংস্করণ",
     "description": "Example of use: Version 1.26.4"
   },
-  "popup3pScriptFilterTip": {
-    "message": "↑: থার্ড-পার্টি স্ক্রিপ্ট থাকা সারিগুলোতে গুরুত্ব দেয়া",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party scripts' cell"
+  "popup3pScriptFilter": {
+    "message": "স্ক্রিপ্ট",
+    "description": "Appears as an option to filter out firewall rows"
   },
-  "popup3pFrameFilterTip": {
-    "message": "↑: থার্ড-পার্টি ফ্রেম থাকা সারিগুলোতে গুরুত্ব দেয়া",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party frames' cell"
+  "popup3pFrameFilter": {
+    "message": "কাঠামো",
+    "description": "Appears as an option to filter out firewall rows"
   },
   "pickerCreate": {
     "message": "তৈরি করুন",
@@ -469,35 +469,43 @@
   },
   "3pGroupDefault": {
     "message": "বিল্ট-ইন",
-    "description": "Header for the uBlock filters section in 'Filter lists pane'"
+    "description": "Filter lists section name"
   },
   "3pGroupAds": {
     "message": "বিজ্ঞাপন",
-    "description": "English: Ads"
+    "description": "Filter lists section name"
   },
   "3pGroupPrivacy": {
     "message": "গোপনীয়তা",
-    "description": "English: Privacy"
+    "description": "Filter lists section name"
   },
   "3pGroupMalware": {
     "message": "ম্যালওয়্যার ডোমেইন",
-    "description": "English: Malware domains"
+    "description": "Filter lists section name"
+  },
+  "3pGroupSocial": {
+    "message": "সোশ্যাল উইজেট",
+    "description": "Filter lists section name"
+  },
+  "3pGroupCookies": {
+    "message": "কুকি নোটিশ",
+    "description": "Filter lists section name"
   },
   "3pGroupAnnoyances": {
     "message": "বিরক্তিকর",
-    "description": "The header identifying the filter lists in the category 'annoyances'"
+    "description": "Filter lists section name"
   },
   "3pGroupMultipurpose": {
     "message": "বহুমুখী",
-    "description": "English: Multipurpose"
+    "description": "Filter lists section name"
   },
   "3pGroupRegions": {
     "message": "অঞ্চল, ভাষা",
-    "description": "English: Regions, languages"
+    "description": "Filter lists section name"
   },
   "3pGroupCustom": {
     "message": "স্বনির্ধারিত",
-    "description": "English: Custom"
+    "description": "Filter lists section name"
   },
   "3pImport": {
     "message": "আমদানি করুন...",
@@ -527,17 +535,25 @@
     "message": "একটি নেটওয়ার্ক ত্রুটি রিসোর্স বা তথ্য হালনাগাদ হওয়া রোধ করেছে।",
     "description": "used as a tooltip for error icon beside a list"
   },
-  "1pFormatHint": {
-    "message": "লাইন প্রতি একটি ফিল্টার। একটি ফিল্টার শুধু হোস্টনেম বা অ্যাডব্লক প্লাস-এর সাথে সামঞ্জস্যপূর্ণ ফিল্টার হতে পারে। <code>!</code> দিয়ে শুরু হওয়া লাইন উপেক্ষা করা হবে।",
-    "description": "Short information about how to create custom filters"
+  "1pTrustWarning": {
+    "message": "সন্দেহজনক উৎস থেকে ফিল্টারে কোন কিছু যোগ করবেন না।",
+    "description": "Warning against copy-pasting filters from random sources"
+  },
+  "1pEnableMyFiltersLabel": {
+    "message": "আপনার কাস্টম ফিল্টারটি চালু করুন",
+    "description": "Label for the checkbox use to enable/disable 'My filters' list"
+  },
+  "1pTrustMyFiltersLabel": {
+    "message": "কাস্টম ফিল্টারকে বিশ্বস্ততার অনুমতি দিন",
+    "description": "Label for the checkbox use to trust the content of 'My filters' list"
   },
   "1pImport": {
     "message": "আমদানি করে পরিশেষে যোগ করুন",
-    "description": "English: Import and append"
+    "description": "Button in the 'My filters' pane"
   },
   "1pExport": {
     "message": "রপ্তানি করুন",
-    "description": "English: Export"
+    "description": "Button in the 'My filters' pane"
   },
   "1pExportFilename": {
     "message": "amar-ublock-static-filters_{{datetime}}.txt",
@@ -581,7 +597,7 @@
   },
   "rulesExport": {
     "message": "ফাইলে রপ্তানি",
-    "description": ""
+    "description": "Button in the 'My rules' pane"
   },
   "rulesDefaultFileName": {
     "message": "amar-ublock-dynamic-niyom_{{datetime}}.txt",
@@ -617,11 +633,11 @@
   },
   "whitelistImport": {
     "message": "আমদানি ও পরিশেষে যোগ করুন",
-    "description": "English: Import and append"
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExport": {
     "message": "রপ্তানি করুন",
-    "description": "English: Export"
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExportFilename": {
     "message": "amar-ublock-whitelist_{{datetime}}.txt",
@@ -881,11 +897,11 @@
   },
   "supportOpenButton": {
     "message": "খুলুন",
-    "description": "Text for button which open an external webpage in Support pane"
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportReportSpecificButton": {
     "message": "নতুন অভিযোগ",
-    "description": "Text for button which open an external webpage in Support pane"
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportFindSpecificButton": {
     "message": "একই রকম অভিযোগ দেখুন",
@@ -939,16 +955,20 @@
     "message": "স্বেচ্ছাসেবকরা যখন কোনো সমস্যা সমাধানের জন্য আপনাকে সাহায্য করার চেষ্টা করছেন তখন প্রযুক্তিগত তথ্য নিচে দেওয়া হল যা কার্যকর হতে পারে।",
     "description": "First paragraph of 'Troubleshooting Information' section in Support pane"
   },
-  "supportS5P2": {
-    "message": "<b>গুরুত্বপূর্ণ:</b> সম্ভাব্য ব্যক্তিগত বা সংবেদনশীল তথ্য ডিফল্টরূপে সংশোধন করা হয়। সংশোধিত তথ্য সমস্যা সমাধান করা আরও কঠিন করে তুলতে পারে।",
-    "description": "Second paragraph of 'Troubleshooting Information' section in Support pane"
-  },
   "supportS6H": {
     "message": "একটি ফিল্টার সমস্যা রিপোর্ট করুন",
     "description": "Header of 'Report a filter issue' section in Support pane"
   },
   "supportS6P1S1": {
     "message": "ডুপ্লিকেট রিপোর্ট সহ স্বেচ্ছাসেবকদের বোঝা এড়াতে, অনুগ্রহ করে যাচাই করুন যে সমস্যাটি ইতিমধ্যে রিপোর্ট করা হয়নি।",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S1": {
+    "message": "ফিল্টারের লিস্ট প্রতিদিন আপডেট করা হয়। নতুন আপডেটে আপনার সমস্যার সমাধান করা হয়েছে কিনা তা লক্ষ্য করুন। ",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S2": {
+    "message": "অভিযোগ দিন যদি আপনার রিলোডের পরও ওয়েবপেজের সমস্যার সমাধান না হয়।",
     "description": "A paragraph in the filter issue reporter section"
   },
   "supportS6URL": {
@@ -987,17 +1007,13 @@
     "message": "অবাঞ্ছিত ট্যাব বা উইন্ডো খোলে",
     "description": "An entry in the widget used to select the type of issue"
   },
+  "supportS6Select1Option7": {
+    "message": "ব্যাডওয়্যার, প্রতারণমূলক জায়গায় নেয়",
+    "description": "An entry in the widget used to select the type of issue"
+  },
   "supportS6Checkbox1": {
     "message": "ওয়েব পৃষ্ঠাটিকে “NSFW” হিসাবে লেবেল করুন (<a href=\"https://bn.wikipedia.org/wiki/নট_সেফ_ফর_ওয়ার্ক\">“কাজের জন্য নিরাপদ নয়”</a>)",
     "description": "A checkbox to use for NSFW sites"
-  },
-  "supportRedact": {
-    "message": "Redact",
-    "description": "Text for 'Redact' button"
-  },
-  "supportUnredact": {
-    "message": "Unredact",
-    "description": "Text for 'Unredact' button"
   },
   "aboutPrivacyPolicy": {
     "message": "গোপনীয়তার নীতি",
@@ -1070,10 +1086,6 @@
   "errorCantConnectTo": {
     "message": "{{url}} -এ সংযোগ করতে অক্ষম",
     "description": "English: Network error: {{msg}}"
-  },
-  "subscriberConfirm": {
-    "message": "uBlock₀: আপনার নিজস্ব ফিল্টার তালিকায় নিম্নলিখিত URL যোগ করবেন?\n\nশিরোনাম: \"{{title}}\"\nURL: {{url}}",
-    "description": "No longer used"
   },
   "subscribeButton": {
     "message": "সদস্যতা নাও",
@@ -1163,6 +1175,26 @@
     "message": "এগিয়ে যান",
     "description": "Button text to navigate to the blocked page"
   },
+  "docblockedRedirectPrompt": {
+    "message": "ব্লককৃত পাতাটি আরেকটি ওয়েবসাইটে নেয়। এগিয়ে যেতে চাইলে, সরাসরি এই জায়গায় যাবে: {{url}}",
+    "description": "Text warning about an incoming redirect"
+  },
+  "docblockedReasonLabel": {
+    "message": "কারণ:",
+    "description": "The label which prepend the actual reason why a page was blocked"
+  },
+  "docblockedReasonMalicious": {
+    "message": "ক্ষতিকারক",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonTracker": {
+    "message": "ট্র্যাকার",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonDisreputable": {
+    "message": "অখ্যাতিপূর্ণ",
+    "description": "An actual reason why a page was blocked"
+  },
   "cloudPush": {
     "message": "ক্লাউড সঞ্চয়ে রপ্তানি করুন",
     "description": "tooltip"
@@ -1215,6 +1247,10 @@
     "message": "সাময়িকভাবে বৃহৎ মিডিয়া উপাদান মঞ্জুরি দিন",
     "description": "A context menu entry, present when large media elements have been blocked on the current site"
   },
+  "contextMenuViewSource": {
+    "message": "সোর্স কোড দেখুন.... ",
+    "description": "A context menu entry, to view the source code of the target resource"
+  },
   "shortcutCapturePlaceholder": {
     "message": "শর্টকাট লিখুন",
     "description": "Placeholder string for input field used to capture a keyboard shortcut"
@@ -1234,6 +1270,10 @@
   "toggleCosmeticFiltering": {
     "message": "সৌন্দর্য্যবর্ধক ফিল্টার চালু বা বন্ধ করুন",
     "description": "Label for keyboard shortcut used to toggle cosmetic filtering"
+  },
+  "toggleJavascript": {
+    "message": "Javascript টগল করুন",
+    "description": "Label for keyboard shortcut used to toggle no-scripting switch"
   },
   "relaxBlockingMode": {
     "message": "রোধক মোড শিথিল করুন",
@@ -1258,6 +1298,14 @@
   "clickToLoad": {
     "message": "লোড করতে টিপ দাও",
     "description": "Message used in frame placeholders"
+  },
+  "linterMainReport": {
+    "message": "এরর: {{গণনা}}",
+    "description": "Summary of number of errors as reported by the linter "
+  },
+  "unprocessedRequestTooltip": {
+    "message": "ঠিকভাবে ফিল্টার চালু করা যায়নি। পুনরায় আবার পেজ রিলোড করুন ঠিকভাবে ফিল্টার চালু করার জন্য",
+    "description": "A warning which will appear in the popup panel if needed"
   },
   "dummy": {
     "message": "This entry must be the last one",

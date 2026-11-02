@@ -68,7 +68,7 @@
     "description": "Title for the advanced settings page"
   },
   "popupPowerSwitchInfo": {
-    "message": "Kliknij, aby włączyć/wyłączyć uBlock₀ na tej witrynie.\n\nKliknij z wciśniętym klawiszem Ctrl, aby włączyć/wyłączyć uBlock₀ tylko na tej stronie.",
+    "message": "Kliknij, aby wyłączyć uBlock₀ dla tej witryny.\n\nKliknij z wciśniętym klawiszem Ctrl,\naby wyłączyć uBlock₀ tylko dla tej strony.",
     "description": "English: Click: disable/enable uBlock₀ for this site.\n\nCtrl+click: disable uBlock₀ only on this page."
   },
   "popupPowerSwitchInfo1": {
@@ -216,11 +216,11 @@
     "description": "Label to be used to hide popup panel sections"
   },
   "popupTipGlobalRules": {
-    "message": "Reguły globalne. W tej kolumnie znajdują się reguły stosowane na wszystkich witrynach.",
+    "message": "Reguły globalne:\nW tej kolumnie znajdują się reguły stosowane na wszystkich witrynach.",
     "description": "Tooltip when hovering the top-most cell of the global-rules column."
   },
   "popupTipLocalRules": {
-    "message": "Reguły lokalne. W tej kolumnie znajdują się reguły stosowane tylko na bieżącej witrynie.\nReguły lokalne zastępują reguły globalne.",
+    "message": "Reguły lokalne:\nW tej kolumnie znajdują się reguły stosowane tylko na bieżącej witrynie.\nReguły lokalne zastępują reguły globalne.",
     "description": "Tooltip when hovering the top-most cell of the local-rules column."
   },
   "popupTipSaveRules": {
@@ -252,7 +252,7 @@
     "description": ""
   },
   "popup1pScriptRulePrompt": {
-    "message": "skrypty własne",
+    "message": "skrypty tej samej domeny",
     "description": ""
   },
   "popup3pScriptRulePrompt": {
@@ -275,13 +275,13 @@
     "message": "Wersja",
     "description": "Example of use: Version 1.26.4"
   },
-  "popup3pScriptFilterTip": {
-    "message": "↑: Wyróżnij wiersze zawierające skrypty z domen zewnętrznych",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party scripts' cell"
+  "popup3pScriptFilter": {
+    "message": "skrypt",
+    "description": "Appears as an option to filter out firewall rows"
   },
-  "popup3pFrameFilterTip": {
-    "message": "↑: Wyróżnij wiersze zawierające ramki z domen zewnętrznych",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party frames' cell"
+  "popup3pFrameFilter": {
+    "message": "ramka",
+    "description": "Appears as an option to filter out firewall rows"
   },
   "pickerCreate": {
     "message": "Utwórz",
@@ -469,35 +469,43 @@
   },
   "3pGroupDefault": {
     "message": "Wbudowane",
-    "description": "Header for the uBlock filters section in 'Filter lists pane'"
+    "description": "Filter lists section name"
   },
   "3pGroupAds": {
     "message": "Reklamy",
-    "description": "English: Ads"
+    "description": "Filter lists section name"
   },
   "3pGroupPrivacy": {
     "message": "Prywatność",
-    "description": "English: Privacy"
+    "description": "Filter lists section name"
   },
   "3pGroupMalware": {
-    "message": "Domeny ze złośliwym oprogramowaniem",
-    "description": "English: Malware domains"
+    "message": "Ochrona przed złośliwym oprogramowaniem, bezpieczeństwo",
+    "description": "Filter lists section name"
+  },
+  "3pGroupSocial": {
+    "message": "Widety społecznościowe",
+    "description": "Filter lists section name"
+  },
+  "3pGroupCookies": {
+    "message": "Powiadomienia o ciasteczkach",
+    "description": "Filter lists section name"
   },
   "3pGroupAnnoyances": {
     "message": "Elementy irytujące",
-    "description": "The header identifying the filter lists in the category 'annoyances'"
+    "description": "Filter lists section name"
   },
   "3pGroupMultipurpose": {
     "message": "Wielofunkcyjne",
-    "description": "English: Multipurpose"
+    "description": "Filter lists section name"
   },
   "3pGroupRegions": {
     "message": "Regiony, języki",
-    "description": "English: Regions, languages"
+    "description": "Filter lists section name"
   },
   "3pGroupCustom": {
     "message": "Własne",
-    "description": "English: Custom"
+    "description": "Filter lists section name"
   },
   "3pImport": {
     "message": "Importuj…",
@@ -527,17 +535,25 @@
     "message": "Błąd sieci uniemożliwił aktualizację zasobów.",
     "description": "used as a tooltip for error icon beside a list"
   },
-  "1pFormatHint": {
-    "message": "W wierszu może być tylko jeden filtr. Filtrem może być nazwa hosta lub filtr kompatybilny z EasyList. Wiersze poprzedzone znakiem <code>!</code> będą pomijane.",
-    "description": "Short information about how to create custom filters"
+  "1pTrustWarning": {
+    "message": "Nie dodawaj filtrów z niezaufanych źródeł.",
+    "description": "Warning against copy-pasting filters from random sources"
+  },
+  "1pEnableMyFiltersLabel": {
+    "message": "Włącz moje własne filtry",
+    "description": "Label for the checkbox use to enable/disable 'My filters' list"
+  },
+  "1pTrustMyFiltersLabel": {
+    "message": "Zezwól na filtry wymagające zaufania",
+    "description": "Label for the checkbox use to trust the content of 'My filters' list"
   },
   "1pImport": {
-    "message": "Importuj i dołącz",
-    "description": "English: Import and append"
+    "message": "Importuj i dołącz…",
+    "description": "Button in the 'My filters' pane"
   },
   "1pExport": {
-    "message": "Eksportuj",
-    "description": "English: Export"
+    "message": "Eksportuj…",
+    "description": "Button in the 'My filters' pane"
   },
   "1pExportFilename": {
     "message": "ublock-statyczne-filtry_{{datetime}}.txt",
@@ -581,7 +597,7 @@
   },
   "rulesExport": {
     "message": "Eksportuj do pliku…",
-    "description": ""
+    "description": "Button in the 'My rules' pane"
   },
   "rulesDefaultFileName": {
     "message": "ublock-dynamiczne-reguly_{{datetime}}.txt",
@@ -616,12 +632,12 @@
     "description": "A concise description of the 'Trusted sites' pane."
   },
   "whitelistImport": {
-    "message": "Importuj i dołącz",
-    "description": "English: Import and append"
+    "message": "Importuj i dołącz…",
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExport": {
-    "message": "Eksportuj",
-    "description": "English: Export"
+    "message": "Eksportuj…",
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExportFilename": {
     "message": "ublock-zaufane-witryny_{{datetime}}.txt",
@@ -881,11 +897,11 @@
   },
   "supportOpenButton": {
     "message": "Otwórz",
-    "description": "Text for button which open an external webpage in Support pane"
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportReportSpecificButton": {
     "message": "Utwórz nowy raport",
-    "description": "Text for button which open an external webpage in Support pane"
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportFindSpecificButton": {
     "message": "Znajdź podobne raporty",
@@ -939,16 +955,20 @@
     "message": "Poniżej znajdują się informacje techniczne które mogą być użyteczne gdy wolontariusze próbują pomóc ci w rozwiązaniu problemu.",
     "description": "First paragraph of 'Troubleshooting Information' section in Support pane"
   },
-  "supportS5P2": {
-    "message": "<b>Ważne:</b> Potencjalnie prywatne lub wrażliwe informacje są domyślnie ocenzurowane. Ocenzurowanie może utrudnić rozwiązanie problemu.",
-    "description": "Second paragraph of 'Troubleshooting Information' section in Support pane"
-  },
   "supportS6H": {
     "message": "Zgłoś problem z filtrem",
     "description": "Header of 'Report a filter issue' section in Support pane"
   },
   "supportS6P1S1": {
-    "message": "Aby uniknąć obciążania wolontariuszy zduplikowanymi zgłoszeniami, sprawdź, czy problem nie został już zgłoszony.",
+    "message": "Sprawdź, czy problem nie został już zgłoszony, aby uniknąć obciążania wolontariuszy duplikatami raportów. <b>Uwaga:</b> kliknięcie przycisku spowoduje wysłanie źródła strony do serwisu GitHub.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S1": {
+    "message": "Listy filtrów są aktualizowane codziennie. Sprawdź, czy twój problem nie został już rozwiązany w najnowszych listach filtrów.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S2": {
+    "message": "Sprawdź, czy problem nadal występuje po odświeżeniu problematycznej strony internetowej.",
     "description": "A paragraph in the filter issue reporter section"
   },
   "supportS6URL": {
@@ -987,17 +1007,13 @@
     "message": "Otwiera niepożądane karty lub okna",
     "description": "An entry in the widget used to select the type of issue"
   },
+  "supportS6Select1Option7": {
+    "message": "Prowadzi do szkodliwego oprogramowania, phishingu",
+    "description": "An entry in the widget used to select the type of issue"
+  },
   "supportS6Checkbox1": {
     "message": "Oznacz stronę internetową jako „NSFW” (<a href=\"https://wikipedia.org/wiki/Not_safe_for_work\">„Not Safe For Work (nieodpowiednią w pracy)”</a>)",
     "description": "A checkbox to use for NSFW sites"
-  },
-  "supportRedact": {
-    "message": "Ocenzuruj",
-    "description": "Text for 'Redact' button"
-  },
-  "supportUnredact": {
-    "message": "Nie cenzuruj",
-    "description": "Text for 'Unredact' button"
   },
   "aboutPrivacyPolicy": {
     "message": "Polityka prywatności",
@@ -1036,7 +1052,7 @@
     "description": "Shown in the About pane"
   },
   "aboutCDNsInfo": {
-    "message": "Losowo wybrana sieć CDN zostanie użyta, gdy lista filtrów będzie wymagała aktualizacji",
+    "message": "Losowo wybrana sieć CDN zostanie użyta, gdy lista filtrów będzie wymagała aktualizacji.",
     "description": "Shown in the About pane"
   },
   "aboutBackupDataButton": {
@@ -1070,10 +1086,6 @@
   "errorCantConnectTo": {
     "message": "Błąd sieci: {{msg}}",
     "description": "English: Network error: {{msg}}"
-  },
-  "subscriberConfirm": {
-    "message": "Dodać następujący URL do twoich list filtrów?\n\nTytuł: \"{{title}}\"\nURL: {{url}}",
-    "description": "No longer used"
   },
   "subscribeButton": {
     "message": "Subskrybuj",
@@ -1163,6 +1175,26 @@
     "message": "Kontynuuj",
     "description": "Button text to navigate to the blocked page"
   },
+  "docblockedRedirectPrompt": {
+    "message": "Zablokowana strona chce przekierować na inną witrynę. Jeśli zdecydujesz się kontynuować, przejdziesz bezpośrednio do: {{url}}",
+    "description": "Text warning about an incoming redirect"
+  },
+  "docblockedReasonLabel": {
+    "message": "Powód:",
+    "description": "The label which prepend the actual reason why a page was blocked"
+  },
+  "docblockedReasonMalicious": {
+    "message": "złośliwa",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonTracker": {
+    "message": "śledząca",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonDisreputable": {
+    "message": "podejrzana",
+    "description": "An actual reason why a page was blocked"
+  },
   "cloudPush": {
     "message": "Eksportuj do chmury",
     "description": "tooltip"
@@ -1215,6 +1247,10 @@
     "message": "Tymczasowo zezwalaj na wyświetlanie dużych elementów multimedialnych",
     "description": "A context menu entry, present when large media elements have been blocked on the current site"
   },
+  "contextMenuViewSource": {
+    "message": "Pokaż źródło…",
+    "description": "A context menu entry, to view the source code of the target resource"
+  },
   "shortcutCapturePlaceholder": {
     "message": "Wprowadź skrót",
     "description": "Placeholder string for input field used to capture a keyboard shortcut"
@@ -1234,6 +1270,10 @@
   "toggleCosmeticFiltering": {
     "message": "Włącz/wyłącz filtrowanie kosmetyczne",
     "description": "Label for keyboard shortcut used to toggle cosmetic filtering"
+  },
+  "toggleJavascript": {
+    "message": "Włącz/wyłącz JavaScript",
+    "description": "Label for keyboard shortcut used to toggle no-scripting switch"
   },
   "relaxBlockingMode": {
     "message": "Rozluźnij tryb blokowania",
@@ -1258,6 +1298,14 @@
   "clickToLoad": {
     "message": "Kliknij, aby załadować",
     "description": "Message used in frame placeholders"
+  },
+  "linterMainReport": {
+    "message": "Błędy: {{count}}",
+    "description": "Summary of number of errors as reported by the linter "
+  },
+  "unprocessedRequestTooltip": {
+    "message": "Podczas uruchamiania przeglądarki nie można prawidłowo filtrować.\nAby zapewnić prawidłowe filtrowanie, wczytaj ponownie stronę.",
+    "description": "A warning which will appear in the popup panel if needed"
   },
   "dummy": {
     "message": "Ten wpis musi być ostatni",

@@ -1,0 +1,15 @@
+[
+  { "url": "https://www.nytimes.com",      "stay": 30 },
+  { "url": "https://www.cnn.com",          "stay": 30 },
+  { "url": "https://www.bbc.com/news",     "stay": 30 },
+  { "url": "https://www.theguardian.com",  "stay": 25 },
+  { "url": "https://www.reuters.com",      "stay": 25 },
+  { "url": "https://thewire.in",           "stay": 30 },
+  { "url": "https://www.lemonde.fr",       "stay": 25 },
+  { "url": "https://www.spiegel.de",       "stay": 25 },
+  { "url": "https://elpais.com",           "stay": 25 },
+  { "url": "https://www.corriere.it",      "stay": 25 },
+  { "url": "https://www.folha.uol.com.br", "stay": 25 },
+  { "url": "https://www.asahi.com",        "stay": 25 },
+  { "url": "https://www.reddit.com",       "stay": 35 }
+]

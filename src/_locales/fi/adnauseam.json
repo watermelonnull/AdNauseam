@@ -36,15 +36,15 @@
     "description": "Message asking user to confirm reset"
   },
   "adnFirstRunHideAllAdsDescription": {
-    "message": "Piilota mainokset valitsemistasi <span class='link' id='To3pfilter'>suodatuslistoista</span>",
+    "message": "Piilota mainokset valitsemistasi <span class='link' id='To3pfilter'>suodatuslistoista<\/span>",
     "description": "English: Firstrun.html -> Hide Ads in your selected filter lists"
   },
   "adnFirstRunClickingAdsDescription": {
-    "message": "Rekisteröi vierailut mainoksiin valitsemistasi <span class='link' id='To3pfilter'>suodatuslistoista</span>",
+    "message": "Rekisteröi vierailut mainoksiin valitsemistasi <span class='link' id='To3pfilter'>suodatuslistoista<\/span>",
     "description": "English: Firstrun.html -> Register visits on Ads found via your filter lists"
   },
   "adnFirstRunBlockingMalwareDescription": {
-    "message": "Estä jäljittäjät ja muut haittaohjelmat (<span>mukauta</span>)",
+    "message": "Estä jäljittäjät ja muut haittaohjelmat (<span>mukauta<\/span>)",
     "description": "English: Firstrun.html -> Block trackers and other malware (customize)"
   },
   "adnNotificationReactivate": {
@@ -96,24 +96,28 @@
     "description": "English: Notifications -> You have allowed adnauseam to have access to your online activities while private browsing."
   },
   "adnNotificationDNTAllowed": {
-    "message": "Tämä sivu kunnioittaa <b>Do Not Track</b> -ominaisuutta, joten mainokset sallitaan.",
+    "message": "Tämä sivu kunnioittaa <b>Do Not Track<\/b> -ominaisuutta, joten mainokset sallitaan.",
     "description": "English: Notifications -> This page respects Do Not Track, Ads are allowed."
   },
   "adnNotificationDNTHidingNotClicking": {
-    "message": "Tämä sivu kunnioittaa <b>Do Not Track</b> -ominaisuutta, joten mainokset piilotetaan, mutta niitä ei klikata.",
+    "message": "Tämä sivu kunnioittaa <b>Do Not Track<\/b> -ominaisuutta, joten mainokset piilotetaan, mutta niitä ei klikata.",
     "description": "English: Notifications -> This page respects Do Not Track, hiding not clicking."
   },
   "adnNotificationDNTClickingNotHiding": {
-    "message": "Tämä sivu kunnioittaa <b>Do Not Track</b> -ominaisuutta, joten mainoksia klikataan, mutta niitä ei piiloteta",
+    "message": "Tämä sivu kunnioittaa <b>Do Not Track<\/b> -ominaisuutta, joten mainoksia klikataan, mutta niitä ei piiloteta",
     "description": "English: Notifications -> This page respects Do Not Track, clicking not hiding."
   },
   "adnNotificationDNTJustSoYouKnow": {
-    "message": "Tämä sivu kunnioittaa <b>Do Not Track</b> -ominaisuutta, ihan vain tiedoksi.",
+    "message": "Tämä sivu kunnioittaa <b>Do Not Track<\/b> -ominaisuutta, ihan vain tiedoksi.",
     "description": "English: Notifications -> This page respects Do Not Track, just so you know."
   },
   "adnNotificationShowAdsDebug": {
-    "message": "Lisäasetus \"Show Ads Debug\" on käytössä",
+    "message": "Lisäasetus \"Näytä mainokset mainoskokoelman vianetsintää varten\" on käytössä",
     "description": "English: Notifications -> The Advanced Setting \"Show Ads Debug\" is turned on"
+  },
+  "adnNewerVersionAvailableNotification": {
+    "message": "Uusi AdNauseam-versio on saatavilla",
+    "description": "English: Notifications -> A newer version of AdNauseam is available"
   },
   "adnTarget": {
     "message": "KOHDE",
@@ -153,7 +157,7 @@
   },
   "adnPausedOnPage": {
     "message": "AdNauseam on pysäytetty tällä sivulla",
-    "description": "English: Menu->display when paused on page/site"
+    "description": "English: Menu->display when paused on page\/site"
   },
   "adnNotHiding": {
     "message": "AdNauseam ei tällä hetkellä piilota mainoksia",
@@ -169,23 +173,23 @@
   },
   "topAdnetworks": {
     "message": "Yleisimmät mainosverkostot",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "topSites": {
     "message": "Yleisimmät sivustot",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypes": {
     "message": "Mainostyypit",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesImageAds": {
     "message": "Kuvamainokset",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesTextAds": {
     "message": "Tekstimainokset",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adnShowingRecentAds": {
     "message": "Mainoksia ei kerätty tällä sivulla (näytetään tämänhetkiset)",
@@ -216,7 +220,7 @@
     "description": "appears in ADN settings"
   },
   "adnPurgeConfirm": {
-    "message": "Toiminto poistaa pysyvästi kaikki mainokset, joiden kuvalatauksissa on virheitä. Varmista, että Internet-yhteytesi toimii, koska muuten kaikki mainokset poistetaan.",
+    "message": "Tämä toiminto poistaa pysyvästi kaikki mainokset, joiden kuvaa ei voida ladata. On suositeltavaa varmuuskopioida holvi ennen puhdistusta sekä varmistaa, että Internet-yhteys on aktiivinen.",
     "description": "appears in ADN settings"
   },
   "adnAdClickingStatusPending": {
@@ -359,6 +363,18 @@
     "message": "Hävitä kuolleet mainokset",
     "description": "appears on vault page"
   },
+  "adnShowDeadAds": {
+    "message": "Näytä kuolleet mainokset",
+    "description": "appears on vault page"
+  },
+  "adnHideDeadAds": {
+    "message": "Piilota kuolleet mainokset",
+    "description": "appears on vault page"
+  },
+  "adnCaptureVault": {
+    "message": "Kaappaa",
+    "description": "appears on vault page in dev mode"
+  },
   "adnVaultFound": {
     "message": "{{total}} mainoksia kerätty",
     "description": "appears on vault page"
@@ -475,6 +491,10 @@
     "message": "Päivitys",
     "description": "English: update"
   },
+  "adnUpdateButton": {
+    "message": "Päivitä",
+    "description": "English: update"
+  },
   "whitelistPageName": {
     "message": "Valkoinen lista",
     "description": "appears as tab name in dashboard"
@@ -484,12 +504,20 @@
     "description": "appears as tab name in dashboard"
   },
   "eventLoggingPrompt": {
-    "message": "Ota virheenkorjaus käyttöön",
+    "message": "Vianselvitystila",
     "description": "prompt for toggle"
   },
   "disableWarnings": {
     "message": "Älä näytä varoituksia",
     "description": "English:Disable warnings"
+  },
+  "blurCollectedAds": {
+    "message": "Sumennus kerätyt mainokset",
+    "description": "English: Blur Collected ads"
+  },
+  "hideDeadAds": {
+    "message": "Piilota kuolleet mainokset",
+    "description": "English: Hide Dead ads"
   },
   "showAdsDebugPrompt": {
     "message": "Näytä mainokset mainoskokoelman vianetsintää varten",
@@ -502,5 +530,25 @@
   "settingsStrictBlockingMode": {
     "message": "Aktivoi tiukka estotila",
     "description": "English: Activate Strict-Blocking Mode"
+  },
+  "adnRefreshButton": {
+    "message": "Päivitä",
+    "description": "English: refresh page from menu notification button"
+  },
+  "adnRefreshNotification": {
+    "message": "Ota muutokset käyttöön tällä sivulla",
+    "description": "English: refresh page from menu notification"
+  },
+  "supportS6P3S1": {
+    "message": "Varmista, että ongelma ilmenee vain <b>AdNauseamissa<\/b>.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P3S2": {
+    "message": "Olen kokeillut samaa sivua myös <a url='https:\/\/github.com\/gorhill\/uBlock'>#uBO:lla#<\/a> ja vahvistanut ongelman ilmenevän <b>juuri AdNauseamilla<\/b>.",
+    "description": "A checkbox in the filter issue reporter section"
+  },
+  "supportS6Select1Option7": {
+    "message": "Mainoksia ei kerätty",
+    "description": "Ads are present on page but none are collected"
   }
 }

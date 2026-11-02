@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2014-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -23,21 +23,22 @@
 
 /******************************************************************************/
 
-import contextMenu from './contextmenu.js';
-import cosmeticFilteringEngine from './cosmetic-filtering.js';
 import io from './assets.js';
 import µb from './background.js';
-import { hostnameFromURI } from './uri-utils.js';
-import { redirectEngine } from './redirect-engine.js';
 import adnauseam from './adn/core.js'
 import dnt from './adn/dnt.js';
+import {
+    broadcast,
+    filteringBehaviorChanged,
+    onBroadcast,
+} from './broadcast.js';
 
 import {
     permanentFirewall,
-    sessionFirewall,
     permanentSwitches,
-    sessionSwitches,
     permanentURLFiltering,
+    sessionFirewall,
+    sessionSwitches,
     sessionURLFiltering,
 } from './filtering-engines.js';
 
@@ -47,6 +48,10 @@ import {
     ClickingDisabled,
     HidingDisabled
 } from './adn/notifications.js';
+import contextMenu from './contextmenu.js';
+import cosmeticFilteringEngine from './cosmetic-filtering.js';
+import { hostnameFromURI } from './uri-utils.js';
+import { redirectEngine } from './redirect-engine.js';
 
 /******************************************************************************/
 /******************************************************************************/
@@ -55,7 +60,7 @@ import {
 // Be more flexible with whitelist syntax
 
 // Any special regexp char will be escaped
-const whitelistDirectiveEscape = /[-\/\\^$+?.()|[\]{}]/g;
+const whitelistDirectiveEscape = /[-/\\^$+?.()|[\]{}]/g;
 
 // All `*` will be expanded into `.*`
 const whitelistDirectiveEscapeAsterisk = /\*/g;
@@ -156,6 +161,7 @@ const matchBucket = function(url, hostname, bucket, start) {
         }
         bucket.push(directive);
         this.saveWhitelist();
+        filteringBehaviorChanged({ hostname: targetHostname, direction: -1 });
         return true;
     }
 
@@ -169,7 +175,7 @@ const matchBucket = function(url, hostname, bucket, start) {
                 if ( i === -1 ) { break; }
                 directive = bucket.splice(i, 1)[0];
                 if ( isHandcraftedWhitelistDirective(directive) ) {
-                    netWhitelist.get('#').push(`# ${directive}`);3
+                    netWhitelist.get('#').push(`# ${directive}`);
                 }
             }
             if ( bucket.length === 0 ) {
@@ -196,6 +202,7 @@ const matchBucket = function(url, hostname, bucket, start) {
         }
     }
     this.saveWhitelist();
+    filteringBehaviorChanged({ direction: 1 });
     return true;
 };
 
@@ -260,7 +267,7 @@ const matchBucket = function(url, hostname, bucket, start) {
             try {
                 const re = new RegExp(directive.slice(1, -1));
                 directiveToRegexpMap.set(directive, re);
-            } catch(ex) {
+            } catch {
                 key = '#';
                 directive = '# ' + line;
             }
@@ -300,8 +307,8 @@ const matchBucket = function(url, hostname, bucket, start) {
 };
 
 // https://github.com/gorhill/uBlock/issues/3717
-µb.reWhitelistBadHostname = /[^a-z0-9.\-_\[\]:]/;
-µb.reWhitelistHostnameExtractor = /([a-z0-9.\-_\[\]]+)(?::[\d*]+)?\/(?:[^\x00-\x20\/]|$)[^\x00-\x20]*$/;
+µb.reWhitelistBadHostname = /[^a-z0-9.\-_[\]:]/;
+µb.reWhitelistHostnameExtractor = /([a-z0-9.\-_[\]]+)(?::[\d*]+)?\/(?:[^\x00-\x20/]|$)[^\x00-\x20]*$/;
 
 /******************************************************************************/
 // ADN - Strict Block List
@@ -478,18 +485,18 @@ const matchBucket = function(url, hostname, bucket, start) {
 
     // Pre-change
     switch ( name ) {
-    case 'largeMediaSize':
-        if ( typeof value !== 'number' ) {
-            value = parseInt(value, 10) || 0;
-        }
-        value = Math.ceil(Math.max(value, 0));
-        break;
-    default:
-        break;
+      case 'largeMediaSize':
+          if ( typeof value !== 'number' ) {
+              value = parseInt(value, 10) || 0;
+          }
+          value = Math.ceil(Math.max(value, 0));
+          break;
+      default:
+          break;
     }
 
     // Change -- but only if the user setting actually exists.
-    const mustSave = us.hasOwnProperty(name) && value !== us[name];
+    const mustSave = Object.hasOwn(us, name) && value !== us[name];
     if ( mustSave ) {
         us[name] = value;
     }
@@ -502,7 +509,7 @@ const matchBucket = function(url, hostname, bucket, start) {
         }
         break;
     case 'autoUpdate':
-        this.scheduleAssetUpdater(value ? 7 * 60 * 1000 : 0);
+        this.scheduleAssetUpdater({ updateDelay: value ? 2000 : 0 });
         break;
     case 'cnameUncloakEnabled':
         if ( vAPI.net.canUncloakCnames === true ) {
@@ -526,7 +533,7 @@ const matchBucket = function(url, hostname, bucket, start) {
     case 'noLargeMedia':
     case 'noRemoteFonts':
     case 'noScripting':
-    case 'noCSPReports':
+    case 'noCSPReports': {
         let switchName;
         switch ( name ) {
         case 'noCosmeticFiltering':
@@ -549,6 +556,7 @@ const matchBucket = function(url, hostname, bucket, start) {
             this.saveHostnameSwitches();
         }
         break;
+    }
     case 'prefetchingDisabled':
         if ( this.privacySettingsSupported ) {
             vAPI.browserSettings.set({ 'prefetching': !value });
@@ -619,7 +627,7 @@ const matchBucket = function(url, hostname, bucket, start) {
         adnauseam.verifySetting(ShowAdsDebug, hs.showAdsDebug);
     }
     /* end of adn */
-    this.fireDOMEvent('hiddenSettingsChanged');
+    broadcast({ what: 'hiddenSettingsChanged' });
 };
 
 /******************************************************************************/
@@ -663,7 +671,8 @@ const matchBucket = function(url, hostname, bucket, start) {
 // (but not really) redundant rules led to this issue.
 
 µb.toggleFirewallRule = function(details) {
-    let { srcHostname, desHostname, requestType, action } = details;
+    const { desHostname, requestType, action } = details;
+    let { srcHostname } = details;
 
     if ( action !== 0 ) {
         sessionFirewall.setCell(
@@ -693,8 +702,7 @@ const matchBucket = function(url, hostname, bucket, start) {
             permanentFirewall.unsetCell(
                 srcHostname,
                 desHostname,
-                requestType,
-                action
+                requestType
             );
         }
         this.savePermanentFirewallRules();
@@ -718,6 +726,12 @@ const matchBucket = function(url, hostname, bucket, start) {
 
     // https://github.com/chrisaljoudi/uBlock/issues/420
     cosmeticFilteringEngine.removeFromSelectorCache(srcHostname, 'net');
+
+    // Flush caches
+    filteringBehaviorChanged({
+        direction: action === 1 ? 1 : 0,
+        hostname: srcHostname,
+    });
 
     if ( details.tabId === undefined ) { return; }
 
@@ -775,7 +789,7 @@ const matchBucket = function(url, hostname, bucket, start) {
     );
     if ( changed === false ) { return; }
 
-    // Take action if needed
+    // Take per-switch action if needed
     switch ( details.name ) {
     case 'no-scripting':
         this.updateToolbarIcon(details.tabId, 0b100);
@@ -788,12 +802,30 @@ const matchBucket = function(url, hostname, bucket, start) {
         });
         break;
     }
-    case 'no-large-media':
+    case 'no-large-media': {
         const pageStore = this.pageStoreFromTabId(details.tabId);
         if ( pageStore !== null ) {
             pageStore.temporarilyAllowLargeMediaElements(!newState);
         }
         break;
+    }
+    default:
+        break;
+    }
+
+    // Flush caches if needed
+    if ( newState ) {
+        switch ( details.name ) {
+        case 'no-scripting':
+        case 'no-remote-fonts':
+            filteringBehaviorChanged({
+                direction: details.state ? 1 : 0,
+                hostname: details.hostname,
+            });
+            break;
+        default:
+            break;
+        }
     }
 
     if ( details.persist !== true ) { return; }
@@ -850,7 +882,10 @@ const matchBucket = function(url, hostname, bucket, start) {
 
     parse();
 
-    self.addEventListener('hiddenSettingsChanged', ( ) => { parse(); });
+    onBroadcast(msg => {
+        if ( msg.what !== 'hiddenSettingsChanged' ) { return; }
+        parse();
+    });
 }
 
 /******************************************************************************/
@@ -860,7 +895,7 @@ const matchBucket = function(url, hostname, bucket, start) {
         try {
             const url = new URL(pageURL);
             return JSON.parse(url.searchParams.get('details')).url;
-        } catch(ex) {
+        } catch {
         }
     }
     return pageURL;

@@ -16,7 +16,7 @@
     "description": "A warning in the dashboard when navigating away from unsaved changes"
   },
   "dashboardUnsavedWarningStay": {
-    "message": "留下",
+    "message": "留在这里",
     "description": "Label for button to prevent navigating away from unsaved changes"
   },
   "dashboardUnsavedWarningIgnore": {
@@ -68,7 +68,7 @@
     "description": "Title for the advanced settings page"
   },
   "popupPowerSwitchInfo": {
-    "message": "单击：对此网站禁用/启用 uBlock₀。\n\nCtrl + 单击：仅对此页面禁用 uBlock₀。",
+    "message": "单击：对此网站禁用/启用 uBlock₀ 。\n\nCtrl + 单击：仅在此页面上禁用 uBlock₀ 。",
     "description": "English: Click: disable/enable uBlock₀ for this site.\n\nCtrl+click: disable uBlock₀ only on this page."
   },
   "popupPowerSwitchInfo1": {
@@ -220,7 +220,7 @@
     "description": "Tooltip when hovering the top-most cell of the global-rules column."
   },
   "popupTipLocalRules": {
-    "message": "本地规则：此列的规则仅作用于当前网站。\n本地规则优先于全局规则。",
+    "message": "本地规则：此列的规则仅作用于当前网站。",
     "description": "Tooltip when hovering the top-most cell of the local-rules column."
   },
   "popupTipSaveRules": {
@@ -275,13 +275,13 @@
     "message": "版本",
     "description": "Example of use: Version 1.26.4"
   },
-  "popup3pScriptFilterTip": {
-    "message": "“↑”：高亮含第三方脚本的域名",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party scripts' cell"
+  "popup3pScriptFilter": {
+    "message": "脚本",
+    "description": "Appears as an option to filter out firewall rows"
   },
-  "popup3pFrameFilterTip": {
-    "message": "“↑”：高亮含第三方框架的域名",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party frames' cell"
+  "popup3pFrameFilter": {
+    "message": "框架",
+    "description": "Appears as an option to filter out firewall rows"
   },
   "pickerCreate": {
     "message": "创建",
@@ -404,7 +404,7 @@
     "description": "Section for controlling advanced-user settings"
   },
   "settingsAdvancedSynopsis": {
-    "message": "仅适合专家级用户的功能。",
+    "message": "仅适合专业用户的功能。",
     "description": "Description of section controlling advanced-user settings"
   },
   "settingsAdvancedUserSettings": {
@@ -469,42 +469,50 @@
   },
   "3pGroupDefault": {
     "message": "内置",
-    "description": "Header for the uBlock filters section in 'Filter lists pane'"
+    "description": "Filter lists section name"
   },
   "3pGroupAds": {
     "message": "广告",
-    "description": "English: Ads"
+    "description": "Filter lists section name"
   },
   "3pGroupPrivacy": {
     "message": "隐私",
-    "description": "English: Privacy"
+    "description": "Filter lists section name"
   },
   "3pGroupMalware": {
-    "message": "恶意网站",
-    "description": "English: Malware domains"
+    "message": "恶意软件防护，安全",
+    "description": "Filter lists section name"
+  },
+  "3pGroupSocial": {
+    "message": "社交网络小部件",
+    "description": "Filter lists section name"
+  },
+  "3pGroupCookies": {
+    "message": "Cookie 提醒",
+    "description": "Filter lists section name"
   },
   "3pGroupAnnoyances": {
     "message": "骚扰",
-    "description": "The header identifying the filter lists in the category 'annoyances'"
+    "description": "Filter lists section name"
   },
   "3pGroupMultipurpose": {
     "message": "多用途",
-    "description": "English: Multipurpose"
+    "description": "Filter lists section name"
   },
   "3pGroupRegions": {
     "message": "区域、语言",
-    "description": "English: Regions, languages"
+    "description": "Filter lists section name"
   },
   "3pGroupCustom": {
     "message": "自定义",
-    "description": "English: Custom"
+    "description": "Filter lists section name"
   },
   "3pImport": {
     "message": "导入…",
     "description": "The label for the checkbox used to import external filter lists"
   },
   "3pExternalListsHint": {
-    "message": "一行一条网址。无效网址将被忽略。",
+    "message": "每行一个 URL。无效的 URL 将被忽略。",
     "description": "Short information about how to use the textarea to import external filter lists by URL"
   },
   "3pExternalListObsolete": {
@@ -527,17 +535,25 @@
     "message": "资源更新因网络错误受阻。",
     "description": "used as a tooltip for error icon beside a list"
   },
-  "1pFormatHint": {
-    "message": "一行一条过滤规则。每条规则可以是一个普通的主机名或者是一条与 EasyList 兼容的过滤规则。以 <code>!</code> 开头的行将被忽略。",
-    "description": "Short information about how to create custom filters"
+  "1pTrustWarning": {
+    "message": "请勿添加未信任来源的过滤规则。",
+    "description": "Warning against copy-pasting filters from random sources"
+  },
+  "1pEnableMyFiltersLabel": {
+    "message": "启用自定义过滤规则",
+    "description": "Label for the checkbox use to enable/disable 'My filters' list"
+  },
+  "1pTrustMyFiltersLabel": {
+    "message": "允许需信任的自定义过滤规则",
+    "description": "Label for the checkbox use to trust the content of 'My filters' list"
   },
   "1pImport": {
-    "message": "导入并添加",
-    "description": "English: Import and append"
+    "message": "导入并添加…",
+    "description": "Button in the 'My filters' pane"
   },
   "1pExport": {
-    "message": "导出",
-    "description": "English: Export"
+    "message": "导出…",
+    "description": "Button in the 'My filters' pane"
   },
   "1pExportFilename": {
     "message": "my-ublock-static-filters_{{datetime}}.txt",
@@ -580,8 +596,8 @@
     "description": ""
   },
   "rulesExport": {
-    "message": "导出到文件",
-    "description": ""
+    "message": "导出到文件...",
+    "description": "Button in the 'My rules' pane"
   },
   "rulesDefaultFileName": {
     "message": "my-ublock-dynamic-rules_{{datetime}}.txt",
@@ -616,12 +632,12 @@
     "description": "A concise description of the 'Trusted sites' pane."
   },
   "whitelistImport": {
-    "message": "导入并添加",
-    "description": "English: Import and append"
+    "message": "导入并添加…",
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExport": {
-    "message": "导出",
-    "description": "English: Export"
+    "message": "导出…",
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExportFilename": {
     "message": "my-ublock-trusted-sites_{{datetime}}.txt",
@@ -664,7 +680,7 @@
     "description": "Tooltip for the reload button in the logger page"
   },
   "loggerDomInspectorTip": {
-    "message": "是否打开 DOM 探查器",
+    "message": "打开/关闭 DOM 检查器",
     "description": "Tooltip for the DOM inspector button in the logger page"
   },
   "loggerPopupPanelTip": {
@@ -728,7 +744,7 @@
     "description": "A keyword in the built-in row filtering expression"
   },
   "loggerEntryDetailsHeader": {
-    "message": "详细资料",
+    "message": "详情",
     "description": "Small header to identify the 'Details' pane for a specific logger entry"
   },
   "loggerEntryDetailsFilter": {
@@ -881,22 +897,22 @@
   },
   "supportOpenButton": {
     "message": "打开",
-    "description": "Text for button which open an external webpage in Support pane"
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportReportSpecificButton": {
     "message": "创建新报告",
-    "description": "Text for button which open an external webpage in Support pane"
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportFindSpecificButton": {
     "message": "查找类似报告",
     "description": "A clickable link in the filter issue reporter section"
   },
   "supportS1H": {
-    "message": "使用说明",
+    "message": "文档",
     "description": "Header of 'Documentation' section in Support pane"
   },
   "supportS1P1": {
-    "message": "请至 <code>uBlock/wiki</code> 参阅 uBlock Origin 的所有功用以及使用说明。",
+    "message": "请至 <code>uBlock/wiki</code> 参阅 uBlock Origin 的所有功能以及使用说明。",
     "description": "First paragraph of 'Documentation' section in Support pane"
   },
   "supportS2H": {
@@ -908,7 +924,7 @@
     "description": "First paragraph of 'Questions and support' section in Support pane"
   },
   "supportS3H": {
-    "message": "过滤规则或者网页的问题",
+    "message": "过滤规则问题/网页被损坏",
     "description": "Header of 'Filter issues' section in Support pane"
   },
   "supportS3P1": {
@@ -939,16 +955,20 @@
     "message": "以下生成的技术报告或有助于他人帮你解决问题。",
     "description": "First paragraph of 'Troubleshooting Information' section in Support pane"
   },
-  "supportS5P2": {
-    "message": "<b>注意：</b>可能涉及隐私的内容已经过删改，需手动取消。删改部分有可能包括解决问题的关键信息。",
-    "description": "Second paragraph of 'Troubleshooting Information' section in Support pane"
-  },
   "supportS6H": {
     "message": "报告过滤规则的问题",
     "description": "Header of 'Report a filter issue' section in Support pane"
   },
   "supportS6P1S1": {
     "message": "请确认该问题未有其他人上报过，避免重复提交报告给维护者带来额外负担。",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S1": {
+    "message": "过滤规则列表每天都会更新。请确认您的问题无法用最新的过滤规则列表解决。",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S2": {
+    "message": "请验证重新加载问题页面后问题依然存在。",
     "description": "A paragraph in the filter issue reporter section"
   },
   "supportS6URL": {
@@ -964,7 +984,7 @@
     "description": "An entry in the widget used to select the type of issue"
   },
   "supportS6Select1Option1": {
-    "message": "显示出广告或清除后的残留物",
+    "message": "显示广告或广告残留",
     "description": "An entry in the widget used to select the type of issue"
   },
   "supportS6Select1Option2": {
@@ -987,24 +1007,20 @@
     "message": "打开不需要的标签页或窗口",
     "description": "An entry in the widget used to select the type of issue"
   },
+  "supportS6Select1Option7": {
+    "message": "指向恶意软件、钓鱼网站",
+    "description": "An entry in the widget used to select the type of issue"
+  },
   "supportS6Checkbox1": {
-    "message": "将该网页标记为<a href=\"https://wikipedia.org/wiki/Not_safe_for_work\">“NSFW”（公众场所不宜阅览）</a>",
+    "message": "将该网页标记为 “NSFW”（<a href=\"https://wikipedia.org/wiki/Not_safe_for_work\">“工作场所不宜”</a>）",
     "description": "A checkbox to use for NSFW sites"
-  },
-  "supportRedact": {
-    "message": "自动删改",
-    "description": "Text for 'Redact' button"
-  },
-  "supportUnredact": {
-    "message": "取消删改",
-    "description": "Text for 'Unredact' button"
   },
   "aboutPrivacyPolicy": {
     "message": "隐私政策",
     "description": "Link to privacy policy on GitHub (English)"
   },
   "aboutChangelog": {
-    "message": "变更日志",
+    "message": "更新日志",
     "description": ""
   },
   "aboutCode": {
@@ -1028,7 +1044,7 @@
     "description": "Link text to uBO's own filter lists repo"
   },
   "aboutDependencies": {
-    "message": "外部依赖（与 GPLv3 协议兼容）：",
+    "message": "外部依赖（兼容 GPLv3 协议）：",
     "description": "Shown in the About pane"
   },
   "aboutCDNs": {
@@ -1036,7 +1052,7 @@
     "description": "Shown in the About pane"
   },
   "aboutCDNsInfo": {
-    "message": "需要更新过滤规则列表时会随机选用一个 CDN",
+    "message": "需要更新过滤规则列表时会随机选用一个 CDN。",
     "description": "Shown in the About pane"
   },
   "aboutBackupDataButton": {
@@ -1070,10 +1086,6 @@
   "errorCantConnectTo": {
     "message": "网络错误：{{msg}}",
     "description": "English: Network error: {{msg}}"
-  },
-  "subscriberConfirm": {
-    "message": "添加下列网址到您的自定义规则列表吗？\n\n标题： “{{title}}”\n网址： {{url}}",
-    "description": "No longer used"
   },
   "subscribeButton": {
     "message": "订阅",
@@ -1163,6 +1175,26 @@
     "message": "继续加载",
     "description": "Button text to navigate to the blocked page"
   },
+  "docblockedRedirectPrompt": {
+    "message": "被屏蔽的网页想重定向到另一个网站。如果您选择继续，将直接导航到：{{url}}",
+    "description": "Text warning about an incoming redirect"
+  },
+  "docblockedReasonLabel": {
+    "message": "原因：",
+    "description": "The label which prepend the actual reason why a page was blocked"
+  },
+  "docblockedReasonMalicious": {
+    "message": "恶意网站",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonTracker": {
+    "message": "跟踪器",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonDisreputable": {
+    "message": "不受信任",
+    "description": "An actual reason why a page was blocked"
+  },
   "cloudPush": {
     "message": "导出到云端储存",
     "description": "tooltip"
@@ -1215,6 +1247,10 @@
     "message": "临时允许较大媒体元素",
     "description": "A context menu entry, present when large media elements have been blocked on the current site"
   },
+  "contextMenuViewSource": {
+    "message": "查看源代码…",
+    "description": "A context menu entry, to view the source code of the target resource"
+  },
   "shortcutCapturePlaceholder": {
     "message": "键入快捷键",
     "description": "Placeholder string for input field used to capture a keyboard shortcut"
@@ -1234,6 +1270,10 @@
   "toggleCosmeticFiltering": {
     "message": "是否应用元素过滤规则",
     "description": "Label for keyboard shortcut used to toggle cosmetic filtering"
+  },
+  "toggleJavascript": {
+    "message": "JavaScript 开关",
+    "description": "Label for keyboard shortcut used to toggle no-scripting switch"
   },
   "relaxBlockingMode": {
     "message": "放宽拦截限制",
@@ -1258,6 +1298,14 @@
   "clickToLoad": {
     "message": "单击以加载",
     "description": "Message used in frame placeholders"
+  },
+  "linterMainReport": {
+    "message": "错误：{{count}}",
+    "description": "Summary of number of errors as reported by the linter "
+  },
+  "unprocessedRequestTooltip": {
+    "message": "无法在浏览器启动时正常过滤。请重新加载此页面以确保正常过滤。",
+    "description": "A warning which will appear in the popup panel if needed"
   },
   "dummy": {
     "message": "此条目必须是最后一个",

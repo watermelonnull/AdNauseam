@@ -1,3 +1,8 @@
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+    }
+
 body {
     margin-bottom: 6rem;
     }
@@ -11,6 +16,7 @@ h3 {
     }
 .supportEntry {
     display: flex;
+    margin-block: 1em;
     }
 :root.mobile .supportEntry {
     flex-direction: column;
@@ -48,11 +54,50 @@ body.filterIssue #moreButton {
     display: none;
 }
 
+body[data-should-update-lists]:not(.updated) .e .createEntry {
+    opacity: 0.25;
+    pointer-events: none;
+}
+
+/* adn specific button for report filter issue */
+body.adn-unchecked .e .createEntry { 
+    opacity: 0.25;
+    pointer-events: none;
+}
+
+body:not([data-should-update-lists]) .shouldUpdate {
+    display: none;
+    }
+body.updating {
+    pointer-events: none;
+    }
+body.updating button {
+    filter: grayscale(1);
+    opacity: 0.5;
+    }
+body.updated .shouldUpdate button {
+    display: none;
+    }
+body.updating .shouldUpdate button .fa-icon svg {
+    animation: spin 1s linear infinite;
+    transform-origin: 50%;
+    }
+body .shouldUpdate .updated {
+    align-self: center;
+    }
+body:not(.updated) .shouldUpdate .updated {
+    display: none;
+    }
+
 button {
     align-self: center;
     }
 span[data-url] {
     color: var(--link-ink);
+    cursor: pointer;
+    }
+
+#showSupportInfo {
     cursor: pointer;
     }
 

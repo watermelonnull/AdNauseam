@@ -7,7 +7,8 @@
   "browser_action": {
     "default_icon": {
       "16": "img/icon_16.png",
-      "32": "img/icon_32.png"
+      "32": "img/icon_32.png",
+      "64": "img/icon_64.png"
     },
     "default_title": "AdNauseam",
     "default_popup": "popup-fenix.html"
@@ -30,6 +31,9 @@
     },
     "toggle-cosmetic-filtering": {
       "description": "__MSG_toggleCosmeticFiltering__"
+    },
+    "toggle-javascript": {
+      "description": "__MSG_toggleJavascript__"
     }
   },
   "content_scripts": [
@@ -54,11 +58,22 @@
         "https://filterlists.com/*",
         "https://forums.lanik.us/*",
         "https://github.com/*",
-        "https://*.github.io/*",
-        "https://*.letsblock.it/*"
+        "https://*.github.io/*"
       ],
       "js": [
         "/js/scriptlets/subscriber.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "https://github.com/uBlockOrigin/*",
+        "https://ublockorigin.github.io/*",
+        "https://*.reddit.com/r/uBlockOrigin/*"
+      ],
+      "js": [
+        "/js/scriptlets/updater.js"
       ],
       "run_at": "document_idle",
       "all_frames": false
@@ -75,13 +90,14 @@
   },
   "incognito": "split",
   "manifest_version": 2,
-  "minimum_chrome_version": "66.0",
+  "minimum_chrome_version": "93.0",
   "name": "uBlock Origin",
   "options_ui": {
     "page": "dashboard.html",
     "open_in_tab": true
   },
   "permissions": [
+    "alarms",
     "contextMenus",
     "privacy",
     "storage",

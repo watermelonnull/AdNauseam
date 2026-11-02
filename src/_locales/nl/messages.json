@@ -4,7 +4,7 @@
     "description": "extension name."
   },
   "extShortDesc": {
-    "message": "Eindelijk, een efficiënte adblocker. Gebruikt weinig processorkracht en geheugen.",
+    "message": "Eindelijk, een efficiënte blokker. Gebruikt weinig processorkracht en geheugen.",
     "description": "this will be in the Chrome web store: must be 132 characters or less"
   },
   "dashboardName": {
@@ -12,11 +12,11 @@
     "description": "English: uBlock₀ — Dashboard"
   },
   "dashboardUnsavedWarning": {
-    "message": "Waarschuwing! Niet-opgeslagen wijzigingen",
+    "message": "Waarschuwing: niet-opgeslagen wijzigingen!",
     "description": "A warning in the dashboard when navigating away from unsaved changes"
   },
   "dashboardUnsavedWarningStay": {
-    "message": "Blijven",
+    "message": "Hier blijven",
     "description": "Label for button to prevent navigating away from unsaved changes"
   },
   "dashboardUnsavedWarningIgnore": {
@@ -220,7 +220,7 @@
     "description": "Tooltip when hovering the top-most cell of the global-rules column."
   },
   "popupTipLocalRules": {
-    "message": "Lokale regels: deze kolom is voor regels die alleen op de huidige website van toepassing zijn.\nLokale regels hebben voorrang op algemene regels.",
+    "message": "Lokale regels: deze kolom is voor regels die alleen op de huidige website van toepassing zijn.",
     "description": "Tooltip when hovering the top-most cell of the local-rules column."
   },
   "popupTipSaveRules": {
@@ -275,13 +275,13 @@
     "message": "Versie",
     "description": "Example of use: Version 1.26.4"
   },
-  "popup3pScriptFilterTip": {
-    "message": "↑: Rijen met scripts van derden benadrukken",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party scripts' cell"
+  "popup3pScriptFilter": {
+    "message": "script",
+    "description": "Appears as an option to filter out firewall rows"
   },
-  "popup3pFrameFilterTip": {
-    "message": "↑: Rijen met frames van derden benadrukken",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party frames' cell"
+  "popup3pFrameFilter": {
+    "message": "frame",
+    "description": "Appears as an option to filter out firewall rows"
   },
   "pickerCreate": {
     "message": "Aanmaken",
@@ -469,35 +469,43 @@
   },
   "3pGroupDefault": {
     "message": "Ingebouwd",
-    "description": "Header for the uBlock filters section in 'Filter lists pane'"
+    "description": "Filter lists section name"
   },
   "3pGroupAds": {
     "message": "Advertenties",
-    "description": "English: Ads"
+    "description": "Filter lists section name"
   },
   "3pGroupPrivacy": {
     "message": "Privacy",
-    "description": "English: Privacy"
+    "description": "Filter lists section name"
   },
   "3pGroupMalware": {
-    "message": "Malwaredomeinen",
-    "description": "English: Malware domains"
+    "message": "Bescherming tegen malware, beveiliging",
+    "description": "Filter lists section name"
+  },
+  "3pGroupSocial": {
+    "message": "Sociale widgets",
+    "description": "Filter lists section name"
+  },
+  "3pGroupCookies": {
+    "message": "Cookiemeldingen",
+    "description": "Filter lists section name"
   },
   "3pGroupAnnoyances": {
     "message": "Storende elementen",
-    "description": "The header identifying the filter lists in the category 'annoyances'"
+    "description": "Filter lists section name"
   },
   "3pGroupMultipurpose": {
     "message": "Multifunctioneel",
-    "description": "English: Multipurpose"
+    "description": "Filter lists section name"
   },
   "3pGroupRegions": {
     "message": "Gebieden, talen",
-    "description": "English: Regions, languages"
+    "description": "Filter lists section name"
   },
   "3pGroupCustom": {
     "message": "Aangepast",
-    "description": "English: Custom"
+    "description": "Filter lists section name"
   },
   "3pImport": {
     "message": "Importeren…",
@@ -527,17 +535,25 @@
     "message": "Een netwerkfout heeft voorkomen dat de bron werd bijgewerkt.",
     "description": "used as a tooltip for error icon beside a list"
   },
-  "1pFormatHint": {
-    "message": "Eén filter per regel. Een filter kan een gewone hostnaam of een EasyList-compatibel filter zijn. Regels beginnend met <code>!</code> worden genegeerd.",
-    "description": "Short information about how to create custom filters"
+  "1pTrustWarning": {
+    "message": "Voeg geen filters van niet-vertrouwde bronnen toe.",
+    "description": "Warning against copy-pasting filters from random sources"
+  },
+  "1pEnableMyFiltersLabel": {
+    "message": "Mijn aangepaste filters inschakelen",
+    "description": "Label for the checkbox use to enable/disable 'My filters' list"
+  },
+  "1pTrustMyFiltersLabel": {
+    "message": "Aangepaste filters die vertrouwen vereisen toestaan",
+    "description": "Label for the checkbox use to trust the content of 'My filters' list"
   },
   "1pImport": {
     "message": "Importeren en toevoegen…",
-    "description": "English: Import and append"
+    "description": "Button in the 'My filters' pane"
   },
   "1pExport": {
     "message": "Exporteren…",
-    "description": "English: Export"
+    "description": "Button in the 'My filters' pane"
   },
   "1pExportFilename": {
     "message": "mijn-ublock-statische-filters_{{datetime}}.txt",
@@ -581,7 +597,7 @@
   },
   "rulesExport": {
     "message": "Exporteren naar bestand…",
-    "description": ""
+    "description": "Button in the 'My rules' pane"
   },
   "rulesDefaultFileName": {
     "message": "mijn-ublock-dynamische-regels_{{datetime}}.txt",
@@ -617,11 +633,11 @@
   },
   "whitelistImport": {
     "message": "Importeren en toevoegen…",
-    "description": "English: Import and append"
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExport": {
     "message": "Exporteren…",
-    "description": "English: Export"
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExportFilename": {
     "message": "mijn-ublock-vertrouwde-websites_{{datetime}}.txt",
@@ -704,7 +720,7 @@
     "description": "A keyword in the built-in row filtering expression"
   },
   "loggerRowFiltererBuiltinEventful": {
-    "message": "afwisselend",
+    "message": "belangrijk",
     "description": "A keyword in the built-in row filtering expression: all items corresponding to uBO doing something (blocked, allowed, redirected, etc.)"
   },
   "loggerRowFiltererBuiltinBlocked": {
@@ -881,14 +897,14 @@
   },
   "supportOpenButton": {
     "message": "Openen",
-    "description": "Text for button which open an external webpage in Support pane"
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportReportSpecificButton": {
-    "message": "Nieuwe melding maken",
-    "description": "Text for button which open an external webpage in Support pane"
+    "message": "Nieuwe melding op GitHub maken",
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportFindSpecificButton": {
-    "message": "Soortgelijke meldingen zoeken",
+    "message": "Soortgelijke meldingen op GitHub zoeken",
     "description": "A clickable link in the filter issue reporter section"
   },
   "supportS1H": {
@@ -916,7 +932,7 @@
     "description": "First paragraph of 'Filter issues' section in Support pane"
   },
   "supportS3P2": {
-    "message": "<b>Belangrijk:</b> vermijd het gebruik van andere adblockers voor dezelfde doeleinden in combinatie met uBlock Origin, omdat dit op bepaalde websites problemen kan geven.",
+    "message": "<b>Belangrijk:</b> vermijd het gebruik van andere blokkers voor dezelfde doeleinden in combinatie met uBlock Origin, omdat dit op bepaalde websites problemen kan geven.",
     "description": "Second paragraph of 'Filter issues' section in Support pane"
   },
   "supportS3P3": {
@@ -939,16 +955,20 @@
     "message": "Hieronder bevindt zich technische informatie die handig kan zijn wanneer vrijwilligers u proberen te helpen bij het oplossen van een probleem.",
     "description": "First paragraph of 'Troubleshooting Information' section in Support pane"
   },
-  "supportS5P2": {
-    "message": "<b>Belangrijk:</b> mogelijk gevoelige of privégegevens worden standaard geredigeerd. Geredigeerde gegevens kunnen het oplossen van een probleem bemoeilijken.",
-    "description": "Second paragraph of 'Troubleshooting Information' section in Support pane"
-  },
   "supportS6H": {
     "message": "Een filterprobleem melden",
     "description": "Header of 'Report a filter issue' section in Support pane"
   },
   "supportS6P1S1": {
-    "message": "Controleer of het probleem niet eerder is gemeld om te voorkomen dat vrijwilligers met dubbele meldingen worden belast.",
+    "message": "Controleer of het probleem niet eerder is gemeld om te voorkomen dat vrijwilligers met dubbele meldingen worden belast. <b>Noot:</b> op de knop klikken zorgt ervoor dat de oorsprong van de pagina naar GitHub wordt verzonden.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S1": {
+    "message": "Filterlijsten worden dagelijks bijgewerkt. Controleer of uw probleem niet al in de meest recente filterlijsten is verholpen.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S2": {
+    "message": "Controleer of het probleem nog steeds bestaat na vernieuwen van de problematische webpagina.",
     "description": "A paragraph in the filter issue reporter section"
   },
   "supportS6URL": {
@@ -987,17 +1007,13 @@
     "message": "Opent ongewenste tabbladen of vensters",
     "description": "An entry in the widget used to select the type of issue"
   },
+  "supportS6Select1Option7": {
+    "message": "Leidt tot badware, phishing",
+    "description": "An entry in the widget used to select the type of issue"
+  },
   "supportS6Checkbox1": {
-    "message": "De webpagina labelen als ‘NSFW’ (<a href=\"https://nl.wikipedia.org/wiki/NSFW\">‘Not Safe For Work’</a>)",
+    "message": "De webpagina labelen als ‘NSFW’ (<a href=\"https://wikipedia.org/wiki/Not_safe_for_work\">‘Not Safe For Work’</a>)",
     "description": "A checkbox to use for NSFW sites"
-  },
-  "supportRedact": {
-    "message": "Redigeren",
-    "description": "Text for 'Redact' button"
-  },
-  "supportUnredact": {
-    "message": "Redigeren ongedaan maken",
-    "description": "Text for 'Unredact' button"
   },
   "aboutPrivacyPolicy": {
     "message": "Privacybeleid",
@@ -1036,7 +1052,7 @@
     "description": "Shown in the About pane"
   },
   "aboutCDNsInfo": {
-    "message": "Als een filterlijst moet worden bijgewerkt, wordt een willekeurig gekozen CDN gebruikt",
+    "message": "Als een filterlijst moet worden bijgewerkt, wordt een willekeurig gekozen CDN gebruikt.",
     "description": "Shown in the About pane"
   },
   "aboutBackupDataButton": {
@@ -1070,10 +1086,6 @@
   "errorCantConnectTo": {
     "message": "Netwerkfout: {{msg}}",
     "description": "English: Network error: {{msg}}"
-  },
-  "subscriberConfirm": {
-    "message": "De volgende URL aan uw lijsten met aangepaste filters toevoegen?\n\nTitel: ‘{{title}}’\nURL: {{url}}",
-    "description": "No longer used"
   },
   "subscribeButton": {
     "message": "Abonneren",
@@ -1120,11 +1132,11 @@
     "description": "Used as a title for the document-blocked page"
   },
   "docblockedPrompt1": {
-    "message": "uBlock₀ heeft het laden van de volgende pagina voorkomen:",
+    "message": "uBlock Origin heeft het laden van de volgende pagina voorkomen:",
     "description": "Used in the strict-blocking page"
   },
   "docblockedPrompt2": {
-    "message": "vanwege het volgende filter:",
+    "message": "Dit is gebeurd vanwege het volgende filter:",
     "description": "Used in the strict-blocking page"
   },
   "docblockedNoParamsPrompt": {
@@ -1132,7 +1144,7 @@
     "description": "label to be used for the parameter-less URL: https://cloud.githubusercontent.com/assets/585534/9832014/bfb1b8f0-593b-11e5-8a27-fba472a5529a.png"
   },
   "docblockedFoundIn": {
-    "message": "Gevonden in:",
+    "message": "Het filter is gevonden in:",
     "description": "English: List of filter list names follows"
   },
   "docblockedBack": {
@@ -1162,6 +1174,26 @@
   "docblockedDisable": {
     "message": "Doorgaan",
     "description": "Button text to navigate to the blocked page"
+  },
+  "docblockedRedirectPrompt": {
+    "message": "De geblokkeerde pagina wil u omleiden naar een andere website. Als u doorgaat, navigeert u rechtstreeks naar: {{url}}",
+    "description": "Text warning about an incoming redirect"
+  },
+  "docblockedReasonLabel": {
+    "message": "Reden:",
+    "description": "The label which prepend the actual reason why a page was blocked"
+  },
+  "docblockedReasonMalicious": {
+    "message": "kwaadwillend",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonTracker": {
+    "message": "tracker",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonDisreputable": {
+    "message": "berucht",
+    "description": "An actual reason why a page was blocked"
   },
   "cloudPush": {
     "message": "Exporteren naar cloudopslag",
@@ -1204,7 +1236,7 @@
     "description": ""
   },
   "contextMenuBlockElementInFrame": {
-    "message": "Element in frame blokkeren…",
+    "message": "Element in deelvenster blokkeren…",
     "description": "An entry in the browser's contextual menu"
   },
   "contextMenuSubscribeToList": {
@@ -1214,6 +1246,10 @@
   "contextMenuTemporarilyAllowLargeMediaElements": {
     "message": "Grote media-elementen tijdelijk toestaan",
     "description": "A context menu entry, present when large media elements have been blocked on the current site"
+  },
+  "contextMenuViewSource": {
+    "message": "Broncode weergeven…",
+    "description": "A context menu entry, to view the source code of the target resource"
   },
   "shortcutCapturePlaceholder": {
     "message": "Typ een sneltoets",
@@ -1234,6 +1270,10 @@
   "toggleCosmeticFiltering": {
     "message": "Cosmetische filters in-/uitschakelen",
     "description": "Label for keyboard shortcut used to toggle cosmetic filtering"
+  },
+  "toggleJavascript": {
+    "message": "JavaScript in-/uitschakelen",
+    "description": "Label for keyboard shortcut used to toggle no-scripting switch"
   },
   "relaxBlockingMode": {
     "message": "Blokkeringsmodus beperken",
@@ -1258,6 +1298,14 @@
   "clickToLoad": {
     "message": "Klik om te laden",
     "description": "Message used in frame placeholders"
+  },
+  "linterMainReport": {
+    "message": "Fouten: {{count}}",
+    "description": "Summary of number of errors as reported by the linter "
+  },
+  "unprocessedRequestTooltip": {
+    "message": "Kon niet goed filteren bij het starten van de browser. Vernieuw de pagina voor een juiste filtering.",
+    "description": "A warning which will appear in the popup panel if needed"
   },
   "dummy": {
     "message": "This entry must be the last one",

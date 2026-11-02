@@ -36,15 +36,15 @@
     "description": "Message asking user to confirm reset"
   },
   "adnFirstRunHideAllAdsDescription": {
-    "message": "Verberg advertenties in uw geselecteerde <span> filter lijst </span>",
+    "message": "Verberg advertenties in uw geselecteerde <span> filter lijst <\/span>",
     "description": "English: Firstrun.html -> Hide Ads in your selected filter lists"
   },
   "adnFirstRunClickingAdsDescription": {
-    "message": "Register bezoeken op advertenties gevonden via uw <span>filter lijst</span>",
+    "message": "Register bezoeken op advertenties gevonden via uw <span>filter lijst<\/span>",
     "description": "English: Firstrun.html -> Register visits on Ads found via your filter lists"
   },
   "adnFirstRunBlockingMalwareDescription": {
-    "message": "Blokkeer tracerende programma's (o.a. cookies) en andere schadelijke software (<span>customize</span>)",
+    "message": "Blokkeer tracerende programma's (o.a. cookies) en andere schadelijke software (<span>customize<\/span>)",
     "description": "English: Firstrun.html -> Block trackers and other malware (customize)"
   },
   "adnNotificationReactivate": {
@@ -96,24 +96,28 @@
     "description": "English: Notifications -> You have allowed adnauseam to have access to your online activities while private browsing."
   },
   "adnNotificationDNTAllowed": {
-    "message": "Deze pagina respecteert <b>Do Not Track</b>, advertenties zijn toegestaan.",
+    "message": "Deze pagina respecteert <b>Do Not Track<\/b>, advertenties zijn toegestaan.",
     "description": "English: Notifications -> This page respects Do Not Track, Ads are allowed."
   },
   "adnNotificationDNTHidingNotClicking": {
-    "message": "Deze pagina respecteert <b> Niet Volgen </b> Verbergen niet klikken.",
+    "message": "Deze pagina respecteert <b> Niet Volgen <\/b> Verbergen niet klikken.",
     "description": "English: Notifications -> This page respects Do Not Track, hiding not clicking."
   },
   "adnNotificationDNTClickingNotHiding": {
-    "message": "Deze pagina respecteert <b>Do Not Track</b>, klikken niet verbergen",
+    "message": "Deze pagina respecteert <b>Do Not Track<\/b>, klikken niet verbergen",
     "description": "English: Notifications -> This page respects Do Not Track, clicking not hiding."
   },
   "adnNotificationDNTJustSoYouKnow": {
-    "message": "Voor uw informatie: deze pagina respecteert <b>Do Not Track</b>.",
+    "message": "Voor uw informatie: deze pagina respecteert <b>Do Not Track<\/b>.",
     "description": "English: Notifications -> This page respects Do Not Track, just so you know."
   },
   "adnNotificationShowAdsDebug": {
-    "message": "The Advanced Setting \"Show Ads Debug\" is turned on",
+    "message": "De geavanceerde instelling \"Toon advertenties in debugmodus\" staat aan",
     "description": "English: Notifications -> The Advanced Setting \"Show Ads Debug\" is turned on"
+  },
+  "adnNewerVersionAvailableNotification": {
+    "message": "Er is een nieuwere versie van AdNauseam beschikbaar",
+    "description": "English: Notifications -> A newer version of AdNauseam is available"
   },
   "adnTarget": {
     "message": "DOEL",
@@ -153,7 +157,7 @@
   },
   "adnPausedOnPage": {
     "message": "AdNauseam is onderbroken op deze pagina",
-    "description": "English: Menu->display when paused on page/site"
+    "description": "English: Menu->display when paused on page\/site"
   },
   "adnNotHiding": {
     "message": "AdNauseam verbergt momenteel geen advertenties",
@@ -168,35 +172,35 @@
     "description": "appears in ADN vault, above ad slider"
   },
   "topAdnetworks": {
-    "message": "Top Ad Networks",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "Top Advertentie Netwerken",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "topSites": {
     "message": "Top websites",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypes": {
     "message": "Advertentietypes",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesImageAds": {
     "message": "Afbeelding advertenties",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesTextAds": {
     "message": "Tekst advertenties",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adnShowingRecentAds": {
     "message": "Geen advertenties verzameld op deze pagina (met recente)",
     "description": "shown in menu when only 'recent' Ads are shown"
   },
   "adnThisPageStrictBlocked": {
-    "message": "{{domain}} is currently strict-blocked.",
+    "message": "{{domain}} is momenteel strikt geblokkeerd.",
     "description": "shown in menu when the current page is strict-blocked"
   },
   "adnStrictBlockListDescription": {
-    "message": "The strict-block list serves to help the users to strict-block specific domains or pages more easily.",
+    "message": "De strikt-block lijst dient om gebruikers makkelijker specifieke domeinen of pagina's te laten blokkeren.",
     "description": "Description on the strict-block list tab, which is found on the dashboard"
   },
   "adnExportedAdsFilename": {
@@ -216,7 +220,7 @@
     "description": "appears in ADN settings"
   },
   "adnPurgeConfirm": {
-    "message": "This action will permanently remove all ads with load image error. Make sure your internet is connected, otherwise all your ads will be deleted.",
+    "message": "Deze actie zal alle advertenties waarbij de afbeelding niet geladen kan worden permanent verwijderen. Het is een goed idee om een back-up van je kluis te maken voordat je gaat opschonen. Zorg ervoor dat je een actieve internetverbinding hebt.",
     "description": "appears in ADN settings"
   },
   "adnAdClickingStatusPending": {
@@ -268,23 +272,23 @@
     "description": "appears in ADN popup menu three state button"
   },
   "adnMenuDisable": {
-    "message": "Disable",
+    "message": "Deactiveer",
     "description": "Disabled Adnauseam -> appears in ADN popup menu three state button"
   },
   "adnMenuActive": {
-    "message": "Active",
+    "message": "Actief",
     "description": "Make Adnauseam Active -> appears in ADN popup menu three state button"
   },
   "adnMenuStrict": {
-    "message": "Strict",
+    "message": "Strikt ",
     "description": "Activate Strict-Block -> appears in ADN popup menu three state button"
   },
   "adnMenuDisableScopeDomain": {
-    "message": "on {{domain}}",
+    "message": "op",
     "description": "Disable AdNaueam Block On this Domain -> Popup option that appears inside ADN menu"
   },
   "adnMenuDisableScopePage": {
-    "message": "on this page",
+    "message": "op deze pagina",
     "description": "Disable AdNaueam Block On This Page -> Popup option that appears inside ADN menu"
   },
   "adnMenuSettings": {
@@ -356,8 +360,20 @@
     "description": "appears on vault page"
   },
   "adnPurgeDeadAds": {
-    "message": "Purge Dead Ads",
+    "message": "Verwijder dode advertenties",
     "description": "appears on vault page"
+  },
+  "adnShowDeadAds": {
+    "message": "Toon dode advertenties",
+    "description": "appears on vault page"
+  },
+  "adnHideDeadAds": {
+    "message": "Verberg dode advertenties",
+    "description": "appears on vault page"
+  },
+  "adnCaptureVault": {
+    "message": "Opnemen",
+    "description": "appears on vault page in dev mode"
   },
   "adnVaultFound": {
     "message": "{{total}} advertenties verzameld",
@@ -475,24 +491,36 @@
     "message": "Bijwerken",
     "description": "English: update"
   },
+  "adnUpdateButton": {
+    "message": "Update",
+    "description": "English: update"
+  },
   "whitelistPageName": {
     "message": "(toegestane) Filterlijsten",
     "description": "appears as tab name in dashboard"
   },
   "strictBlockListPageName": {
-    "message": "Strict-Block List",
+    "message": "Strikte blokkeerlijst",
     "description": "appears as tab name in dashboard"
   },
   "eventLoggingPrompt": {
-    "message": "Foutopsporingsmodus activeren",
+    "message": "Debugmodus",
     "description": "prompt for toggle"
   },
   "disableWarnings": {
     "message": "Waarschuwingen uitschakelen",
     "description": "English:Disable warnings"
   },
+  "blurCollectedAds": {
+    "message": "Vervaag verzamelde advertenties",
+    "description": "English: Blur Collected ads"
+  },
+  "hideDeadAds": {
+    "message": "Verberg dode advertenties",
+    "description": "English: Hide Dead ads"
+  },
   "showAdsDebugPrompt": {
-    "message": "Show ads for ad-collection debugging",
+    "message": "Toon advertenties om advertentieverzameling te debuggen",
     "description": "English: Show ads for ad-collection debugging"
   },
   "removeAdsInPrivate": {
@@ -500,7 +528,27 @@
     "description": "English:Remove ads collected in private mode - settings page"
   },
   "settingsStrictBlockingMode": {
-    "message": "Activate Strict-Blocking Mode",
+    "message": "Activeer Strict-Blokkeer Modus",
     "description": "English: Activate Strict-Blocking Mode"
+  },
+  "adnRefreshButton": {
+    "message": "Verversen",
+    "description": "English: refresh page from menu notification button"
+  },
+  "adnRefreshNotification": {
+    "message": "Wijzigingen op huidige pagina toepassen",
+    "description": "English: refresh page from menu notification"
+  },
+  "supportS6P3S1": {
+    "message": "Maak zeker dat dit probleem is  <b>AdNauseam-specific<\/b>.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P3S2": {
+    "message": "Ik heb dezelfde webpagina op <a url='https:\/\/github.com\/gorhill\/uBlock'>#uBO#<\/a> getest en bevestig dat dit probleem <b>AdNauseam-specifiek<\/b> is.",
+    "description": "A checkbox in the filter issue reporter section"
+  },
+  "supportS6Select1Option7": {
+    "message": "Geen advertenties verzameld",
+    "description": "Ads are present on page but none are collected"
   }
 }

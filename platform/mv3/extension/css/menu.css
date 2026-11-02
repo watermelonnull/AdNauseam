@@ -1,0 +1,375 @@
+/*******************************************************************************
+    AdNauseam MV3 - Popup Menu Styles
+    Width: 320px  Height: 500px  BG: black  Theme: dark
+*******************************************************************************/
+
+/* ── RESET ─────────────────────────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── GLOBAL ────────────────────────────────────────────────────── */
+
+html, body {
+  width: 320px;
+  height: 500px;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 13px;
+  color: #bbb;
+  background: #000;
+}
+
+body.disabled header {
+  opacity: 0.45;
+}
+
+.hide {
+  display: none !important;
+}
+
+/* ── CONTAINER ─────────────────────────────────────────────────── */
+
+.container {
+  width: 320px;
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* ── HEADER (100px) ────────────────────────────────────────────── */
+
+header {
+  height: 100px;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  background: #111;
+  padding: 0 12px;
+  border-bottom: 1px solid #222;
+  gap: 10px;
+}
+
+#toggle-button {
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+#adn-icon {
+  width: 72px;
+  height: 72px;
+  display: block;
+  transition: opacity 0.2s;
+}
+
+#toggle-button:hover #adn-icon {
+  opacity: 0.8;
+}
+
+#stats {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.stats-line {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.stats-line .visited {
+  color: #b284be;
+  font-size: 26px;
+  font-weight: 700;
+  font-family: bebas_neue, roboto_flex, noto_sans, sans-serif;
+}
+
+.stats-line .separator {
+  color: #555;
+  margin: 0 2px;
+  font-size: 18px;
+}
+
+.stats-line .found {
+  color: #4a90d9;
+  font-size: 26px;
+  font-weight: 700;
+  font-family: bebas_neue, roboto_flex, noto_sans, sans-serif;
+}
+
+.stats-line .label {
+  display: block;
+  font-size: 11px;
+  color: #777;
+  font-weight: 400;
+  margin-top: 1px;
+  font-family: bebas_neue, roboto_flex, noto_sans, sans-serif;
+}
+
+#vault-btn {
+  margin-top: 2px;
+}
+
+#vault-button {
+  background: transparent;
+  border: 1px solid #4a90d9;
+  color: #4a90d9;
+  padding: 3px 12px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-family: bebas_neue, roboto_flex, noto_sans, sans-serif;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+#vault-button:hover {
+  background: #4a90d9;
+  color: #fff;
+}
+
+/* ── AD LIST (fills middle) ────────────────────────────────────── */
+
+#ad-list {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #1a1a1a;
+  scrollbar-width: thin;
+  scrollbar-color: #444 transparent;
+}
+
+#ad-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+#ad-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#ad-list::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 3px;
+}
+
+.recent-ads {
+	margin: 125px 30px 0px 0px;
+}
+
+/* Alert */
+.alert {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+}
+
+.alert p {
+  color: #555;
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* Ad items */
+#ad-list-items {
+  list-style: none;
+  padding: 4px;
+}
+
+.ad-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  margin-bottom: 3px;
+  border-radius: 3px;
+  background: #222;
+  cursor: default;
+  border-left: 3px solid transparent;
+  transition: background 0.15s;
+}
+
+.ad-item:hover {
+  background: #2a2a2a;
+}
+
+.ad-item.visited {
+  border-left-color: #b284be;
+}
+
+.ad-item.pending {
+  border-left-color: #4a90d9;
+}
+
+.ad-item.failed {
+  border-left-color: #c44;
+}
+
+.ad-item.skipped {
+  border-left-color: #666;
+}
+
+/* Thumbnails */
+.thumb {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #333;
+  border: 1px solid #444;
+}
+
+.thumb.text-thumb {
+  font-size: 20px;
+  font-weight: 700;
+  color: #666;
+}
+
+.ad-item-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Ad info text */
+.ad-info {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ad-title {
+  font-size: 12px;
+  color: #ccc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ad-info cite {
+  font-size: 10px;
+  color: #666;
+  font-style: normal;
+}
+
+.ad-status {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ad-status.visited {
+  color: #b284be;
+}
+
+.ad-status.pending {
+  color: #4a90d9;
+}
+
+.ad-status.failed {
+  color: #c44;
+}
+
+.ad-status.skipped {
+  color: #666;
+}
+
+/* ── FOOTER (44px) ─────────────────────────────────────────────── */
+
+footer {
+  height: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #111;
+  border-top: 1px solid #222;
+  padding: 0 8px;
+}
+
+.footer-btn {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.footer-btn:hover {
+  background: #333;
+}
+
+.footer-btn svg {
+  display: block;
+}
+
+/* State button group */
+#state-btn-wrapper {
+  display: flex;
+  gap: 0;
+  border: 1px solid #444;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.state-btn {
+  background: #222;
+  color: #888;
+  border: none;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: bebas_neue, roboto_flex, noto_sans, sans-serif;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.state-btn + .state-btn {
+  border-left: 1px solid #444;
+}
+
+.state-btn:hover {
+  background: #333;
+  color: #bbb;
+}
+
+/* Strict (selected) */
+.state-btn[data-state="strict"].selected {
+  background: #c44;
+  color: #fff;
+}
+
+/* Active (selected) */
+.state-btn[data-state="active"].selected {
+  background: #4a90d9;
+  color: #fff;
+}
+
+/* Off (selected) */
+.state-btn[data-state="disable"].selected {
+  background: #555;
+  color: #fff;
+}

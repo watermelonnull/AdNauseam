@@ -11,8 +11,8 @@
   "default_locale": "en",
   "description": "__MSG_extShortDesc__",
   "icons": {
-    "48": "img/icon-48.png",
-    "96": "img/icon-96.png"
+    "48": "img/icon_48.png",
+    "96": "img/icon_96.png"
   },
   "browser_action": {
     "browser_style": false,
@@ -85,8 +85,8 @@
     "default_title": "__MSG_statsPageName__",
     "default_panel": "logger-ui.html",
     "default_icon": {
-      "16": "img/icon-16.png",
-      "48": "img/icon-48.png"
+      "16": "img/icon_16.png",
+      "48": "img/icon_48.png"
     },
     "open_at_install": false
   },

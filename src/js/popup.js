@@ -24,6 +24,7 @@
 'use strict';
 
 import punycode from '../lib/punycode.js';
+import uDom from './adn/uDom.js';
 
 /******************************************************************************/
 
@@ -589,6 +590,8 @@ const renderPopup = function() {
     }
 
     uDom.nodeFromId('panes').classList.toggle('dfEnabled', dfPaneVisible === true);
+
+    console.log("popupData", popupData)
 
     document.documentElement.classList.toggle(
         'colorBlind',

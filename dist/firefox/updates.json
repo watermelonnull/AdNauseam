@@ -1,13 +1,17 @@
 {
- "addons": {
-  "uBlock0@raymondhill.net": {
-   "updates": [
-    {
-     "version": "1.44.5.104",
-     "browser_specific_settings": { "gecko": { "strict_min_version": "60" } },
-     "update_link": "https://github.com/gorhill/uBlock/releases/download/1.44.5rc4/uBlock0_1.44.5rc4.firefox.signed.xpi"
+  "addons": {
+    "uBlock0@raymondhill.net": {
+      "updates": [
+        {
+          "version": "1.74.1.7",
+          "browser_specific_settings": {
+            "gecko": {
+              "strict_min_version": "115.0"
+            }
+          },
+          "update_link": "https://github.com/gorhill/uBlock/releases/download/1.74.1b7/uBlock0_1.74.1b7.firefox.signed.xpi"
+        }
+      ]
     }
-   ]
   }
- }
 }

@@ -11,23 +11,43 @@ echo "*** Packaging assets in $DES... "
 rm -rf $DES
 cp -R ./assets $DES/
 
+VERSION=$(cat ./dist/version)
+
+# ADN - no need for us to use dev assets for dev build, but it is something we can implement later.
+# if [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+#     echo "*** Removing $DES/assets.dev.json"
+#     rm -f $DES/assets.dev.json
+# else
+#     echo "*** Removing $DES/assets.json"
+#     rm -f $DES/assets.json
+# fi
+
+echo "*** Removing $DES/assets.dev.json"
+rm -f $DES/assets.dev.json
+
 mkdir $DES/thirdparties
 
-git submodule update --depth 1 --init
-UASSETS=submodules/uAssets
+ASSETS_MAIN=dist/build/uAssets/main
+ASSETS_PROD=dist/build/uAssets/prod
 
-cp -R $UASSETS/thirdparties/easylist-downloads.adblockplus.org $DES/thirdparties/
-cp -R $UASSETS/thirdparties/pgl.yoyo.org                       $DES/thirdparties/
-cp -R $UASSETS/thirdparties/publicsuffix.org                   $DES/thirdparties/
-cp -R $UASSETS/thirdparties/urlhaus-filter                     $DES/thirdparties/
+cp -R $ASSETS_MAIN/thirdparties/pgl.yoyo.org     $DES/thirdparties/
+cp -R $ASSETS_MAIN/thirdparties/publicsuffix.org $DES/thirdparties/
+cp -R $ASSETS_MAIN/thirdparties/urlhaus-filter   $DES/thirdparties/
 
-cp -R ./thirdparties/www.eff.org                                 $DES/thirdparties/ # ADN
+mkdir -p $DES/thirdparties/easylist
+cp $ASSETS_PROD/thirdparties/easylist.txt $DES/thirdparties/easylist/
+cp $ASSETS_PROD/thirdparties/easyprivacy.txt $DES/thirdparties/easylist/
 
-# mkdir $DES/ublock
-cp -R $UASSETS/filters/* $DES/ublock/
+# ADN
+cp -R ./thirdparties/www.eff.org                                 $DES/thirdparties/
 
-# Optional filter lists: do not include in package
+# ADN
+cp -R ./filters/adnauseam.txt                                    $DES/ublock/adnauseam.txt
 
-rm    $DES/ublock/annoyances.txt
-cp -R ./filters/adnauseam.txt                                    $DES/ublock/ # ADN
-
+mkdir $DES/ublock
+cp $ASSETS_PROD/filters/badlists.txt $DES/ublock/badlists.txt
+cp $ASSETS_PROD/filters/badware.min.txt $DES/ublock/badware.min.txt
+cp $ASSETS_PROD/filters/filters.min.txt $DES/ublock/filters.min.txt
+cp $ASSETS_PROD/filters/privacy.min.txt $DES/ublock/privacy.min.txt
+cp $ASSETS_PROD/filters/quick-fixes.min.txt $DES/ublock/quick-fixes.min.txt
+cp $ASSETS_PROD/filters/unbreak.min.txt $DES/ublock/unbreak.min.txt

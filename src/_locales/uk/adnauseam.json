@@ -36,15 +36,15 @@
     "description": "Message asking user to confirm reset"
   },
   "adnFirstRunHideAllAdsDescription": {
-    "message": "приховати оголошення у ваших вибраних <span class='link' id='To3pfilter'>списках фільтрів</span>",
+    "message": "приховати оголошення у ваших вибраних <span class='link' id='To3pfilter'>списках фільтрів<\/span>",
     "description": "English: Firstrun.html -> Hide Ads in your selected filter lists"
   },
   "adnFirstRunClickingAdsDescription": {
-    "message": "записувати візитіи на оголошення, знайдені через ваші <span class='link' id='To3pfilter'>списки фільтрів</span>",
+    "message": "записувати візитіи на оголошення, знайдені через ваші <span class='link' id='To3pfilter'>списки фільтрів<\/span>",
     "description": "English: Firstrun.html -> Register visits on Ads found via your filter lists"
   },
   "adnFirstRunBlockingMalwareDescription": {
-    "message": "Блокувати трекери та інше зловмисне програмне забезпечення (<span>налаштувати</span>)",
+    "message": "Блокувати трекери та інше зловмисне програмне забезпечення (<span>налаштувати<\/span>)",
     "description": "English: Firstrun.html -> Block trackers and other malware (customize)"
   },
   "adnNotificationReactivate": {
@@ -96,24 +96,28 @@
     "description": "English: Notifications -> You have allowed adnauseam to have access to your online activities while private browsing."
   },
   "adnNotificationDNTAllowed": {
-    "message": "Ця сторінка поважає <b>Do Not Track</b>, реклама дозволена.",
+    "message": "Ця сторінка поважає <b>Do Not Track<\/b>, реклама дозволена.",
     "description": "English: Notifications -> This page respects Do Not Track, Ads are allowed."
   },
   "adnNotificationDNTHidingNotClicking": {
-    "message": "Ця сторінка поважає <b>Do Not Track</b>, не клікати по рекламі, лише приховати.",
+    "message": "Ця сторінка поважає <b>Do Not Track<\/b>, не клікати по рекламі, лише приховати.",
     "description": "English: Notifications -> This page respects Do Not Track, hiding not clicking."
   },
   "adnNotificationDNTClickingNotHiding": {
-    "message": "Ця сторінка поважає <b>Do Not Track</b>, клікати по рекламі, не ховати її",
+    "message": "Ця сторінка поважає <b>Do Not Track<\/b>, клікати по рекламі, не ховати її",
     "description": "English: Notifications -> This page respects Do Not Track, clicking not hiding."
   },
   "adnNotificationDNTJustSoYouKnow": {
-    "message": "Ця сторінка поважає <b>Do Not Track</b>, ну такоє.",
+    "message": "Ця сторінка поважає <b>Do Not Track<\/b>, ну такоє.",
     "description": "English: Notifications -> This page respects Do Not Track, just so you know."
   },
   "adnNotificationShowAdsDebug": {
-    "message": "The Advanced Setting \"Show Ads Debug\" is turned on",
+    "message": "Розширені налаштування \"Показати налагодження реклами\" ввімкнено",
     "description": "English: Notifications -> The Advanced Setting \"Show Ads Debug\" is turned on"
+  },
+  "adnNewerVersionAvailableNotification": {
+    "message": "Доступна нова версія AdNauseam",
+    "description": "English: Notifications -> A newer version of AdNauseam is available"
   },
   "adnTarget": {
     "message": "МЕТА",
@@ -153,7 +157,7 @@
   },
   "adnPausedOnPage": {
     "message": "AdNauseam зупинився на цій сторінці",
-    "description": "English: Menu->display when paused on page/site"
+    "description": "English: Menu->display when paused on page\/site"
   },
   "adnNotHiding": {
     "message": "AdNauseam в даний час не приховує реклами",
@@ -168,35 +172,35 @@
     "description": "appears in ADN vault, above ad slider"
   },
   "topAdnetworks": {
-    "message": "Top Ad Networks",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "Топ Рекламних мереж",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "topSites": {
     "message": "Найпопулярніші сайти",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypes": {
     "message": "Тип реклами",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesImageAds": {
     "message": "Реклама при зображенні",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesTextAds": {
     "message": "Текстова реклама",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adnShowingRecentAds": {
     "message": "Немає оголошень на цій сторінці (показано останні)",
     "description": "shown in menu when only 'recent' Ads are shown"
   },
   "adnThisPageStrictBlocked": {
-    "message": "{{domain}} is currently strict-blocked.",
+    "message": "{{domain}} в даний час обмежений.",
     "description": "shown in menu when the current page is strict-blocked"
   },
   "adnStrictBlockListDescription": {
-    "message": "The strict-block list serves to help the users to strict-block specific domains or pages more easily.",
+    "message": "Список блоків обмеження допомагає користувачам легше блокувати конкретні домени або сторінки з додатком.",
     "description": "Description on the strict-block list tab, which is found on the dashboard"
   },
   "adnExportedAdsFilename": {
@@ -216,7 +220,7 @@
     "description": "appears in ADN settings"
   },
   "adnPurgeConfirm": {
-    "message": "This action will permanently remove all ads with load image error. Make sure your internet is connected, otherwise all your ads will be deleted.",
+    "message": "Ця дія назавжди видалить всі оголошення, для яких зображення неможливо завантажити. Це гарна ідея, щоб зробити резервне копіювання сховища перед очищенням, а також переконатися, що у вас є активне підключення до Інтернету.",
     "description": "appears in ADN settings"
   },
   "adnAdClickingStatusPending": {
@@ -268,23 +272,23 @@
     "description": "appears in ADN popup menu three state button"
   },
   "adnMenuDisable": {
-    "message": "Disable",
+    "message": "Вимкнути",
     "description": "Disabled Adnauseam -> appears in ADN popup menu three state button"
   },
   "adnMenuActive": {
-    "message": "Active",
+    "message": "Активований",
     "description": "Make Adnauseam Active -> appears in ADN popup menu three state button"
   },
   "adnMenuStrict": {
-    "message": "Strict",
+    "message": "Строго",
     "description": "Activate Strict-Block -> appears in ADN popup menu three state button"
   },
   "adnMenuDisableScopeDomain": {
-    "message": "on {{domain}}",
+    "message": "на {{domain}}",
     "description": "Disable AdNaueam Block On this Domain -> Popup option that appears inside ADN menu"
   },
   "adnMenuDisableScopePage": {
-    "message": "on this page",
+    "message": "на цій сторінці",
     "description": "Disable AdNaueam Block On This Page -> Popup option that appears inside ADN menu"
   },
   "adnMenuSettings": {
@@ -358,6 +362,18 @@
   "adnPurgeDeadAds": {
     "message": "Purge Dead Ads",
     "description": "appears on vault page"
+  },
+  "adnShowDeadAds": {
+    "message": "Показати мерлу рекламу",
+    "description": "appears on vault page"
+  },
+  "adnHideDeadAds": {
+    "message": "Purge Dead Ads",
+    "description": "appears on vault page"
+  },
+  "adnCaptureVault": {
+    "message": "Взяття",
+    "description": "appears on vault page in dev mode"
   },
   "adnVaultFound": {
     "message": "{{total}} зібраних оголошень",
@@ -475,24 +491,36 @@
     "message": "Оновлення",
     "description": "English: update"
   },
+  "adnUpdateButton": {
+    "message": "Оновлення",
+    "description": "English: update"
+  },
   "whitelistPageName": {
     "message": "Список винятків",
     "description": "appears as tab name in dashboard"
   },
   "strictBlockListPageName": {
-    "message": "Strict-Block List",
+    "message": "Список блоків Strict-Block",
     "description": "appears as tab name in dashboard"
   },
   "eventLoggingPrompt": {
-    "message": "Активувати режим відлагодження",
+    "message": "Режим вiдладки",
     "description": "prompt for toggle"
   },
   "disableWarnings": {
     "message": "Вимкнути попередження",
     "description": "English:Disable warnings"
   },
+  "blurCollectedAds": {
+    "message": "Розмиття оголошень зібрані",
+    "description": "English: Blur Collected ads"
+  },
+  "hideDeadAds": {
+    "message": "Purge Dead Ads",
+    "description": "English: Hide Dead ads"
+  },
   "showAdsDebugPrompt": {
-    "message": "Show ads for ad-collection debugging",
+    "message": "Показувати рекламу для відлагодження реклами",
     "description": "English: Show ads for ad-collection debugging"
   },
   "removeAdsInPrivate": {
@@ -500,7 +528,27 @@
     "description": "English:Remove ads collected in private mode - settings page"
   },
   "settingsStrictBlockingMode": {
-    "message": "Activate Strict-Blocking Mode",
+    "message": "Активувати суворе блокування",
     "description": "English: Activate Strict-Blocking Mode"
+  },
+  "adnRefreshButton": {
+    "message": "Оновити",
+    "description": "English: refresh page from menu notification button"
+  },
+  "adnRefreshNotification": {
+    "message": "Застосувати зміни на поточній сторінці",
+    "description": "English: refresh page from menu notification"
+  },
+  "supportS6P3S1": {
+    "message": "Переконайтесь, що проблема саме в  <b>AdNauseam<\/b>.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P3S2": {
+    "message": "Я перевірив цю ж вебсторінку на  <a url='https:\/\/github.com\/gorhill\/uBlock'>#uBO#<\/a> і підтверджую, що проблема саме в <b>AdNauseam<\/b>.",
+    "description": "A checkbox in the filter issue reporter section"
+  },
+  "supportS6Select1Option7": {
+    "message": "Реклама не зібрана",
+    "description": "Ads are present on page but none are collected"
   }
 }

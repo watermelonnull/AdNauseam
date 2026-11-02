@@ -36,15 +36,15 @@
     "description": "Message asking user to confirm reset"
   },
   "adnFirstRunHideAllAdsDescription": {
-    "message": "আপনার নির্বাচিত<span>ফিল্টার তালিকাগুলিতে বিজ্ঞাপনগুলি লুকান</span>",
+    "message": "আপনার নির্বাচিত<span>ফিল্টার তালিকাগুলিতে বিজ্ঞাপনগুলি লুকান<\/span>",
     "description": "English: Firstrun.html -> Hide Ads in your selected filter lists"
   },
   "adnFirstRunClickingAdsDescription": {
-    "message": "আপনার <span> ফিল্টার তালিকা </span> এর মাধ্যমে পাওয়া বিজ্ঞাপনগুলিতে নিবন্ধন করা নিবন্ধনগুলি",
+    "message": "আপনার <span> ফিল্টার তালিকা <\/span> এর মাধ্যমে পাওয়া বিজ্ঞাপনগুলিতে নিবন্ধন করা নিবন্ধনগুলি",
     "description": "English: Firstrun.html -> Register visits on Ads found via your filter lists"
   },
   "adnFirstRunBlockingMalwareDescription": {
-    "message": "ব্লক ট্র্যাকার এবং অন্যান্য ম্যালওয়্যার (<span> কাস্টমাইজ করুন </span>)",
+    "message": "ব্লক ট্র্যাকার এবং অন্যান্য ম্যালওয়্যার (<span> কাস্টমাইজ করুন <\/span>)",
     "description": "English: Firstrun.html -> Block trackers and other malware (customize)"
   },
   "adnNotificationReactivate": {
@@ -96,24 +96,28 @@
     "description": "English: Notifications -> You have allowed adnauseam to have access to your online activities while private browsing."
   },
   "adnNotificationDNTAllowed": {
-    "message": "এই পৃষ্ঠাটি <b>Do Not Track</b> শ্রদ্ধা করে বিজ্ঞাপন দেওয়া হয়।",
+    "message": "এই পৃষ্ঠাটি <b>Do Not Track<\/b> শ্রদ্ধা করে বিজ্ঞাপন দেওয়া হয়।",
     "description": "English: Notifications -> This page respects Do Not Track, Ads are allowed."
   },
   "adnNotificationDNTHidingNotClicking": {
-    "message": "এই পাতায় ক্লিক না করে লুকিয়ে <b>অনুসরণ করবেন না</b>, সম্মান করে।",
+    "message": "এই পাতায় ক্লিক না করে লুকিয়ে <b>অনুসরণ করবেন না<\/b>, সম্মান করে।",
     "description": "English: Notifications -> This page respects Do Not Track, hiding not clicking."
   },
   "adnNotificationDNTClickingNotHiding": {
-    "message": "এই পৃষ্ঠাটি <b> ট্র্যাক করবেন না </b>, গোপন না ক্লিক করে",
+    "message": "এই পৃষ্ঠাটি <b> ট্র্যাক করবেন না <\/b>, গোপন না ক্লিক করে",
     "description": "English: Notifications -> This page respects Do Not Track, clicking not hiding."
   },
   "adnNotificationDNTJustSoYouKnow": {
-    "message": "এই পৃষ্ঠাটি <b> ট্র্যাক করবেন না </b>, তাই আপনাকে জানার জন্য।",
+    "message": "এই পৃষ্ঠাটি <b> ট্র্যাক করবেন না <\/b>, তাই আপনাকে জানার জন্য।",
     "description": "English: Notifications -> This page respects Do Not Track, just so you know."
   },
   "adnNotificationShowAdsDebug": {
-    "message": "The Advanced Setting \"Show Ads Debug\" is turned on",
+    "message": "অ্যাডভান্সড সেটিং \"শো এডস ডিবাগ\" চালু আছে",
     "description": "English: Notifications -> The Advanced Setting \"Show Ads Debug\" is turned on"
+  },
+  "adnNewerVersionAvailableNotification": {
+    "message": "AdNauseam এর নতুন ভার্সন উপলব্ধ হয়েছে।",
+    "description": "English: Notifications -> A newer version of AdNauseam is available"
   },
   "adnTarget": {
     "message": "লক্ষ্য",
@@ -153,7 +157,7 @@
   },
   "adnPausedOnPage": {
     "message": "AdNauseam এই পাতা হতে বিরত রাখা হয়েছে",
-    "description": "English: Menu->display when paused on page/site"
+    "description": "English: Menu->display when paused on page\/site"
   },
   "adnNotHiding": {
     "message": "AdNauseam বর্তমানে বিজ্ঞাপন গোপন করা হয় না",
@@ -168,35 +172,35 @@
     "description": "appears in ADN vault, above ad slider"
   },
   "topAdnetworks": {
-    "message": "Top Ad Networks",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "শীর্ষস্থানীয় বিজ্ঞাপন নেটওয়ার্কসমূহ",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "topSites": {
     "message": "শীর্ষস্থানীয় সাইটগুলি",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypes": {
     "message": "বিজ্ঞাপন প্রকার",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesImageAds": {
     "message": "চিত্র বিজ্ঞাপন",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesTextAds": {
     "message": "পাঠ্য বিজ্ঞাপন",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adnShowingRecentAds": {
     "message": "এই পৃষ্ঠায় কোনও বিজ্ঞাপন সংগ্রহ করা হয়নি (সাম্প্রতিক দেখানো হয়েছে)",
     "description": "shown in menu when only 'recent' Ads are shown"
   },
   "adnThisPageStrictBlocked": {
-    "message": "{{domain}} is currently strict-blocked.",
+    "message": "এই {{domain}} কঠোরভাবে ব্লক করা আছে",
     "description": "shown in menu when the current page is strict-blocked"
   },
   "adnStrictBlockListDescription": {
-    "message": "The strict-block list serves to help the users to strict-block specific domains or pages more easily.",
+    "message": "কঠোর-ব্লক তালিকা ব্যবহারকারীদের নির্দিষ্ট ডোমেন বা পৃষ্ঠাগুলিকে আরও সহজে কঠোরভাবে ব্লক করতে সহায়তা করে।",
     "description": "Description on the strict-block list tab, which is found on the dashboard"
   },
   "adnExportedAdsFilename": {
@@ -216,7 +220,7 @@
     "description": "appears in ADN settings"
   },
   "adnPurgeConfirm": {
-    "message": "This action will permanently remove all ads with load image error. Make sure your internet is connected, otherwise all your ads will be deleted.",
+    "message": "এই পদক্ষেপের ফলে যেসব বিজ্ঞাপনের ছবি লোড করা যাবে না, সেগুলি স্থায়ীভাবে মুছে যাবে। Purge করার আগে আপনার ভল্টের ব্যাকআপ নেওয়া এবং আপনার একটি সক্রিয় ইন্টারনেট সংযোগ আছে কিনা তা নিশ্চিত করা ভালো।",
     "description": "appears in ADN settings"
   },
   "adnAdClickingStatusPending": {
@@ -280,7 +284,7 @@
     "description": "Activate Strict-Block -> appears in ADN popup menu three state button"
   },
   "adnMenuDisableScopeDomain": {
-    "message": "on {{domain}}",
+    "message": "এই {{domain}} এ",
     "description": "Disable AdNaueam Block On this Domain -> Popup option that appears inside ADN menu"
   },
   "adnMenuDisableScopePage": {
@@ -356,8 +360,20 @@
     "description": "appears on vault page"
   },
   "adnPurgeDeadAds": {
-    "message": "Purge Dead Ads",
+    "message": "মৃত বিজ্ঞাপন পরিষ্কার করুন",
     "description": "appears on vault page"
+  },
+  "adnShowDeadAds": {
+    "message": "অকার্যকর বিজ্ঞাপন দেখান",
+    "description": "appears on vault page"
+  },
+  "adnHideDeadAds": {
+    "message": "Hide Dead Ads",
+    "description": "appears on vault page"
+  },
+  "adnCaptureVault": {
+    "message": "ছবি উঠান ",
+    "description": "appears on vault page in dev mode"
   },
   "adnVaultFound": {
     "message": "{{total}} বিজ্ঞাপনগুলোর সংগ্রহ",
@@ -475,24 +491,36 @@
     "message": "আপডেট",
     "description": "English: update"
   },
+  "adnUpdateButton": {
+    "message": "আপডেট",
+    "description": "English: update"
+  },
   "whitelistPageName": {
     "message": "সাদাতালিকা",
     "description": "appears as tab name in dashboard"
   },
   "strictBlockListPageName": {
-    "message": "Strict-Block List",
+    "message": "কঠোরভাবে ব্লক করা তালিকা",
     "description": "appears as tab name in dashboard"
   },
   "eventLoggingPrompt": {
-    "message": "ডিবাগিং মোড সক্রিয় করুন",
+    "message": "Debug মোড",
     "description": "prompt for toggle"
   },
   "disableWarnings": {
     "message": "সতর্কতা অক্ষম করুন",
     "description": "English:Disable warnings"
   },
+  "blurCollectedAds": {
+    "message": "সংগৃহীত বিজ্ঞাপন ঝাপসাকরণ",
+    "description": "English: Blur Collected ads"
+  },
+  "hideDeadAds": {
+    "message": "অকার্যকর বিজ্ঞাপন লুকান",
+    "description": "English: Hide Dead ads"
+  },
   "showAdsDebugPrompt": {
-    "message": "Show ads for ad-collection debugging",
+    "message": "বিজ্ঞাপন কালেকশন ডিবাগিংয়ের এর জন্য বিজ্ঞাপন দেখান",
     "description": "English: Show ads for ad-collection debugging"
   },
   "removeAdsInPrivate": {
@@ -500,7 +528,27 @@
     "description": "English:Remove ads collected in private mode - settings page"
   },
   "settingsStrictBlockingMode": {
-    "message": "Activate Strict-Blocking Mode",
+    "message": "কঠোর ব্লকিং মোড চালু করুন",
     "description": "English: Activate Strict-Blocking Mode"
+  },
+  "adnRefreshButton": {
+    "message": "রিফ্রেশ",
+    "description": "English: refresh page from menu notification button"
+  },
+  "adnRefreshNotification": {
+    "message": "বর্তমান পৃষ্ঠায় পরিবর্তনগুলি বাস্তবায়ন করুন",
+    "description": "English: refresh page from menu notification"
+  },
+  "supportS6P3S1": {
+    "message": "নিশ্চিত করুন যে এই সমস্যাটি <b>AdNauseam সম্পর্কিত<\/b>।",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P3S2": {
+    "message": "আমি একই ওয়েব-পেজটি <a url='https:\/\/github.com\/gorhill\/uBlock'>#uBO#<\/a> তে পরীক্ষা করেছি এবং নিশ্চিত করছি যে এই সমস্যাটি <b>AdNauseam সম্পর্কিত <\/b>।",
+    "description": "A checkbox in the filter issue reporter section"
+  },
+  "supportS6Select1Option7": {
+    "message": "বিজ্ঞাপন সংগ্রহ করা হয়নি",
+    "description": "Ads are present on page but none are collected"
   }
 }

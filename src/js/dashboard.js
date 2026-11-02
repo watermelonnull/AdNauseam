@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2014-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,11 +19,11 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-/* global uDom */
-
 'use strict';
 
 import { renderNotifications } from './adn/notifications.js'
+import { dom, qs$ } from './dom.js';
+import { onBroadcast } from './broadcast.js';
 
 /******************************************************************************/
 
@@ -38,8 +38,8 @@ const resizeFrame = function() {
     );
 };
 
-const discardUnsavedData = function(synchronous = false) {
-    const paneFrame = document.getElementById('iframe');
+function discardUnsavedData(synchronous = false) {
+    const paneFrame = qs$('#iframe');
     const paneWindow = paneFrame.contentWindow;
     if (
         typeof paneWindow.hasUnsavedData !== 'function' ||
@@ -53,13 +53,13 @@ const discardUnsavedData = function(synchronous = false) {
     }
 
     return new Promise(resolve => {
-        const modal = uDom.nodeFromId('unsavedWarning');
-        modal.classList.add('on');
+        const modal = qs$('#unsavedWarning');
+        dom.cl.add(modal, 'on');
         modal.focus();
 
         const onDone = status => {
-            modal.classList.remove('on');
-            document.removeEventListener('click', onClick, true);
+            dom.cl.remove(modal, 'on');
+            dom.off(document, 'click', onClick, true);
             resolve(status);
         };
 
@@ -71,28 +71,30 @@ const discardUnsavedData = function(synchronous = false) {
             if ( target.matches('[data-i18n="dashboardUnsavedWarningIgnore"]') ) {
                 return onDone(true);
             }
-            if ( modal.querySelector('[data-i18n="dashboardUnsavedWarning"]').contains(target) ) {
+            if ( qs$(modal, '[data-i18n="dashboardUnsavedWarning"]').contains(target) ) {
                 return;
             }
             onDone(false);
         };
 
-        document.addEventListener('click', onClick, true);
+        dom.on(document, 'click', onClick, true);
     });
-};
+}
 
-const loadDashboardPanel = function(pane, first) {
-    const tabButton = uDom.nodeFromSelector(`[data-pane="${pane}"]`);
-    if ( tabButton === null || tabButton.classList.contains('selected') ) {
-        return;
-    }
+function loadDashboardPanel(pane, first) {
+    const tabButton = qs$(`[data-pane="${pane}"]`);
+    if ( tabButton === null || dom.cl.has(tabButton, 'selected') ) { return; }
     const loadPane = ( ) => {
         self.location.replace(`#${pane}`);
-        uDom('.tabButton.selected').toggleClass('selected', false);
-        tabButton.classList.add('selected');
+        dom.cl.remove('.tabButton.selected', 'selected');
+        dom.cl.add(tabButton, 'selected');
         tabButton.scrollIntoView();
-        uDom.nodeFromId('iframe').contentWindow.location.replace(pane);
+        const iframe = qs$('#iframe');
+        iframe.contentWindow.location.replace(pane);
         if ( pane !== 'no-dashboard.html' ) {
+            iframe.addEventListener('load', ( ) => {
+                qs$('.wikilink').href = iframe.contentWindow.wikilink || '';
+            }, { once: true });
             vAPI.localStorage.setItem('dashboardLastVisitedPane', pane);
         }
     };
@@ -101,25 +103,23 @@ const loadDashboardPanel = function(pane, first) {
     }
     const r = discardUnsavedData();
     if ( r === false ) { return; }
-    if ( r === true ) {
-        return loadPane();
-    }
+    if ( r === true ) { return loadPane(); }
     r.then(status => {
         if ( status === false ) { return; }
         loadPane();
     });
-};
+}
 
-const onTabClickHandler = function(ev) {
-    loadDashboardPanel(ev.target.getAttribute('data-pane'));
-};
+function onTabClickHandler(ev) {
+    loadDashboardPanel(dom.attr(ev.target, 'data-pane'));
+}
 
 if ( self.location.hash.slice(1) === 'no-dashboard.html' ) {
-    document.body.classList.add('noDashboard');
+    dom.cl.add(dom.body, 'noDashboard');
 }
 
 /// ADN notification to appear on dashboard
-vAPI.broadcastListener.add(request => {
+onBroadcast(request => {
     switch (request.what) {
         case 'notifications':
             renderNotifications(request.notifications, "dashboard");
@@ -127,15 +127,36 @@ vAPI.broadcastListener.add(request => {
             break;
         // ADN when "disable notifications" option is changed, hide or show notifications
         case 'hideNotifications':
-            uDom('#notifications').addClass("hide");
+            dom.cl.add('#notifications', 'hide');
             break;
         case 'showNotifications':
-           uDom('#notifications').removeClass("hide");
+            dom.cl.remove('#notifications', 'hide');
             break;
     }
   });
 
 (async ( ) => {
+    // Wait for uBO's main process to be ready
+    await new Promise(resolve => {
+        const check = async ( ) => {
+            try {
+                const response = await vAPI.messaging.send('dashboard', {
+                    what: 'readyToFilter'
+                });
+                if ( response ) { return resolve(true); }
+                const iframe = qs$('#iframe');
+                if ( iframe.src !== '' ) {
+                    iframe.src = '';
+                }
+            } catch {
+            }
+            vAPI.defer.once(250).then(( ) => check());
+        };
+        check();
+    });
+
+    dom.cl.remove(dom.body, 'notReady');
+
     const results = await Promise.all([
         // https://github.com/uBlockOrigin/uBlock-issues/issues/106
         vAPI.messaging.send('dashboard', { what: 'dashboardConfig' }),
@@ -144,13 +165,9 @@ vAPI.broadcastListener.add(request => {
 
     {
         const details = results[0] || {};
-        document.body.classList.toggle(
-            'canUpdateShortcuts',
-            details.canUpdateShortcuts === true
-        );
         if ( details.noDashboard ) {
             self.location.hash = '#no-dashboard.html';
-            document.body.classList.add('noDashboard');
+            dom.cl.add(dom.body, 'noDashboard');
         } else if ( self.location.hash === '#no-dashboard.html' ) {
             self.location.hash = '';
         }
@@ -163,14 +180,22 @@ vAPI.broadcastListener.add(request => {
         }
         loadDashboardPanel(pane !== null ? pane : 'options.html', true);
 
-        uDom('.tabButton').on('click', onTabClickHandler);
+        dom.on('.tabButton', 'click', onTabClickHandler);
 
         // https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event
-        window.addEventListener('beforeunload', ( ) => {
+        dom.on(self, 'beforeunload', ( ) => {
             if ( discardUnsavedData(true) ) { return; }
             event.preventDefault();
             event.returnValue = '';
         });
+
+        // https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event
+        dom.on(self, 'hashchange', ( ) => {
+            const pane = self.location.hash.slice(1);
+            if ( pane === '' ) { return; }
+            loadDashboardPanel(pane);
+        });
+
     }
 })();
 
@@ -195,9 +220,9 @@ vAPI.messaging.send(
     }
   ).then(isDisabled => {
     if (isDisabled) {
-      uDom("#notifications").addClass('hide');
+      dom.cl.add('#notifications', 'hide');
     } else {
-      uDom("#notifications").removeClass('hide');
+      dom.cl.remove('#notifications', 'hide');
     }
     // adjustHeight();
   })

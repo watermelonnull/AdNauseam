@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2018-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,13 +19,9 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-'use strict';
-
-/******************************************************************************/
-
 import {
-    hostnameFromURI,
     domainFromHostname,
+    hostnameFromURI,
     originFromURI,
 } from './uri-utils.js';
 
@@ -37,30 +33,31 @@ import {
 // values -- the assumption being that integer operations are faster than
 // string operations.
 
-const           NO_TYPE = 0;
-const            BEACON = 1 <<  0;
-const        CSP_REPORT = 1 <<  1;
-const              FONT = 1 <<  2;
-const             IMAGE = 1 <<  4;
-const          IMAGESET = 1 <<  4;
-const        MAIN_FRAME = 1 <<  5;
-const             MEDIA = 1 <<  6;
-const            OBJECT = 1 <<  7;
-const OBJECT_SUBREQUEST = 1 <<  7;
-const              PING = 1 <<  8;
-const            SCRIPT = 1 <<  9;
-const        STYLESHEET = 1 << 10;
-const         SUB_FRAME = 1 << 11;
-const         WEBSOCKET = 1 << 12;
-const    XMLHTTPREQUEST = 1 << 13;
-const       INLINE_FONT = 1 << 14;
-const     INLINE_SCRIPT = 1 << 15;
-const             OTHER = 1 << 16;
-const         FRAME_ANY = MAIN_FRAME | SUB_FRAME;
-const          FONT_ANY = FONT | INLINE_FONT;
-const        INLINE_ANY = INLINE_FONT | INLINE_SCRIPT;
-const          PING_ANY = BEACON | CSP_REPORT | PING;
-const        SCRIPT_ANY = SCRIPT | INLINE_SCRIPT;
+export const           NO_TYPE = 0;
+export const            BEACON = 1 <<  0;
+export const        CSP_REPORT = 1 <<  1;
+export const              FONT = 1 <<  2;
+export const             IMAGE = 1 <<  4;
+export const          IMAGESET = 1 <<  4;
+export const        MAIN_FRAME = 1 <<  5;
+export const             MEDIA = 1 <<  6;
+export const            OBJECT = 1 <<  7;
+export const OBJECT_SUBREQUEST = 1 <<  7;
+export const              PING = 1 <<  8;
+export const            SCRIPT = 1 <<  9;
+export const        STYLESHEET = 1 << 10;
+export const         SUB_FRAME = 1 << 11;
+export const         WEBSOCKET = 1 << 12;
+export const    XMLHTTPREQUEST = 1 << 13;
+export const       INLINE_FONT = 1 << 14;
+export const     INLINE_SCRIPT = 1 << 15;
+export const             OTHER = 1 << 16;
+export const           ADVISIT = 1 << 17; // ADN
+export const         FRAME_ANY = MAIN_FRAME | SUB_FRAME | OBJECT;
+export const          FONT_ANY = FONT | INLINE_FONT;
+export const        INLINE_ANY = INLINE_FONT | INLINE_SCRIPT;
+export const          PING_ANY = BEACON | CSP_REPORT | PING;
+export const        SCRIPT_ANY = SCRIPT | INLINE_SCRIPT;
 
 const typeStrToIntMap = {
            'no_type': NO_TYPE,
@@ -82,24 +79,70 @@ const typeStrToIntMap = {
        'inline-font': INLINE_FONT,
      'inline-script': INLINE_SCRIPT,
              'other': OTHER,
+           'advisit': ADVISIT,
 };
+
+export const    METHOD_NONE = 0;
+export const METHOD_CONNECT = 1 << 1;
+export const  METHOD_DELETE = 1 << 2;
+export const     METHOD_GET = 1 << 3;
+export const    METHOD_HEAD = 1 << 4;
+export const METHOD_OPTIONS = 1 << 5;
+export const   METHOD_PATCH = 1 << 6;
+export const    METHOD_POST = 1 << 7;
+export const     METHOD_PUT = 1 << 8;
+
+const methodStrToBitMap = {
+           '': METHOD_NONE,
+    'connect': METHOD_CONNECT,
+     'delete': METHOD_DELETE,
+        'get': METHOD_GET,
+       'head': METHOD_HEAD,
+    'options': METHOD_OPTIONS,
+      'patch': METHOD_PATCH,
+       'post': METHOD_POST,
+        'put': METHOD_PUT,
+    'CONNECT': METHOD_CONNECT,
+     'DELETE': METHOD_DELETE,
+        'GET': METHOD_GET,
+       'HEAD': METHOD_HEAD,
+    'OPTIONS': METHOD_OPTIONS,
+      'PATCH': METHOD_PATCH,
+       'POST': METHOD_POST,
+        'PUT': METHOD_PUT,
+};
+
+const methodBitToStrMap = new Map([
+    [ METHOD_NONE, '' ],
+    [ METHOD_CONNECT, 'connect' ],
+    [ METHOD_DELETE, 'delete' ],
+    [ METHOD_GET, 'get' ],
+    [ METHOD_HEAD, 'head' ],
+    [ METHOD_OPTIONS, 'options' ],
+    [ METHOD_PATCH, 'patch' ],
+    [ METHOD_POST, 'post' ],
+    [ METHOD_PUT, 'put' ],
+]);
+
+const reIPv4 = /^\d+\.\d+\.\d+\.\d+$/;
 
 /******************************************************************************/
 
-const FilteringContext = class {
+export const FilteringContext = class {
     constructor(other) {
         if ( other instanceof FilteringContext ) {
             return this.fromFilteringContext(other);
         }
         this.tstamp = 0;
         this.realm = '';
-        this.id = undefined;
-        this.itype = 0;
+        this.method = 0;
+        this.itype = NO_TYPE;
         this.stype = undefined;
         this.url = undefined;
         this.aliasURL = undefined;
         this.hostname = undefined;
         this.domain = undefined;
+        this.ipaddress = undefined;
         this.docId = -1;
         this.frameId = -1;
         this.docOrigin = undefined;
@@ -122,6 +165,9 @@ const FilteringContext = class {
         this.stype = a;
     }
 
+    isRootDocument() {
+        return (this.itype & MAIN_FRAME) !== 0;
+    }
     isDocument() {
         return (this.itype & FRAME_ANY) !== 0;
     }
@@ -133,9 +179,11 @@ const FilteringContext = class {
     fromFilteringContext(other) {
         this.realm = other.realm;
         this.type = other.type;
+        this.method = other.method;
         this.url = other.url;
         this.hostname = other.hostname;
         this.domain = other.domain;
+        this.ipaddress = other.ipaddress;
         this.docId = other.docId;
         this.frameId = other.frameId;
         this.docOrigin = other.docOrigin;
@@ -173,7 +221,7 @@ const FilteringContext = class {
 
     setURL(a) {
         if ( a !== this.url ) {
-            this.hostname = this.domain = undefined;
+            this.hostname = this.domain = this.ipaddress = undefined;
             this.url = a;
         }
         return this;
@@ -203,6 +251,28 @@ const FilteringContext = class {
 
     setDomain(a) {
         this.domain = a;
+        return this;
+    }
+
+    getIPAddress() {
+        if ( this.ipaddress !== undefined ) {
+            return this.ipaddress;
+        }
+        const ipaddr = this.getHostname();
+        const c0 = ipaddr.charCodeAt(0);
+        if ( c0 === 0x5B /* [ */ ) {
+            return (this.ipaddress = ipaddr.slice(1, -1));
+        } else if ( c0 <= 0x39 && c0 >= 0x30 ) {
+            if ( reIPv4.test(ipaddr) ) {
+                return (this.ipaddress = ipaddr);
+            }
+        }
+        return (this.ipaddress = '');
+    }
+
+    // Must always be called *after* setURL()
+    setIPAddress(ipaddr) {
+        this.ipaddress = ipaddr || undefined;
         return this;
     }
 
@@ -252,7 +322,7 @@ const FilteringContext = class {
         return this;
     }
 
-    // The idea is to minimize the amout of work done to figure out whether
+    // The idea is to minimize the amount of work done to figure out whether
     // the resource is 3rd-party to the document.
     is3rdPartyToDoc() {
         let docDomain = this.getDocDomain();
@@ -315,7 +385,7 @@ const FilteringContext = class {
         return this;
     }
 
-    // The idea is to minimize the amout of work done to figure out whether
+    // The idea is to minimize the amount of work done to figure out whether
     // the resource is 3rd-party to the top document.
     is3rdPartyToTab() {
         let tabDomain = this.getTabDomain();
@@ -358,34 +428,89 @@ const FilteringContext = class {
         }
         return this;
     }
+
+    setMethod(a) {
+        this.method = methodStrToBitMap[a] || 0;
+        return this;
+    }
+
+    getMethodName() {
+        return FilteringContext.getMethodName(this.method);
+    }
+
+    static getMethod(a) {
+        return methodStrToBitMap[a] || 0;
+    }
+
+    static getMethodName(a) {
+        return methodBitToStrMap.get(a) || '';
+    }
+
+    BEACON = BEACON;
+    CSP_REPORT = CSP_REPORT;
+    FONT = FONT;
+    IMAGE = IMAGE;
+    IMAGESET = IMAGESET;
+    MAIN_FRAME = MAIN_FRAME;
+    MEDIA = MEDIA;
+    OBJECT = OBJECT;
+    OBJECT_SUBREQUEST = OBJECT_SUBREQUEST;
+    PING = PING;
+    SCRIPT = SCRIPT;
+    STYLESHEET = STYLESHEET;
+    SUB_FRAME = SUB_FRAME;
+    WEBSOCKET = WEBSOCKET;
+    XMLHTTPREQUEST = XMLHTTPREQUEST;
+    INLINE_FONT = INLINE_FONT;
+    INLINE_SCRIPT = INLINE_SCRIPT;
+    OTHER = OTHER;
+    FRAME_ANY = FRAME_ANY;
+    FONT_ANY = FONT_ANY;
+    INLINE_ANY = INLINE_ANY;
+    PING_ANY = PING_ANY;
+    SCRIPT_ANY = SCRIPT_ANY;
+    METHOD_NONE = METHOD_NONE;
+    METHOD_CONNECT = METHOD_CONNECT;
+    METHOD_DELETE = METHOD_DELETE;
+    METHOD_GET = METHOD_GET;
+    METHOD_HEAD = METHOD_HEAD;
+    METHOD_OPTIONS = METHOD_OPTIONS;
+    METHOD_PATCH = METHOD_PATCH;
+    METHOD_POST = METHOD_POST;
+    METHOD_PUT = METHOD_PUT;
+
+    static BEACON = BEACON;
+    static CSP_REPORT = CSP_REPORT;
+    static FONT = FONT;
+    static IMAGE = IMAGE;
+    static IMAGESET = IMAGESET;
+    static MAIN_FRAME = MAIN_FRAME;
+    static MEDIA = MEDIA;
+    static OBJECT = OBJECT;
+    static OBJECT_SUBREQUEST = OBJECT_SUBREQUEST;
+    static PING = PING;
+    static SCRIPT = SCRIPT;
+    static STYLESHEET = STYLESHEET;
+    static SUB_FRAME = SUB_FRAME;
+    static WEBSOCKET = WEBSOCKET;
+    static XMLHTTPREQUEST = XMLHTTPREQUEST;
+    static INLINE_FONT = INLINE_FONT;
+    static INLINE_SCRIPT = INLINE_SCRIPT;
+    static OTHER = OTHER;
+    static FRAME_ANY = FRAME_ANY;
+    static FONT_ANY = FONT_ANY;
+    static INLINE_ANY = INLINE_ANY;
+    static PING_ANY = PING_ANY;
+    static SCRIPT_ANY = SCRIPT_ANY;
+    static METHOD_NONE = METHOD_NONE;
+    static METHOD_CONNECT = METHOD_CONNECT;
+    static METHOD_DELETE = METHOD_DELETE;
+    static METHOD_GET = METHOD_GET;
+    static METHOD_HEAD = METHOD_HEAD;
+    static METHOD_OPTIONS = METHOD_OPTIONS;
+    static METHOD_PATCH = METHOD_PATCH;
+    static METHOD_POST = METHOD_POST;
+    static METHOD_PUT = METHOD_PUT;
 };
 
 /******************************************************************************/
-
-FilteringContext.prototype.BEACON = FilteringContext.BEACON = BEACON;
-FilteringContext.prototype.CSP_REPORT = FilteringContext.CSP_REPORT = CSP_REPORT;
-FilteringContext.prototype.FONT = FilteringContext.FONT = FONT;
-FilteringContext.prototype.IMAGE = FilteringContext.IMAGE = IMAGE;
-FilteringContext.prototype.IMAGESET = FilteringContext.IMAGESET = IMAGESET;
-FilteringContext.prototype.MAIN_FRAME = FilteringContext.MAIN_FRAME = MAIN_FRAME;
-FilteringContext.prototype.MEDIA = FilteringContext.MEDIA = MEDIA;
-FilteringContext.prototype.OBJECT = FilteringContext.OBJECT = OBJECT;
-FilteringContext.prototype.OBJECT_SUBREQUEST = FilteringContext.OBJECT_SUBREQUEST = OBJECT_SUBREQUEST;
-FilteringContext.prototype.PING = FilteringContext.PING = PING;
-FilteringContext.prototype.SCRIPT = FilteringContext.SCRIPT = SCRIPT;
-FilteringContext.prototype.STYLESHEET = FilteringContext.STYLESHEET = STYLESHEET;
-FilteringContext.prototype.SUB_FRAME = FilteringContext.SUB_FRAME = SUB_FRAME;
-FilteringContext.prototype.WEBSOCKET = FilteringContext.WEBSOCKET = WEBSOCKET;
-FilteringContext.prototype.XMLHTTPREQUEST = FilteringContext.XMLHTTPREQUEST = XMLHTTPREQUEST;
-FilteringContext.prototype.INLINE_FONT = FilteringContext.INLINE_FONT = INLINE_FONT;
-FilteringContext.prototype.INLINE_SCRIPT = FilteringContext.INLINE_SCRIPT = INLINE_SCRIPT;
-FilteringContext.prototype.OTHER = FilteringContext.OTHER = OTHER;
-FilteringContext.prototype.FRAME_ANY = FilteringContext.FRAME_ANY = FRAME_ANY;
-FilteringContext.prototype.FONT_ANY = FilteringContext.FONT_ANY = FONT_ANY;
-FilteringContext.prototype.INLINE_ANY = FilteringContext.INLINE_ANY = INLINE_ANY;
-FilteringContext.prototype.PING_ANY = FilteringContext.PING_ANY = PING_ANY;
-FilteringContext.prototype.SCRIPT_ANY = FilteringContext.SCRIPT_ANY = SCRIPT_ANY;
-
-/******************************************************************************/
-
-export { FilteringContext };

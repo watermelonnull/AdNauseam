@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2014-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,22 +19,12 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-/* eslint-disable-next-line no-redeclare */
 /* globals process */
 
-'use strict';
-
-/******************************************************************************/
-
-import { strict as assert } from 'assert';
+import { StaticNetFilteringEngine, enableWASM } from './index.js';
+import { mkdir, readFile, writeFile } from 'fs/promises';
 import { createRequire } from 'module';
-import { readFileSync, writeFileSync } from 'fs';
-import { dirname, resolve } from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-import { enableWASM, StaticNetFilteringEngine } from './index.js';
+import { dirname } from 'path';
 
 /******************************************************************************/
 
@@ -81,11 +71,12 @@ function nanoToMicro(bigint) {
 }
 
 async function read(path) {
-    return readFileSync(resolve(__dirname, path), 'utf8');
+    return readFile(path, 'utf8');
 }
 
 async function write(path, data) {
-    return writeFileSync(resolve(__dirname, path), data, 'utf8');
+    await mkdir(dirname(path), { recursive: true });
+    return writeFile(path, data, 'utf8');
 }
 
 /******************************************************************************/
@@ -342,23 +333,19 @@ async function bench() {
 
     let start = process.hrtime.bigint();
     await engine.useLists([
+        read('assets/ublock/filters.min.txt')
+            .then(raw => ({ name: 'filters', raw })),
         read('assets/ublock/badware.txt')
             .then(raw => ({ name: 'badware', raw })),
-        read('assets/ublock/filters.txt')
-            .then(raw => ({ name: 'filters', raw })),
-        read('assets/ublock/filters-2020.txt')
-            .then(raw => ({ name: 'filters-2020', raw })),
-        read('assets/ublock/filters-2021.txt')
-            .then(raw => ({ name: 'filters-2021', raw })),
-        read('assets/ublock/privacy.txt')
+        read('assets/ublock/privacy.min.txt')
             .then(raw => ({ name: 'privacy', raw })),
-        read('assets/ublock/resource-abuse.txt')
-            .then(raw => ({ name: 'resource-abuse', raw })),
+        read('assets/ublock/quick-fixes.txt')
+            .then(raw => ({ name: 'quick-fixes.txt', raw })),
         read('assets/ublock/unbreak.txt')
             .then(raw => ({ name: 'unbreak.txt', raw })),
-        read('assets/thirdparties/easylist-downloads.adblockplus.org/easylist.txt')
+        read('assets/thirdparties/easylist/easylist.txt')
             .then(raw => ({ name: 'easylist', raw })),
-        read('assets/thirdparties/easylist-downloads.adblockplus.org/easyprivacy.txt')
+        read('assets/thirdparties/easylist/easyprivacy.txt')
             .then(raw => ({ name: 'easyprivacy', raw })),
         read('assets/thirdparties/pgl.yoyo.org/as/serverlist')
             .then(raw => ({ name: 'PGL', raw })),

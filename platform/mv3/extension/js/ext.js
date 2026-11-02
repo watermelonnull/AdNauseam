@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    AdNauseam Lite - a comprehensive, MV3-compliant content blocker
     Copyright (C) 2022-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,46 +19,123 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-/* jshint esversion:11 */
-
-'use strict';
+import { webext } from './ext-compat.js';
 
 /******************************************************************************/
 
-const browser =
-    self.browser instanceof Object &&
-    self.browser instanceof Element === false
-        ? self.browser
-        : self.chrome;
+export const browser = webext;
+export const i18n = browser.i18n;
+export const runtime = browser.runtime;
 
-const dnr = browser.declarativeNetRequest;
-const i18n = browser.i18n;
-const runtime = browser.runtime;
+export const webextFlavor = (( ) => {
+    const extURL = runtime.getURL('');
+    if ( extURL.startsWith('safari-web-extension:') ) { return 'safari'; }
+    return extURL.startsWith('moz-extension:') ? 'firefox' : 'chromium';
+})();
+
+const notAnObject = a => typeof a !== 'object' || a === null;
+
+/******************************************************************************/
+
+export function supportsUserScripts() {
+    try { browser.userScripts.getScripts(); }
+    catch { return false; }
+    return true;
+}
 
 /******************************************************************************/
 
 // The extension's service worker can be evicted at any time, so when we
 // send a message, we try a few more times when the message fails to be sent.
 
-function sendMessage(msg) {
-    return new Promise((resolve, reject) => {
-        let i = 5;
-        const send = ( ) => {
-            runtime.sendMessage(msg).then(response => {
-                resolve(response);
-            }).catch(reason => {
-                i -= 1;
-                if ( i <= 0 ) {
-                    reject(reason);
-                } else {
-                    setTimeout(send, 200);
-                }
-            });
-        };
-        send();
+export function sendMessage(msg) {
+    return runtime.sendMessage(msg).catch(reason => {
+        console.log(reason);
     });
 }
 
 /******************************************************************************/
 
-export { browser, dnr, i18n, runtime, sendMessage };
+export async function localRead(key) {
+    if ( notAnObject(browser?.storage?.local) ) { return; }
+    try {
+        const bin = await browser.storage.local.get(key);
+        if ( notAnObject(bin) ) { return; }
+        return bin[key] ?? undefined;
+    } catch {
+    }
+}
+
+export async function localWrite(key, value) {
+    if ( notAnObject(browser?.storage?.local) ) { return; }
+    return browser.storage.local.set({ [key]: value });
+}
+
+export async function localRemove(keys) {
+    if ( notAnObject(browser?.storage?.local) ) { return; }
+    return browser.storage.local.remove(keys);
+}
+
+export async function localKeys() {
+    if ( notAnObject(browser?.storage?.local) ) { return; }
+    if ( browser.storage.local.getKeys ) {
+        return browser.storage.local.getKeys();
+    }
+    const bin = await browser.storage.local.get(null);
+    if ( notAnObject(bin) ) { return; }
+    return Object.keys(bin);
+}
+
+/******************************************************************************/
+
+export async function sessionRead(key) {
+    if ( notAnObject(browser?.storage?.session) ) { return; }
+    try {
+        const bin = await browser.storage.session.get(key);
+        if ( notAnObject(bin) ) { return; }
+        return bin[key] ?? undefined;
+    } catch {
+    }
+}
+
+export async function sessionWrite(key, value) {
+    if ( notAnObject(browser?.storage?.session) ) { return; }
+    return browser.storage.session.set({ [key]: value });
+}
+
+export async function sessionRemove(keys) {
+    if ( notAnObject(browser?.storage?.session) ) { return; }
+    return browser.storage.session.remove(keys);
+}
+
+export async function sessionKeys() {
+    if ( notAnObject(browser?.storage?.session) ) { return; }
+    if ( browser.storage.session.getKeys ) {
+        return browser.storage.session.getKeys();
+    }
+    const bin = await browser.storage.session.get(null);
+    if ( notAnObject(bin) ) { return; }
+    return Object.keys(bin);
+}
+
+export async function sessionAccessLevel(level) {
+    try {
+        browser.storage.session.setAccessLevel(level);
+    } catch {
+    }
+    
+}
+
+/******************************************************************************/
+
+export async function adminRead(key) {
+    if ( browser?.storage?.managed instanceof Object === false ) { return; }
+    try {
+        const bin = await browser.storage.managed.get(key);
+        if ( notAnObject(bin) ) { return; }
+        return bin[key] ?? undefined;
+    } catch {
+    }
+}
+
+/******************************************************************************/

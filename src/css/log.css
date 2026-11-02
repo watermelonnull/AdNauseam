@@ -131,11 +131,11 @@ a {
   text-align: center;
 }
 #settings header a.close:hover{
-  color: #0076FF;
+  color: var(--adn-blue);
 }
 #settings header h2 {
   display: inline-block;
   width: 130px;
   padding:20px;
-  color: #0076FF;
+  color: var(--adn-blue);
 }

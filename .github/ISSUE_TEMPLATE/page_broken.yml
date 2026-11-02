@@ -1,0 +1,51 @@
+name: Page Broken
+description: Report page broken by AdNauseam
+body:
+  - type: checkboxes
+    attributes:
+      label: I tried to reproduce the issue when...
+      options:
+        - label: AdNauseam is the only extension
+          required: true
+        - label: AdNauseam uses default lists and settings
+          required: true
+        - label: Using a new, unmodified browser profile
+          required: true
+
+  - type: textarea
+    attributes:
+      label: Description
+      description: Provide a clear and concise description of this issue.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: URL(s) of the broken page
+      description: |
+        At least one URL is **MANDATORY** for an issue affecting a web page.
+        The backticks (`) surrounding the URL(s) are important, it prevents the URL(s) from being clickable. Warn with **"NSFW"** where applicable.
+      placeholder: |
+        `https://example.com`
+        `https://example.org`
+        `https://example.net`
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Screenshot(s)
+      description: |
+        Screenshot(s) are **MANDATORY** for hard-to-describe visual issues.
+        Post **LINKS** instead of inline images for screenshots containing **ADULT MATERIAL**.
+    validations:
+      required: false
+
+  - type: textarea
+    id: configuration
+    attributes:
+      label: Configuration
+      description: |
+        If this section gets automatically filled by AdNauseam, leave it alone.
+    validations:
+      required: true

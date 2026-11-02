@@ -36,15 +36,15 @@
     "description": "Message asking user to confirm reset"
   },
   "adnFirstRunHideAllAdsDescription": {
-    "message": "Seçili <span>süzgeç listeleriniz</span> deki reklamları gizle",
+    "message": "Seçili <span>süzgeç listeleriniz<\/span> deki reklamları gizle",
     "description": "English: Firstrun.html -> Hide Ads in your selected filter lists"
   },
   "adnFirstRunClickingAdsDescription": {
-    "message": "<span>Süzgeç listeleriniz</span> deki reklamlara ziyaretleri kaydet",
+    "message": "<span>Süzgeç listeleriniz<\/span> deki reklamlara ziyaretleri kaydet",
     "description": "English: Firstrun.html -> Register visits on Ads found via your filter lists"
   },
   "adnFirstRunBlockingMalwareDescription": {
-    "message": "İzleyicileri ve diğer kötü amaçlı yazılımları engelleyin (<span> özelleştir</span>)",
+    "message": "İzleyicileri ve diğer kötü amaçlı yazılımları engelleyin (<span> özelleştir<\/span>)",
     "description": "English: Firstrun.html -> Block trackers and other malware (customize)"
   },
   "adnNotificationReactivate": {
@@ -96,24 +96,28 @@
     "description": "English: Notifications -> You have allowed adnauseam to have access to your online activities while private browsing."
   },
   "adnNotificationDNTAllowed": {
-    "message": "Bu sayfa <b>Takip etmeme</b> ye uyuyor, reklamlara izin verildi.",
+    "message": "Bu sayfa <b>Takip etmeme<\/b> ye uyuyor, reklamlara izin verildi.",
     "description": "English: Notifications -> This page respects Do Not Track, Ads are allowed."
   },
   "adnNotificationDNTHidingNotClicking": {
-    "message": "Bu sayfa <b>Takip etmeme</b> ye uyuyor, tıklamadan gizliyoruz.",
+    "message": "Bu sayfa <b>Takip etmeme<\/b> ye uyuyor, tıklamadan gizliyoruz.",
     "description": "English: Notifications -> This page respects Do Not Track, hiding not clicking."
   },
   "adnNotificationDNTClickingNotHiding": {
-    "message": "Bu sayfa <b>Takip etmeme</b> ye uyuyor, gizlemeden tıklıyoruz",
+    "message": "Bu sayfa <b>Takip etmeme<\/b> ye uyuyor, gizlemeden tıklıyoruz",
     "description": "English: Notifications -> This page respects Do Not Track, clicking not hiding."
   },
   "adnNotificationDNTJustSoYouKnow": {
-    "message": "Bu sayfa <b>Takip etmeme</b> ye uyuyor, bilginiz olsun.",
+    "message": "Bu sayfa <b>Takip etmeme<\/b> ye uyuyor, bilginiz olsun.",
     "description": "English: Notifications -> This page respects Do Not Track, just so you know."
   },
   "adnNotificationShowAdsDebug": {
     "message": "\"Reklamların Hata Ayıklamasını Göster\" Gelişmiş Ayarı açık",
     "description": "English: Notifications -> The Advanced Setting \"Show Ads Debug\" is turned on"
+  },
+  "adnNewerVersionAvailableNotification": {
+    "message": "Yeni AdNauseam sürümü mevcut",
+    "description": "English: Notifications -> A newer version of AdNauseam is available"
   },
   "adnTarget": {
     "message": "HEDEF",
@@ -153,7 +157,7 @@
   },
   "adnPausedOnPage": {
     "message": "AdNauseam bu sayfada duraklatıldı",
-    "description": "English: Menu->display when paused on page/site"
+    "description": "English: Menu->display when paused on page\/site"
   },
   "adnNotHiding": {
     "message": "AdNauseam şu anda reklamları gizlemiyor",
@@ -169,23 +173,23 @@
   },
   "topAdnetworks": {
     "message": "En İyi Reklam Ağları",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "topSites": {
     "message": "En iyi siteler",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypes": {
     "message": "Reklam Türleri",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesImageAds": {
     "message": "Resimli Reklamlar",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesTextAds": {
     "message": "Yazılı Reklamlar",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adnShowingRecentAds": {
     "message": "Bu sayfadan hiç reklam toplanmadı (en yeniler gösteriliyor)",
@@ -216,7 +220,7 @@
     "description": "appears in ADN settings"
   },
   "adnPurgeConfirm": {
-    "message": "Bu işlem, görsel yükleme hatası olan tüm reklamları kalıcı olarak kaldıracaktır. İnternetinizin bağlı olduğundan emin olun, aksi takdirde tüm reklamlarınız silinecektir.",
+    "message": "Bu işlem, görseli yüklenemeyen tüm reklamları kalıcı olarak kaldırır. Temizleme işlemini yapmadan önce mahzeni yedeklemeniz ve etkin bir internet bağlantınız olduğundan emin olmanız önerilir.",
     "description": "appears in ADN settings"
   },
   "adnAdClickingStatusPending": {
@@ -359,6 +363,18 @@
     "message": "Ölü Reklamları Temizle",
     "description": "appears on vault page"
   },
+  "adnShowDeadAds": {
+    "message": "Ölü Reklamları Göster",
+    "description": "appears on vault page"
+  },
+  "adnHideDeadAds": {
+    "message": "Ölü Reklamları Gizle",
+    "description": "appears on vault page"
+  },
+  "adnCaptureVault": {
+    "message": "Yakala",
+    "description": "appears on vault page in dev mode"
+  },
   "adnVaultFound": {
     "message": "{{total}} reklam toplandı",
     "description": "appears on vault page"
@@ -475,6 +491,10 @@
     "message": "Güncelle",
     "description": "English: update"
   },
+  "adnUpdateButton": {
+    "message": "Güncelle",
+    "description": "English: update"
+  },
   "whitelistPageName": {
     "message": "Beyaz liste",
     "description": "appears as tab name in dashboard"
@@ -484,12 +504,20 @@
     "description": "appears as tab name in dashboard"
   },
   "eventLoggingPrompt": {
-    "message": "Hata ayıklama modunu etkinleştir",
+    "message": "Hata ayıklama modu",
     "description": "prompt for toggle"
   },
   "disableWarnings": {
     "message": "Uyarıları devre dışı bırak",
     "description": "English:Disable warnings"
+  },
+  "blurCollectedAds": {
+    "message": "Toplanmış reklamları bulanıklaştır",
+    "description": "English: Blur Collected ads"
+  },
+  "hideDeadAds": {
+    "message": "Ölü Reklamları Gizle",
+    "description": "English: Hide Dead ads"
   },
   "showAdsDebugPrompt": {
     "message": "Reklam toplamada hata ayıklaması için reklamları göster",
@@ -502,5 +530,25 @@
   "settingsStrictBlockingMode": {
     "message": "Katı Engelleme Modunu Aktifleştir",
     "description": "English: Activate Strict-Blocking Mode"
+  },
+  "adnRefreshButton": {
+    "message": "Yenile",
+    "description": "English: refresh page from menu notification button"
+  },
+  "adnRefreshNotification": {
+    "message": "Mevcut sayfada değişiklikleri uygula",
+    "description": "English: refresh page from menu notification"
+  },
+  "supportS6P3S1": {
+    "message": "Bu sorunun <b>AdNauseam özelinde<\/b> olduğundan emin olun.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P3S2": {
+    "message": "Aynı web sayfasını  <a url='https:\/\/github.com\/gorhill\/uBlock'>#uBO#<\/a> üzerinde test ettim ve bu sorunun <b>AdNauseam'a özgü<\/b> olduğunu doğruladım.",
+    "description": "A checkbox in the filter issue reporter section"
+  },
+  "supportS6Select1Option7": {
+    "message": "Toplanmamış reklamlar",
+    "description": "Ads are present on page but none are collected"
   }
 }

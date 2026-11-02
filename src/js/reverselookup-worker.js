@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2015-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -18,8 +18,6 @@
 
     Home: https://github.com/gorhill/uBlock
 */
-
-'use strict';
 
 /******************************************************************************/
 
@@ -75,9 +73,10 @@ const fromNetFilter = function(details) {
                 continue;
             }
             lists.push({
-                assetKey: assetKey,
+                assetKey,
                 title: entry.title,
-                supportURL: entry.supportURL
+                supportURL: entry.supportURL,
+                reason: entry.reason,
             });
             break;
         }
@@ -117,12 +116,13 @@ const fromExtendedFilter = function(details) {
     const exception = prefix.charAt(1) === '@';
     const selector = details.rawFilter.slice(prefix.length);
     const isHtmlFilter = prefix.endsWith('^');
-    const hostname = details.hostname;
+    const url = new URL(details.url || 'about:blank');
+    const { hostname, pathname } = url;
 
     // The longer the needle, the lower the number of false positives.
     // https://github.com/uBlockOrigin/uBlock-issues/issues/1139
     //   Mind that there is no guarantee a selector has `\w` characters.
-    const needle = selector.match(/\w+|\*/g).reduce(function(a, b) {
+    const needle = (details.needle || selector).match(/\w+|\*/g).reduce(function(a, b) {
         return a.length > b.length ? a : b;
     });
 
@@ -149,10 +149,41 @@ const fromExtendedFilter = function(details) {
         }
     }
 
-    const hostnameMatches = hn => {
-        return hn === '' ||
-               reHostname.test(hn) ||
-               reEntity !== undefined && reEntity.test(hn);
+    const hostnameTargetMatchesHostname = target => {
+        if ( target === '' ) { return true; }
+        if ( reHostname.test(target) ) { return true; }
+        if ( reEntity === undefined ) { return false; }
+        if ( reEntity.test(target) ) { return true; }
+        return false;
+    };
+
+    const regexTargetMatchesHostname = target => {
+        return (new RegExp(target)).test(hostname);
+    };
+
+    const regexTargetMatchesURL = target => {
+        const pathPos = target.indexOf('\\/');
+        if ( pathPos === -1 ) {
+            return regexTargetMatchesHostname(target);
+        }
+        return regexTargetMatchesHostname(`${target.slice(1, pathPos)}$`) &&
+            (new RegExp(`^${target.slice(pathPos, -1)}`)).test(pathname);
+    };
+
+    const pathTargetMatchesURL = target => {
+        const pathPos = target.indexOf('/');
+        return hostnameTargetMatchesHostname(target.slice(0, pathPos)) &&
+            pathname.startsWith(target.slice(pathPos));
+    };
+
+    const targetMatchesURL = target => {
+        if ( target.charCodeAt(0) === 0x2F /* / */ ) {
+            return regexTargetMatchesURL(target.slice(1, -1));
+        }
+        if ( target.includes('/') ) {
+            return pathTargetMatchesURL(target);
+        }
+        return hostnameTargetMatchesHostname(target);
     };
 
     const response = Object.create(null);
@@ -183,33 +214,14 @@ const fromExtendedFilter = function(details) {
             const filterType = fargs[0];
 
             // https://github.com/gorhill/uBlock/issues/2763
-            if (
-                filterType >= 0 &&
-                filterType <= 5 &&
-                details.ignoreGeneric
-            ) {
-                continue;
-            }
+            if ( filterType === 0 && details.ignoreGeneric ) { continue; }
 
             // Do not confuse cosmetic filters with HTML ones.
             if ( (filterType === 64) !== isHtmlFilter ) { continue; }
 
             switch ( filterType ) {
             // Lowly generic cosmetic filters
-            case 0: // simple id-based
-                if ( exception ) { break; }
-                if ( fargs[1] !== selector.slice(1) ) { break; }
-                if ( selector.charAt(0) !== '#' ) { break; }
-                found = prefix + selector;
-                break;
-            case 2: // simple class-based
-                if ( exception ) { break; }
-                if ( fargs[1] !== selector.slice(1) ) { break; }
-                if ( selector.charAt(0) !== '.' ) { break; }
-                found = prefix + selector;
-                break;
-            case 1: // complex id-based
-            case 3: // complex class-based
+            case 0:
                 if ( exception ) { break; }
                 if ( fargs[2] !== selector ) { break; }
                 found = prefix + selector;
@@ -226,19 +238,27 @@ const fromExtendedFilter = function(details) {
             case 8:
             // HTML filtering
             // Response header filtering
+            /* fallthrough */
             case 64: {
-                if ( exception !== ((fargs[2] & 0b001) !== 0) ) { break; }
-                const isProcedural = (fargs[2] & 0b010) !== 0;
+                if ( exception !== (fargs[2].charCodeAt(0) === 0x2D /* - */) ) { break; }
+                const candidate = fargs[2].slice(1);
+                if ( /^responseheader\(.+\)$/.test(selector) ) {
+                    if ( candidate !== needle ) { break; }
+                    if ( targetMatchesURL(fargs[1]) === false ) { break; }
+                    found = fargs[1] + prefix + selector;
+                    break;
+                }
+                const isProcedural = candidate.charCodeAt(0) === 0x7B /* { */;
                 if (
-                    isProcedural === false && fargs[3] !== selector ||
-                    isProcedural && JSON.parse(fargs[3]).raw !== selector
+                    isProcedural === false && candidate !== selector ||
+                    isProcedural && JSON.parse(candidate).raw !== selector
                 ) {
                     break;
                 }
-                if ( hostnameMatches(fargs[1]) === false ) { break; }
+                if ( targetMatchesURL(fargs[1]) === false ) { break; }
                 // https://www.reddit.com/r/uBlockOrigin/comments/d6vxzj/
                 //   Ignore match if specific cosmetic filters are disabled
-                if (
+                if ( 
                     filterType === 8 &&
                     exception === false &&
                     details.ignoreSpecific
@@ -249,12 +269,16 @@ const fromExtendedFilter = function(details) {
                 break;
             }
             // Scriptlet injection
-            case 32:
-                if ( exception !== ((fargs[2] & 0b001) !== 0) ) { break; }
-                if ( fargs[3] !== selector ) { break; }
-                if ( hostnameMatches(fargs[1]) ) {
+            case 32: {
+                if ( exception !== (fargs[2].charCodeAt(0) === 0x2D /* - */) ) { break; }
+                const candidate = fargs[2].slice(1);
+                if ( candidate !== details.needle ) { break; }
+                if (targetMatchesURL(fargs[1]) ) {
                     found = fargs[1] + prefix + selector;
                 }
+                break;
+            }
+            default:
                 break;
             }
             if ( found !== undefined  ) {

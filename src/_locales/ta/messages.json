@@ -12,11 +12,11 @@
     "description": "English: uBlock₀ — Dashboard"
   },
   "dashboardUnsavedWarning": {
-    "message": "எச்சரிக்கை! உங்களிடம் சேமிக்கப்படாத மாற்றங்கள் உள்ளன",
+    "message": "எச்சரிக்கை: உங்களிடம் சேமிக்கப்படாத மாற்றங்கள் உள்ளன!",
     "description": "A warning in the dashboard when navigating away from unsaved changes"
   },
   "dashboardUnsavedWarningStay": {
-    "message": "இருங்கள்",
+    "message": "இங்கேயே இரு",
     "description": "Label for button to prevent navigating away from unsaved changes"
   },
   "dashboardUnsavedWarningIgnore": {
@@ -136,7 +136,7 @@
     "description": "Tooltip for the no-popups per-site switch"
   },
   "popupTipNoPopups1": {
-    "message": "இந்த தளத்தில் உள்ள அனைத்து பாப்அப்களையும் தடுக்க கிளிக் செய்க",
+    "message": "இந்தத் தளத்தில் உள்ள அனைத்து பாப்அப்களையும் தடுக்க கிளிக் செய்க",
     "description": "Tooltip for the no-popups per-site switch"
   },
   "popupTipNoPopups2": {
@@ -220,7 +220,7 @@
     "description": "Tooltip when hovering the top-most cell of the global-rules column."
   },
   "popupTipLocalRules": {
-    "message": "அக விதிகள்: இந்நெடுவரிசை தற்போதைய தளத்திற்கு மட்டுமே பொருந்தும் விதிகளுக்கானது.அக விதிகள் உலகளாவிய விதிகளை மீறுகின்றன.",
+    "message": "அக விதிகள்: இந்நெடுவரிசை தற்போதைய தளத்திற்கு மட்டுமே பொருந்தும் விதிகளுக்கானது.",
     "description": "Tooltip when hovering the top-most cell of the local-rules column."
   },
   "popupTipSaveRules": {
@@ -275,13 +275,13 @@
     "message": "பதிப்பு",
     "description": "Example of use: Version 1.26.4"
   },
-  "popup3pScriptFilterTip": {
-    "message": "↑: மூன்றாம் தரப்பு ஸ்கிரிப்டுகளைக் கொண்ட வரிசைகளை வலியுறுத்து",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party scripts' cell"
+  "popup3pScriptFilter": {
+    "message": "நிரல்",
+    "description": "Appears as an option to filter out firewall rows"
   },
-  "popup3pFrameFilterTip": {
-    "message": "↑: மூன்றாம் தரப்பு பிரேம்கள் கொண்டிருக்கும் வரிசைகளை வலியுறுத்து",
-    "description": "Tooltip shown when hovering small filtering widget in '3rd-party frames' cell"
+  "popup3pFrameFilter": {
+    "message": "சட்டம்",
+    "description": "Appears as an option to filter out firewall rows"
   },
   "pickerCreate": {
     "message": "உருவாக்கு",
@@ -456,7 +456,7 @@
     "description": "Describes the purpose of the 'Ignore generic cosmetic filters' feature."
   },
   "3pSuspendUntilListsAreLoaded": {
-    "message": "Suspend network activity until all filter lists are loaded",
+    "message": "வடிகட்டிப் பட்டியல்கள் அனைத்தும் ஏற்றப்படும் வரை வலைப்பின்னல் செயல்பாட்டை நிறுத்து",
     "description": "A checkbox in the 'Filter lists' pane"
   },
   "3pListsOfBlockedHostsHeader": {
@@ -469,35 +469,43 @@
   },
   "3pGroupDefault": {
     "message": "உள்ளமைக்கப்பட்ட",
-    "description": "Header for the uBlock filters section in 'Filter lists pane'"
+    "description": "Filter lists section name"
   },
   "3pGroupAds": {
     "message": "விளம்பரங்கள்",
-    "description": "English: Ads"
+    "description": "Filter lists section name"
   },
   "3pGroupPrivacy": {
     "message": "தனியுரிமை",
-    "description": "English: Privacy"
+    "description": "Filter lists section name"
   },
   "3pGroupMalware": {
     "message": "தீப்பொருள் ஆள்களங்கள்",
-    "description": "English: Malware domains"
+    "description": "Filter lists section name"
+  },
+  "3pGroupSocial": {
+    "message": "சமூக விட்ஜெட்கள்",
+    "description": "Filter lists section name"
+  },
+  "3pGroupCookies": {
+    "message": "குக்கீ அறிவிப்புகள்",
+    "description": "Filter lists section name"
   },
   "3pGroupAnnoyances": {
     "message": "எரிச்சல்கள்",
-    "description": "The header identifying the filter lists in the category 'annoyances'"
+    "description": "Filter lists section name"
   },
   "3pGroupMultipurpose": {
     "message": "பல்நோக்கு வடிகட்டி",
-    "description": "English: Multipurpose"
+    "description": "Filter lists section name"
   },
   "3pGroupRegions": {
     "message": "மாநில பகுதிகள், மொழிகள் வாரியான",
-    "description": "English: Regions, languages"
+    "description": "Filter lists section name"
   },
   "3pGroupCustom": {
     "message": "தனிபயன்",
-    "description": "English: Custom"
+    "description": "Filter lists section name"
   },
   "3pImport": {
     "message": "இறக்குமதி ...",
@@ -527,17 +535,25 @@
     "message": "ஒரு பிணைய பிழை வளத்தைப் புதுப்பிப்பதைத் தடுத்தது.",
     "description": "used as a tooltip for error icon beside a list"
   },
-  "1pFormatHint": {
-    "message": "ஒரு வரிக்கு ஒரு வடிகட்டி. வடிகட்டி என்பது வெறும் வழங்கிப்பெயராக இருக்கலாம், அல்லது Adblock Plus-க்குப் பொருந்தும் வடிகட்டியாக இருக்கலாம். &lsquo;!&rsquo; எனும் எழுத்தில் தொடங்கும் வரிகள் புறக்கணிக்கப்படும்.",
-    "description": "Short information about how to create custom filters"
+  "1pTrustWarning": {
+    "message": "நம்பகமில்லாத மூலத்தில் இருக்கும் வடிகட்டிகளை சேர்க்காதே.",
+    "description": "Warning against copy-pasting filters from random sources"
+  },
+  "1pEnableMyFiltersLabel": {
+    "message": "என் தனிப்பட்ட வடிகட்டிகளை செயல்படுத்து",
+    "description": "Label for the checkbox use to enable/disable 'My filters' list"
+  },
+  "1pTrustMyFiltersLabel": {
+    "message": "நம்பிக்கை தேவைப்படும் தனிப்பயன் வடிப்பான்களை அனுமதிக்கவும்",
+    "description": "Label for the checkbox use to trust the content of 'My filters' list"
   },
   "1pImport": {
     "message": "இறக்குமதி செய் மற்றும் இணை",
-    "description": "English: Import and append"
+    "description": "Button in the 'My filters' pane"
   },
   "1pExport": {
     "message": "ஏற்று",
-    "description": "English: Export"
+    "description": "Button in the 'My filters' pane"
   },
   "1pExportFilename": {
     "message": "my-ublock-dynamic-rules_{{datetime}}.txt",
@@ -581,7 +597,7 @@
   },
   "rulesExport": {
     "message": "கோப்பினுள் ஏற்று",
-    "description": ""
+    "description": "Button in the 'My rules' pane"
   },
   "rulesDefaultFileName": {
     "message": "my-ublock-dynamic-rules_{{datetime}}.txt",
@@ -617,11 +633,11 @@
   },
   "whitelistImport": {
     "message": "இறக்குமதி செய்து சேர்",
-    "description": "English: Import and append"
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExport": {
     "message": "ஏற்று",
-    "description": "English: Export"
+    "description": "Button in the 'Trusted sites' pane"
   },
   "whitelistExportFilename": {
     "message": "my-ublock-dynamic-rules_{{datetime}}.txt",
@@ -881,11 +897,11 @@
   },
   "supportOpenButton": {
     "message": "திற",
-    "description": "Text for button which open an external webpage in Support pane"
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportReportSpecificButton": {
     "message": "புதிய புகாரை உருவாக்கு",
-    "description": "Text for button which open an external webpage in Support pane"
+    "description": "Text for button which open an external web page in Support pane"
   },
   "supportFindSpecificButton": {
     "message": "ஒரேமாதிரியான புகார்களைக் கண்டறி",
@@ -896,7 +912,7 @@
     "description": "Header of 'Documentation' section in Support pane"
   },
   "supportS1P1": {
-    "message": "Read the documentation at <code>uBlock/wiki</code> to learn about all of uBlock Origin's features.",
+    "message": "uBlock Originன் அனைத்து அம்சங்களையும்ப் பற்றி அறிய <code>uBlock/wiki</code> இல் உள்ள ஆவணத்தைப் படிக்கவும்.",
     "description": "First paragraph of 'Documentation' section in Support pane"
   },
   "supportS2H": {
@@ -904,23 +920,23 @@
     "description": "Header of 'Questions and support' section in Support pane"
   },
   "supportS2P1": {
-    "message": "Answers to questions and other kinds of help support is provided on the subreddit <code>/r/uBlockOrigin</code>.",
+    "message": "கேள்விகளுக்கான பதில்கள் மற்றும் பிற வகையான உதவி ஆதரவு <code>/r/uBlockOrigin</code> என்ற சப்ரெடிட்டில் வழங்கப்படுகிறது.",
     "description": "First paragraph of 'Questions and support' section in Support pane"
   },
   "supportS3H": {
-    "message": "Filter issues/website is broken",
+    "message": "வடிப்பான் சிக்கல்கள்/இணையதளம் செயலிழந்துள்ளது",
     "description": "Header of 'Filter issues' section in Support pane"
   },
   "supportS3P1": {
-    "message": "Report filter issues with specific websites to the <span data-url=\"https://github.com/uBlockOrigin/uAssets/issues?q=is%3Aissue\"><code>uBlockOrigin/uAssets</code> issue tracker</span>. <u>Requires a GitHub account.</u>",
+    "message": "குறிப்பிட்ட இணையதளங்களில் உள்ள வடிப்பான் சிக்கல்களை <span data-url=\"https://github.com/uBlockOrigin/uAssets/issues?q=is%3Aissue\"><code>uBlockOrigin/uAssets</code> சிக்கல் கண்காணிப்பாளரிடம்</span> புகாரளிக்கவும். <u>GitHub கணக்கு தேவை.</u>",
     "description": "First paragraph of 'Filter issues' section in Support pane"
   },
   "supportS3P2": {
-    "message": "<b>Important:</b> Avoid using other similarly-purposed blockers along with uBlock Origin, as this may cause filter issues on specific websites.",
+    "message": "<b>முக்கியமானது:</b> uBlock Origin உடன் இதே போன்ற நோக்கத்தில் உள்ள பிற தடுப்பான்களைப் பயன்படுத்துவதைத் தவிர்க்கவும், ஏனெனில் இது குறிப்பிட்ட இணையதளங்களில் வடிப்பான் சிக்கல்களை ஏற்படுத்தலாம்.",
     "description": "Second paragraph of 'Filter issues' section in Support pane"
   },
   "supportS3P3": {
-    "message": "<b>Tips:</b> Be sure your filter lists are up to date. <span data-url=\"logger-ui.html#_\">The logger</span> is the primary tool to diagnose filter-related issues.",
+    "message": "<b>உதவிக்குறிப்புகள்:</b> உங்கள் வடிப்பான் பட்டியல்கள் புதுப்பித்த நிலையில் இருப்பதை உறுதிசெய்யவும். <span data-url=\"logger-ui.html#_\">பதிவு கருவி</span> வடிப்பான் தொடர்பான சிக்கல்களைக் கண்டறிவதற்கான முதன்மைக் கருவியாகும்.",
     "description": "Third paragraph of 'Filter issues' section in Support pane"
   },
   "supportS4H": {
@@ -928,27 +944,31 @@
     "description": "Header of 'Bug report' section in Support pane"
   },
   "supportS4P1": {
-    "message": "Report issues with uBlock Origin itself to the <span data-url=\"https://github.com/uBlockOrigin/uBlock-issues/issues?q=is%3Aissue\"><code>uBlockOrigin/uBlock-issue</code> issue tracker</span>. <u>Requires a GitHub account.</u>",
+    "message": "uBlock Origin உடன் தொடர்புடைய சிக்கல்களை <span data-url=\"https://github.com/uBlockOrigin/uBlock-issues/issues?q=is%3Aissue\"><code>uBlockOrigin/uBlock-issue</code> சிக்கல் கண்காணிப்பாளரிடம்</span> புகாரளிக்கவும். <u>GitHub கணக்கு தேவை.</u>",
     "description": "First paragraph of 'Bug report' section in Support pane"
   },
   "supportS5H": {
-    "message": "Troubleshooting Information",
+    "message": "பிழைதீர்க்கும் தகவல்",
     "description": "Header of 'Troubleshooting Information' section in Support pane"
   },
   "supportS5P1": {
-    "message": "Below is technical information that might be useful when volunteers are trying to help you solve a problem.",
+    "message": "தன்னார்வலர்கள் உங்களுக்கு ஒரு சிக்கலைத் தீர்க்க உதவ முயற்சிக்கும்போது பயனுள்ளதாக இருக்கும் தொழில்நுட்பத் தகவல் கீழே உள்ளது.",
     "description": "First paragraph of 'Troubleshooting Information' section in Support pane"
-  },
-  "supportS5P2": {
-    "message": "<b>Important:</b> Potentially private or sensitive information is redacted by default. Redacted information may make it more difficult to solve a problem.",
-    "description": "Second paragraph of 'Troubleshooting Information' section in Support pane"
   },
   "supportS6H": {
     "message": "வடிகட்டி சிக்கலைப் புகாரளி",
     "description": "Header of 'Report a filter issue' section in Support pane"
   },
   "supportS6P1S1": {
-    "message": "To avoid burdening volunteers with duplicate reports, please verify that the issue has not already been reported.",
+    "message": "தன்னார்வலர்களுக்கு நகல் அறிக்கைகளால் சுமையை ஏற்படுத்துவதைத் தவிர்க்க, இந்த சிக்கல் ஏற்கனவே புகாரளிக்கப்படவில்லை என்பதை உறுதிசெய்யவும். <b>குறிப்பு:</b> பொத்தானைக் கிளிக் செய்வதால் பக்கத்தின் மூல (origin) GitHub க்கு அனுப்பப்படும்.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S1": {
+    "message": "வடிப்பான் பட்டியல்கள் தினமும் புதுப்பிக்கப்படும். உங்கள் சிக்கல் சமீபத்திய வடிப்பான் பட்டியல்களில் ஏற்கனவே தீர்க்கப்படவில்லை என்பதை உறுதிசெய்யவும்.",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P2S2": {
+    "message": "சிக்கலுள்ள இணையப் பக்கத்தை மீண்டும் ஏற்றிய பிறகு சிக்கல் இன்னும் உள்ளதா என்பதை சரிபார்க்கவும்.",
     "description": "A paragraph in the filter issue reporter section"
   },
   "supportS6URL": {
@@ -960,19 +980,19 @@
     "description": "Label for widget to select type of issue"
   },
   "supportS6Select1Option0": {
-    "message": "-- Pick an entry --",
+    "message": "-- ஒரு உள்ளீட்டைத் தேர்வு செய்யவும் --",
     "description": "An entry in the widget used to select the type of issue"
   },
   "supportS6Select1Option1": {
-    "message": "Shows ads or ad leftovers",
+    "message": "விளம்பரங்கள் அல்லது விளம்பர எச்சங்களைக் காட்டுகிறது",
     "description": "An entry in the widget used to select the type of issue"
   },
   "supportS6Select1Option2": {
-    "message": "Has overlays or other nuisances",
+    "message": "மேலோட்டங்கள் (overlays) அல்லது பிற தொல்லைகள் உள்ளன",
     "description": "An entry in the widget used to select the type of issue"
   },
   "supportS6Select1Option3": {
-    "message": "Detects uBlock Origin",
+    "message": "uBlock Origin ஐ கண்டறிகிறது",
     "description": "An entry in the widget used to select the type of issue"
   },
   "supportS6Select1Option4": {
@@ -987,17 +1007,13 @@
     "message": "தேவையற்ற தாவல்கள் அ சாளரங்களைத் திறக்கிறது",
     "description": "An entry in the widget used to select the type of issue"
   },
+  "supportS6Select1Option7": {
+    "message": "தீம்பொருள், பிஷிங் போன்றவற்றிற்கு இட்டுச்செல்கிறது",
+    "description": "An entry in the widget used to select the type of issue"
+  },
   "supportS6Checkbox1": {
-    "message": "Label the web page as “NSFW” (<a href=\"https://wikipedia.org/wiki/Not_safe_for_work\">“Not Safe For Work”</a>)",
+    "message": "இணையப் பக்கத்தை “NSFW” (<a href=\"https://wikipedia.org/wiki/Not_safe_for_work\">“பணிக்கு பாதுகாப்பானது அல்ல”</a>) என்று பெயரிடவும்",
     "description": "A checkbox to use for NSFW sites"
-  },
-  "supportRedact": {
-    "message": "Redact",
-    "description": "Text for 'Redact' button"
-  },
-  "supportUnredact": {
-    "message": "Unredact",
-    "description": "Text for 'Unredact' button"
   },
   "aboutPrivacyPolicy": {
     "message": "தனியுரிமை கொள்கை",
@@ -1071,10 +1087,6 @@
     "message": "பிணையத்தில் பிழை: {{msg}}",
     "description": "English: Network error: {{msg}}"
   },
-  "subscriberConfirm": {
-    "message": "uBlock₀: பின்வரும் உரலியை உங்களுடைய தனிபயன் வடிகட்டியில் சேர்க்கலாமா?\n\nதலைப்பு: \"{{title}}\"\nஉரலி: {{url}}",
-    "description": "No longer used"
-  },
   "subscribeButton": {
     "message": "சந்தாதராகு",
     "description": "For the button used to subscribe to a filter list"
@@ -1116,7 +1128,7 @@
     "description": "Firefox-specific: appears as 'uBlock₀ (off)'"
   },
   "docblockedTitle": {
-    "message": "Page blocked",
+    "message": "பக்கம் தடுக்கப்பட்டது",
     "description": "Used as a title for the document-blocked page"
   },
   "docblockedPrompt1": {
@@ -1144,7 +1156,7 @@
     "description": "English: Close this window"
   },
   "docblockedDontWarn": {
-    "message": "Don't warn me again about this site",
+    "message": "இந்த தளத்தைப் பற்றி மீண்டும் என்னை எச்சரிக்க வேண்டாம்",
     "description": "Label for checkbox in document-blocked page"
   },
   "docblockedProceed": {
@@ -1160,8 +1172,28 @@
     "description": "English: Permanently"
   },
   "docblockedDisable": {
-    "message": "Proceed",
+    "message": "தொடரவும்",
     "description": "Button text to navigate to the blocked page"
+  },
+  "docblockedRedirectPrompt": {
+    "message": "தடுக்கப்பட்ட பக்கம் வேறொரு தளத்திற்கு திருப்பிவிட முயல்கிறது. நீங்கள் தொடர்ந்து செல்ல தேர்வுசெய்தால், நீங்கள் நேரடியாக இங்கு செல்லுவீர்கள்: {{url}}",
+    "description": "Text warning about an incoming redirect"
+  },
+  "docblockedReasonLabel": {
+    "message": "காரணம்:",
+    "description": "The label which prepend the actual reason why a page was blocked"
+  },
+  "docblockedReasonMalicious": {
+    "message": "தீங்கிழைக்கும்",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonTracker": {
+    "message": "பின்தொடர்பான்",
+    "description": "An actual reason why a page was blocked"
+  },
+  "docblockedReasonDisreputable": {
+    "message": "மதிப்பற்றது",
+    "description": "An actual reason why a page was blocked"
   },
   "cloudPush": {
     "message": "மேகக்கணினி சேமிப்பகத்திற்கு ஏற்று",
@@ -1215,6 +1247,10 @@
     "message": "தற்காலிகமாகப் பெரிய ஒலி‍-ஒளி-படத்தொகுப்புகளின் கூறுகளை அனுமதி",
     "description": "A context menu entry, present when large media elements have been blocked on the current site"
   },
+  "contextMenuViewSource": {
+    "message": "மூலக் குறியீட்டைக் காண்க…",
+    "description": "A context menu entry, to view the source code of the target resource"
+  },
   "shortcutCapturePlaceholder": {
     "message": "குறுக்குவழியைத் தட்டச்சு செய்க",
     "description": "Placeholder string for input field used to capture a keyboard shortcut"
@@ -1234,6 +1270,10 @@
   "toggleCosmeticFiltering": {
     "message": "ஒப்பனை வடிகட்டுதலை மறுநிலைமாற்று",
     "description": "Label for keyboard shortcut used to toggle cosmetic filtering"
+  },
+  "toggleJavascript": {
+    "message": "JavaScript ஐ மாற்று",
+    "description": "Label for keyboard shortcut used to toggle no-scripting switch"
   },
   "relaxBlockingMode": {
     "message": "தடுப்பு பயன்முறையை தளர்த்தவும்",
@@ -1258,6 +1298,14 @@
   "clickToLoad": {
     "message": "ஏற்ற கிளிக் செய்க",
     "description": "Message used in frame placeholders"
+  },
+  "linterMainReport": {
+    "message": "தவறுகள்: {{count}}",
+    "description": "Summary of number of errors as reported by the linter "
+  },
+  "unprocessedRequestTooltip": {
+    "message": "உலாவி தொடக்கத்தில் சரியாக வடிகட்ட முடியவில்லை. சரியான வடிகட்டலை உறுதிசெய்ய பக்கத்தை மீண்டும் ஏற்றவும்.",
+    "description": "A warning which will appear in the popup panel if needed"
   },
   "dummy": {
     "message": "This entry must be the last one",

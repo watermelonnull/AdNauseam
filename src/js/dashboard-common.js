@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    uBlock Origin - a comprehensive, efficient content blocker
     Copyright (C) 2014-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,9 +19,7 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-/* global uDom */
-
-'use strict';
+import { dom } from './dom.js';
 
 /******************************************************************************/
 
@@ -113,18 +111,18 @@ self.uBlockDashboard.dateNowToSensibleString = function() {
 /******************************************************************************/
 
 self.uBlockDashboard.patchCodeMirrorEditor = (function() {
-    let grabFocusTimer;
     let grabFocusTarget;
 
     const grabFocus = function() {
         grabFocusTarget.focus();
-        grabFocusTimer = grabFocusTarget = undefined;
+        grabFocusTarget = undefined;
     };
+
+    const grabFocusTimer = vAPI.defer.create(grabFocus);
+
     const grabFocusAsync = function(cm) {
         grabFocusTarget = cm;
-        if ( grabFocusTimer === undefined ) {
-            grabFocusTimer = vAPI.setTimeout(grabFocus, 1);
-        }
+        grabFocusTimer.on(1);
     };
 
     // https://github.com/gorhill/uBlock/issues/3646
@@ -196,7 +194,7 @@ self.uBlockDashboard.openOrSelectPage = function(url, options = {}) {
     let ev;
     if ( url instanceof MouseEvent ) {
         ev = url;
-        url = ev.target.getAttribute('href');
+        url = dom.attr(ev.target, 'href');
     } 
     const details = Object.assign({ url, select: true, index: -1 }, options);
     vAPI.messaging.send('default', {
@@ -211,5 +209,5 @@ self.uBlockDashboard.openOrSelectPage = function(url, options = {}) {
 /******************************************************************************/
 
 // Open links in the proper window
-uDom('a').attr('target', '_blank');
-uDom('a[href*="dashboard.html"]').attr('target', '_parent');
+dom.attr('a', 'target', '_blank');
+dom.attr('a[href*="dashboard.html"]', 'target', '_parent');

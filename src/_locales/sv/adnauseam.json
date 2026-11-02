@@ -36,15 +36,15 @@
     "description": "Message asking user to confirm reset"
   },
   "adnFirstRunHideAllAdsDescription": {
-    "message": "dölj annonser i dina valda <span class='link' id='To3pfilter'>filterlistor</span>",
+    "message": "dölj annonser i dina valda <span class='link' id='To3pfilter'>filterlistor<\/span>",
     "description": "English: Firstrun.html -> Hide Ads in your selected filter lists"
   },
   "adnFirstRunClickingAdsDescription": {
-    "message": "Registrera besökta annonser hittade via dina <span class='link' id='To3pfilter'>filterlistor</span>",
+    "message": "Registrera besökta annonser hittade via dina <span class='link' id='To3pfilter'>filterlistor<\/span>",
     "description": "English: Firstrun.html -> Register visits on Ads found via your filter lists"
   },
   "adnFirstRunBlockingMalwareDescription": {
-    "message": "Blockera trackers och annan skadlig kod (<span>Anpassa</span>)",
+    "message": "Blockera trackers och annan skadlig kod (<span>Anpassa<\/span>)",
     "description": "English: Firstrun.html -> Block trackers and other malware (customize)"
   },
   "adnNotificationReactivate": {
@@ -96,24 +96,28 @@
     "description": "English: Notifications -> You have allowed adnauseam to have access to your online activities while private browsing."
   },
   "adnNotificationDNTAllowed": {
-    "message": "Sidan respekterar <b>Spåra inte</b>, annonser är tillåtna.",
+    "message": "Sidan respekterar <b>Spåra inte<\/b>, annonser är tillåtna.",
     "description": "English: Notifications -> This page respects Do Not Track, Ads are allowed."
   },
   "adnNotificationDNTHidingNotClicking": {
-    "message": "Sidan respekterar <b>Spåra inte</b>, dölja inte klicka.",
+    "message": "Sidan respekterar <b>Spåra inte<\/b>, dölja inte klicka.",
     "description": "English: Notifications -> This page respects Do Not Track, hiding not clicking."
   },
   "adnNotificationDNTClickingNotHiding": {
-    "message": "Sidan respekterar <b>Spåra inte</b>, klicka inte dölja",
+    "message": "Sidan respekterar <b>Spåra inte<\/b>, klicka inte dölja",
     "description": "English: Notifications -> This page respects Do Not Track, clicking not hiding."
   },
   "adnNotificationDNTJustSoYouKnow": {
-    "message": "Sidan respekterar <b>Spåra inte</b>, bara så du vet.",
+    "message": "Sidan respekterar <b>Spåra inte<\/b>, bara så du vet.",
     "description": "English: Notifications -> This page respects Do Not Track, just so you know."
   },
   "adnNotificationShowAdsDebug": {
-    "message": "The Advanced Setting \"Show Ads Debug\" is turned on",
+    "message": "Den avancerade inställningen \"Visa annonsfelsökning\" är på",
     "description": "English: Notifications -> The Advanced Setting \"Show Ads Debug\" is turned on"
+  },
+  "adnNewerVersionAvailableNotification": {
+    "message": "En ny version av AdNauseam har släppts ",
+    "description": "English: Notifications -> A newer version of AdNauseam is available"
   },
   "adnTarget": {
     "message": "MÅL",
@@ -153,7 +157,7 @@
   },
   "adnPausedOnPage": {
     "message": "AdNauseam är pausat på den här sidan",
-    "description": "English: Menu->display when paused on page/site"
+    "description": "English: Menu->display when paused on page\/site"
   },
   "adnNotHiding": {
     "message": "AdNauseam döljer inte annonser för närvarande",
@@ -168,35 +172,35 @@
     "description": "appears in ADN vault, above ad slider"
   },
   "topAdnetworks": {
-    "message": "Top Ad Networks",
-    "description": "appears in ADN vault/My Statistics"
+    "message": "Topp annonsnätverk",
+    "description": "appears in ADN vault\/My Statistics"
   },
   "topSites": {
     "message": "Topp sajter",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypes": {
     "message": "Annonstyper",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesImageAds": {
     "message": "Annonser för bild",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adTypesTextAds": {
     "message": "Text annonser",
-    "description": "appears in ADN vault/My Statistics"
+    "description": "appears in ADN vault\/My Statistics"
   },
   "adnShowingRecentAds": {
     "message": "Inga annonser insamlade på denna sida (visar senaste)",
     "description": "shown in menu when only 'recent' Ads are shown"
   },
   "adnThisPageStrictBlocked": {
-    "message": "{{domain}} is currently strict-blocked.",
+    "message": "{{domain}} är för närvarande strikt blockerad.",
     "description": "shown in menu when the current page is strict-blocked"
   },
   "adnStrictBlockListDescription": {
-    "message": "The strict-block list serves to help the users to strict-block specific domains or pages more easily.",
+    "message": "Strikt-blockerade-listan hjälper användarna att enklare blockera specifika domäner eller sidor.",
     "description": "Description on the strict-block list tab, which is found on the dashboard"
   },
   "adnExportedAdsFilename": {
@@ -216,7 +220,7 @@
     "description": "appears in ADN settings"
   },
   "adnPurgeConfirm": {
-    "message": "This action will permanently remove all ads with load image error. Make sure your internet is connected, otherwise all your ads will be deleted.",
+    "message": "Denna handling kommer att permanent ta bort alla annonser där bilden in kan laddas. Det är rekommenderat att göra en säkerhetskopia av ditt valv innan du rensar och att ha en stabil internet uppkoppling.",
     "description": "appears in ADN settings"
   },
   "adnAdClickingStatusPending": {
@@ -268,23 +272,23 @@
     "description": "appears in ADN popup menu three state button"
   },
   "adnMenuDisable": {
-    "message": "Disable",
+    "message": "Inaktivera",
     "description": "Disabled Adnauseam -> appears in ADN popup menu three state button"
   },
   "adnMenuActive": {
-    "message": "Active",
+    "message": "Aktiv",
     "description": "Make Adnauseam Active -> appears in ADN popup menu three state button"
   },
   "adnMenuStrict": {
-    "message": "Strict",
+    "message": "Strikt",
     "description": "Activate Strict-Block -> appears in ADN popup menu three state button"
   },
   "adnMenuDisableScopeDomain": {
-    "message": "on {{domain}}",
+    "message": "på {{domain}}",
     "description": "Disable AdNaueam Block On this Domain -> Popup option that appears inside ADN menu"
   },
   "adnMenuDisableScopePage": {
-    "message": "on this page",
+    "message": "på denna sida",
     "description": "Disable AdNaueam Block On This Page -> Popup option that appears inside ADN menu"
   },
   "adnMenuSettings": {
@@ -356,8 +360,20 @@
     "description": "appears on vault page"
   },
   "adnPurgeDeadAds": {
-    "message": "Purge Dead Ads",
+    "message": "Rensa döda reklamer",
     "description": "appears on vault page"
+  },
+  "adnShowDeadAds": {
+    "message": "Visa döda annonser",
+    "description": "appears on vault page"
+  },
+  "adnHideDeadAds": {
+    "message": "Dölj döda annonser",
+    "description": "appears on vault page"
+  },
+  "adnCaptureVault": {
+    "message": "Fånga",
+    "description": "appears on vault page in dev mode"
   },
   "adnVaultFound": {
     "message": "{{total}} annonser insamlade",
@@ -444,7 +460,7 @@
     "description": "English: Don't hide non-tracking Ads"
   },
   "disableClickingForDNTPrompt": {
-    "message": "Klicka på inte annonser utan spårning",
+    "message": "Klicka inte på icke-spårande annonser",
     "description": "English: Don't click non-tracking Ads"
   },
   "extName": {
@@ -475,24 +491,36 @@
     "message": "Uppdatera",
     "description": "English: update"
   },
+  "adnUpdateButton": {
+    "message": "Uppdatera",
+    "description": "English: update"
+  },
   "whitelistPageName": {
     "message": "Vitlistor",
     "description": "appears as tab name in dashboard"
   },
   "strictBlockListPageName": {
-    "message": "Strict-Block List",
+    "message": "Strikt-blockerade-listan",
     "description": "appears as tab name in dashboard"
   },
   "eventLoggingPrompt": {
-    "message": "Aktivera felsökningsläge",
+    "message": "Felsökningsläge",
     "description": "prompt for toggle"
   },
   "disableWarnings": {
     "message": "Inaktivera varningar",
     "description": "English:Disable warnings"
   },
+  "blurCollectedAds": {
+    "message": "Sudda insamlade annonser",
+    "description": "English: Blur Collected ads"
+  },
+  "hideDeadAds": {
+    "message": "Dölj döda annonser",
+    "description": "English: Hide Dead ads"
+  },
   "showAdsDebugPrompt": {
-    "message": "Show ads for ad-collection debugging",
+    "message": "Visa annonser för annons-samlingsfelsökning",
     "description": "English: Show ads for ad-collection debugging"
   },
   "removeAdsInPrivate": {
@@ -500,7 +528,27 @@
     "description": "English:Remove ads collected in private mode - settings page"
   },
   "settingsStrictBlockingMode": {
-    "message": "Activate Strict-Blocking Mode",
+    "message": "Aktivera strikt blockeringsläge",
     "description": "English: Activate Strict-Blocking Mode"
+  },
+  "adnRefreshButton": {
+    "message": "Uppdatera",
+    "description": "English: refresh page from menu notification button"
+  },
+  "adnRefreshNotification": {
+    "message": "Tillämpa ändringar på nuvarande sida",
+    "description": "English: refresh page from menu notification"
+  },
+  "supportS6P3S1": {
+    "message": "Se till att problemet är relaterat till <b>AdNauseam<\/b>",
+    "description": "A paragraph in the filter issue reporter section"
+  },
+  "supportS6P3S2": {
+    "message": "Jag har provat samma webbsida på <a url='https:\/\/github.com\/gorhill\/uBlock'>#uBO#<\/a> och kan bekräfta att problemet är relaterat till <b>AdNauseam<\/b>.",
+    "description": "A checkbox in the filter issue reporter section"
+  },
+  "supportS6Select1Option7": {
+    "message": "Annonser ej insamlade ",
+    "description": "Ads are present on page but none are collected"
   }
 }

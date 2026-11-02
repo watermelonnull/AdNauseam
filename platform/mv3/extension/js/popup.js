@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    uBlock Origin - a browser extension to block requests.
+    AdNauseam Lite - a comprehensive, MV3-compliant content blocker
     Copyright (C) 2022-present Raymond Hill
 
     This program is free software: you can redistribute it and/or modify
@@ -19,59 +19,67 @@
     Home: https://github.com/gorhill/uBlock
 */
 
-/* jshint esversion:11 */
-
-'use strict';
-
-/******************************************************************************/
-
-import { browser, sendMessage } from './ext.js';
+import { browser, runtime, sendMessage } from './ext.js';
 import { dom, qs$ } from './dom.js';
 import { i18n$ } from './i18n.js';
-import { simpleStorage } from './storage.js';
+import punycode from './punycode.js';
 
 /******************************************************************************/
 
 const popupPanelData = {};
 const  currentTab = {};
-let tabHostname = '';
+const tabURL = new URL(runtime.getURL('/'));
 
 /******************************************************************************/
 
-function normalizedHostname(hn) {
-    return hn.replace(/^www\./, '');
+function renderAdminRules() {
+    const { disabledFeatures: forbid = [] } = popupPanelData;
+    if ( forbid.length === 0 ) { return; }
+    dom.body.dataset.forbid = forbid.join(' ');
 }
 
 /******************************************************************************/
 
 const BLOCKING_MODE_MAX = 3;
 
-function setFilteringMode(level, commit = false) {
+async function setFilteringMode(level, commit = false) {
     const modeSlider = qs$('.filteringModeSlider');
     modeSlider.dataset.level = level;
     if ( qs$('.filteringModeSlider.moving') === null ) {
         dom.text(
-            qs$('#filteringModeText > span:nth-of-type(1)'),
+            '#filteringModeText > span:nth-of-type(1)',
             i18n$(`filteringMode${level}Name`)
         );
     }
     if ( commit !== true ) { return; }
-    commitFilteringMode();
+    dom.cl.add(dom.body, 'busy');
+    await commitFilteringMode();
+    dom.cl.remove(dom.body, 'busy');
 }
 
 async function commitFilteringMode() {
-    if ( tabHostname === '' ) { return; }
-    const targetHostname = normalizedHostname(tabHostname);
+    if ( tabURL.hostname === '' ) { return; }
+    const targetHostname = tabURL.hostname;
     const modeSlider = qs$('.filteringModeSlider');
     const afterLevel = parseInt(modeSlider.dataset.level, 10);
     const beforeLevel = parseInt(modeSlider.dataset.levelBefore, 10);
     if ( afterLevel > 1 ) {
+        if ( beforeLevel <= 1 ) {
+            sendMessage({
+                what: 'setPendingFilteringMode',
+                tabId: currentTab.id,
+                url: tabURL.href,
+                hostname: targetHostname,
+                beforeLevel,
+                afterLevel,
+            });
+        }
         let granted = false;
         try {
             granted = await browser.permissions.request({
                 origins: [ `*://*.${targetHostname}/*` ],
             });
-        } catch(ex) {
+        } catch {
         }
         if ( granted !== true ) {
             setFilteringMode(beforeLevel);
@@ -79,7 +87,7 @@ async function commitFilteringMode() {
         }
     }
     dom.text(
-        qs$('#filteringModeText > span:nth-of-type(1)'),
+        '#filteringModeText > span:nth-of-type(1)',
         i18n$(`filteringMode${afterLevel}Name`)
     );
     const actualLevel = await sendMessage({
@@ -91,7 +99,14 @@ async function commitFilteringMode() {
         setFilteringMode(actualLevel);
     }
     if ( actualLevel !== beforeLevel && popupPanelData.autoReload ) {
-        browser.tabs.reload(currentTab.id);
+        const justReload = tabURL.href === currentTab.url;
+        self.setTimeout(( ) => {
+            if ( justReload ) {
+                browser.tabs.reload(currentTab.id);
+            } else {
+                browser.tabs.update(currentTab.id, { url: tabURL.href });
+            }
+        }, 437);
     }
 }
 
@@ -112,7 +127,7 @@ async function commitFilteringMode() {
         const modeSlider = qs$('.filteringModeSlider');
         if ( `${level}` === modeSlider.dataset.level ) { return; }
         dom.text(
-            qs$('#filteringModeText > span:nth-of-type(2)'),
+            '#filteringModeText > span:nth-of-type(2)',
             i18n$(`filteringMode${level}Name`)
         );
         setFilteringMode(level);
@@ -131,7 +146,7 @@ async function commitFilteringMode() {
         dom.cl.remove(modeSlider, 'moving');
         self.removeEventListener('mousemove', moveAsync, { capture: true });
         self.removeEventListener('mouseup', stop, { capture: true });
-        dom.text(qs$('#filteringModeText > span:nth-of-type(2)'), '');
+        dom.text('#filteringModeText > span:nth-of-type(2)', '');
         commitFilteringMode();
         ev.stopPropagation();
         ev.preventDefault();
@@ -160,11 +175,11 @@ async function commitFilteringMode() {
         ev.preventDefault();
     };
 
-    dom.on(qs$('.filteringModeButton'), 'mousedown', startSliding);
+    dom.on('.filteringModeButton', 'mousedown', startSliding);
 }
 
 dom.on(
-    qs$('.filteringModeSlider'),
+    '.filteringModeSlider',
     'click',
     '.filteringModeSlider span[data-level]',
     ev => {
@@ -176,141 +191,289 @@ dom.on(
     }
 );
 
-dom.on(
-    qs$('.filteringModeSlider'),
-    'mouseenter',
-    '.filteringModeSlider span[data-level]',
-    ev => {
-        const span = ev.target;
-        const level = parseInt(span.dataset.level, 10);
-        dom.text(
-            qs$('#filteringModeText > span:nth-of-type(2)'),
-            i18n$(`filteringMode${level}Name`)
-        );
-    }
-);
+if ( dom.cl.has(dom.html, 'mobile') === false ) {
+    dom.on('.filteringModeSlider',
+        'mouseenter',
+        '.filteringModeSlider span[data-level]',
+        ev => {
+            const span = ev.target;
+            const level = parseInt(span.dataset.level, 10);
+            dom.text('#filteringModeText > span:nth-of-type(2)',
+                i18n$(`filteringMode${level}Name`)
+            );
+        }
+    );
 
-dom.on(
-    qs$('.filteringModeSlider'),
-    'mouseleave',
-    '.filteringModeSlider span[data-level]',
-    ( ) => {
-        dom.text(qs$('#filteringModeText > span:nth-of-type(2)'), '');
-    }
-);
+    dom.on('.filteringModeSlider',
+        'mouseleave',
+        '.filteringModeSlider span[data-level]',
+        ( ) => {
+            dom.text('#filteringModeText > span:nth-of-type(2)', '');
+        }
+    );
+}
 
 /******************************************************************************/
 
-// The popup panel is made of sections. Visibility of sections can be
-// toggled on/off.
+dom.on('#gotoMatchedRules', 'click', ev => {
+    if ( ev.isTrusted !== true ) { return; }
+    if ( ev.button !== 0 ) { return; }
+    sendMessage({
+        what: 'showMatchedRules',
+        tabId: currentTab.id,
+    });
+});
 
-const maxNumberOfSections = 2;
+/******************************************************************************/
 
-const sectionBitsFromAttribute = function() {
-    const value = dom.body.dataset.section;
-    if ( value === '' ) { return 0; }
-    let bits = 0;
-    for ( const c of value.split(' ') ) {
-        bits |= 1 << (c.charCodeAt(0) - 97);
+dom.on('#gotoReport', 'click', ev => {
+    if ( ev.isTrusted !== true ) { return; }
+    let url;
+    try {
+        url = new URL(currentTab.url);
+    } catch {
     }
-    return bits;
-};
+    if ( url === undefined ) { return; }
+    const reportURL = new URL(runtime.getURL('/report.html'));
+    reportURL.searchParams.set('tabid', currentTab.id);
+    reportURL.searchParams.set('url', tabURL.href);
+    reportURL.searchParams.set('mode', popupPanelData.level);
+    sendMessage({
+        what: 'gotoURL',
+        url: `${reportURL.pathname}${reportURL.search}`,
+    });
+});
 
-const sectionBitsToAttribute = function(bits) {
-    if ( typeof bits !== 'number' ) { return; }
-    if ( isNaN(bits) ) { return; }
-    const value = [];
-    for ( let i = 0; i < maxNumberOfSections; i++ ) {
-        const bit = 1 << i;
-        if ( (bits & bit) === 0 ) { continue; }
-        value.push(String.fromCharCode(97 + i));
-    }
-    dom.body.dataset.section = value.join(' ');
-};
+/******************************************************************************/
 
-async function toggleSections(more) {
-    let currentBits = sectionBitsFromAttribute();
-    let newBits = currentBits;
-    for ( let i = 0; i < maxNumberOfSections; i++ ) {
-        const bit = 1 << (more ? i : maxNumberOfSections - i - 1);
-        if ( more ) {
-            newBits |= bit;
-        } else {
-            newBits &= ~bit;
+dom.on('#gotoDashboard', 'click', ev => {
+    if ( ev.isTrusted !== true ) { return; }
+    if ( ev.button !== 0 ) { return; }
+    runtime.openOptionsPage();
+});
+
+/******************************************************************************/
+
+dom.on('#gotoZapper', 'click', ( ) => {
+    if ( browser.scripting === undefined ) { return; }
+    browser.scripting.executeScript({
+        files: [ '/js/scripting/tool-overlay.js', '/js/scripting/zapper.js' ],
+        target: { tabId: currentTab.id },
+    });
+    self.close();
+});
+
+/******************************************************************************/
+
+dom.on('#gotoPicker', 'click', ( ) => {
+    if ( browser.scripting === undefined ) { return; }
+    browser.scripting.executeScript({
+        files: [
+            '/js/scripting/css-procedural-api.js',
+            '/js/scripting/tool-overlay.js',
+            '/js/scripting/picker.js',
+        ],
+        target: { tabId: currentTab.id },
+    });
+    self.close();
+});
+
+/******************************************************************************/
+
+dom.on('#gotoUnpicker', 'click', ( ) => {
+    if ( browser.scripting === undefined ) { return; }
+    browser.scripting.executeScript({
+        files: [
+            '/js/scripting/css-procedural-api.js',
+            '/js/scripting/tool-overlay.js',
+            '/js/scripting/unpicker.js',
+        ],
+        target: { tabId: currentTab.id },
+    });
+    self.close();
+});
+
+
+/******************************************************************************/
+// AdNauseam Vault Integration
+/******************************************************************************/
+
+async function updateAdNauseamStats() {
+    try {
+        const response = await sendMessage({ what: 'getAdNauseamStats' });
+        if (response) {
+            dom.text('#adn-total-ads', response.totalAds || 0);
+            dom.text('#adn-total-clicks', response.totalClicks || 0);
         }
-        if ( newBits !== currentBits ) { break; }
+    } catch (error) {
+        console.error('[ADN Popup] Failed to get stats:', error);
     }
-    if ( newBits === currentBits ) { return; }
-    sectionBitsToAttribute(newBits);
-    simpleStorage.setItem('popupPanelSections', newBits);
 }
 
-simpleStorage.getItem('popupPanelSections').then(s => {
-    sectionBitsToAttribute(parseInt(s, 10) || 0);
+function adStatusText(ad) {
+    if (ad.visitedTs > 0) return 'visited';
+    if (ad.visitedTs < 0) return 'failed';
+    if (ad.noVisit) return 'no-visit';
+    if (ad.dntAllowed) return 'dnt';
+    return 'pending';
+}
+
+function adStatusLabel(ad) {
+    const status = adStatusText(ad);
+    const labels = {
+        'visited': 'Visited',
+        'failed': 'Failed',
+        'no-visit': 'Skipped',
+        'dnt': 'DNT',
+        'pending': 'Pending'
+    };
+    return labels[status] || 'Pending';
+}
+
+async function renderVault() {
+    try {
+        const ads = await sendMessage({ what: 'adsForVault' });
+        const vaultList = qs$('#adn-vault-list');
+
+        if (!ads || ads.length === 0) {
+            vaultList.innerHTML = '<div class="adn-vault-empty">No ads collected yet</div>';
+            return;
+        }
+
+        // Sort by foundTs descending, show most recent 20
+        const sorted = ads.sort((a, b) => (b.foundTs || 0) - (a.foundTs || 0));
+        const recentAds = sorted.slice(0, 20);
+
+        vaultList.innerHTML = recentAds.map(ad => {
+            let displayUrl = '';
+            try {
+                displayUrl = ad.targetUrl ? new URL(ad.targetUrl).hostname : '';
+            } catch (e) {
+                displayUrl = ad.targetDomain || '';
+            }
+
+            // Get image source from contentData (MV2 format) or direct fields
+            const imgSrc = (ad.contentData && ad.contentData.src) || ad.imgSrc;
+            const imgWidth = (ad.contentData && ad.contentData.width) || ad.imgWidth;
+            const imgHeight = (ad.contentData && ad.contentData.height) || ad.imgHeight;
+            const title = (ad.contentData && ad.contentData.title) || ad.title || 'Untitled Ad';
+            const text = (ad.contentData && ad.contentData.text) || ad.text || '';
+
+            const imgHtml = imgSrc
+                ? `<img src="${imgSrc}" class="adn-vault-img" onerror="this.style.display='none'">`
+                : '';
+
+            const status = adStatusText(ad);
+            const statusLabel = adStatusLabel(ad);
+
+            return `
+                <div class="adn-vault-item ${status}">
+                    ${imgHtml}
+                    <div class="adn-vault-details">
+                        <div class="adn-vault-title">${title}</div>
+                        ${text ? `<div class="adn-vault-text">${text.substring(0, 60)}</div>` : ''}
+                        <div class="adn-vault-url">${displayUrl}</div>
+                        <div class="adn-vault-status ${status}">
+                            ${statusLabel}
+                            ${imgWidth > 0 ? ` &bull; ${imgWidth}&times;${imgHeight}` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+    } catch (error) {
+        console.error('[ADN Popup] Failed to render vault:', error);
+    }
+}
+
+dom.on('#adn-toggle-vault', 'click', async () => {
+    const vaultList = qs$('#adn-vault-list');
+    const isHidden = dom.cl.has(vaultList, 'hidden');
+
+    if (isHidden) {
+        dom.cl.remove(vaultList, 'hidden');
+        await renderVault();
+    } else {
+        dom.cl.add(vaultList, 'hidden');
+    }
 });
 
-dom.on(qs$('#moreButton'), 'click', ( ) => {
-    toggleSections(true);
+dom.on('#adn-clear-vault', 'click', async () => {
+    if (!confirm('Clear all ads from vault?')) return;
+
+    try {
+        await sendMessage({ what: 'clearAds' });
+        await updateAdNauseamStats();
+        const vaultList = qs$('#adn-vault-list');
+        if (!dom.cl.has(vaultList, 'hidden')) {
+            await renderVault();
+        }
+    } catch (error) {
+        console.error('[ADN Popup] Failed to clear vault:', error);
+    }
 });
 
-dom.on(qs$('#lessButton'), 'click', ( ) => {
-    toggleSections(false);
-});
+// Update stats when popup opens
+async function initAdNauseam() {
+    await updateAdNauseamStats();
+    // Update stats every 2 seconds while popup is open
+    setInterval(updateAdNauseamStats, 2000);
+}
 
 /******************************************************************************/
 
 async function init() {
-    const [ tab ] = await browser.tabs.query({ active: true });
+    const [ tab ] = await browser.tabs.query({
+        active: true,
+        currentWindow: true,
+    });
     if ( tab instanceof Object === false ) { return true; }
     Object.assign(currentTab, tab);
 
     let url;
     try {
+        const strictBlockURL = runtime.getURL('/strictblock.');
         url = new URL(currentTab.url);
-        tabHostname = url.hostname || '';
-    } catch(ex) {
+        if ( url.href.startsWith(strictBlockURL) ) {
+            url = new URL(url.hash.slice(1));
+        }
+        tabURL.href = url.href || '';
+    } catch {
+        return false;
     }
 
     if ( url !== undefined ) {
         const response = await sendMessage({
             what: 'popupPanelData',
             origin: url.origin,
-            hostname: normalizedHostname(tabHostname),
+            hostname: tabURL.hostname,
         });
         if ( response instanceof Object ) {
             Object.assign(popupPanelData, response);
         }
     }
 
+    renderAdminRules();
+
     setFilteringMode(popupPanelData.level);
 
-    dom.text(qs$('#hostname'), tabHostname);
+    dom.text('#hostname', punycode.toUnicode(tabURL.hostname));
 
-    const parent = qs$('#rulesetStats');
-    for ( const details of popupPanelData.rulesetDetails || [] ) {
-        const div = qs$('#templates .rulesetDetails').cloneNode(true);
-        dom.text(qs$('h1', div), details.name);
-        const { rules, filters, css } = details;
-        let ruleCount = rules.plain + rules.regex;
-        if ( popupPanelData.hasOmnipotence ) {
-            ruleCount += rules.removeparam + rules.redirect + rules.csp;
-        }
-        let specificCount = 0;
-        if ( css.specific instanceof Object ) {
-            specificCount += css.specific.domainBased;
-            specificCount += css.specific.entityBased;
-        }
-        dom.text(
-            qs$('p', div),
-            i18n$('perRulesetStats')
-                .replace('{{ruleCount}}', ruleCount.toLocaleString())
-                .replace('{{filterCount}}', filters.accepted.toLocaleString())
-                .replace('{{cssSpecificCount}}', specificCount.toLocaleString())
-        );
-        parent.append(div);
-    }
+    dom.cl.toggle('#gotoMatchedRules', 'enabled',
+        popupPanelData.isSideloaded === true &&
+        popupPanelData.developerMode &&
+        typeof currentTab.id === 'number' &&
+        isNaN(currentTab.id) === false
+    );
 
-    dom.cl.remove(dom.body, 'loading');
+    const isHTTP = url.protocol === 'http:' || url.protocol === 'https:';
+    dom.cl.toggle(dom.root, 'isHTTP', isHTTP);
+
+    dom.cl.toggle('#gotoUnpicker', 'enabled', popupPanelData.hasCustomFilters);
+
+		// adn
+		await initAdNauseam();
 
     return true;
 }
@@ -318,8 +481,10 @@ async function init() {
 async function tryInit() {
     try {
         await init();
-    } catch(ex) {
+    } catch {
         setTimeout(tryInit, 100);
+    } finally {
+        dom.cl.remove(dom.body, 'loading', 'busy');
     }
 }
 
